@@ -1,0 +1,1068 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} 报警存储管理 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+<style>
+    :root {
+        --xc-primary: #10b981;
+        --xc-primary-light: #34d399;
+        --xc-primary-dark: #059669;
+        --xc-warning: #f59e0b;
+        --xc-danger: #ef4444;
+        --xc-gray-100: #f9fafb;
+        --xc-gray-200: #f3f4f6;
+        --xc-gray-300: #e5e7eb;
+        --xc-gray-400: #9ca3af;
+        --xc-gray-500: #6b7280;
+        --xc-gray-600: #4b5563;
+        --xc-gray-700: #374151;
+        --xc-white: #FFFFFF;
+        --xc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --xc-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --xc-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --xc-radius-sm: 4px;
+        --xc-radius: 6px;
+        --xc-radius-lg: 8px;
+        --xc-radius-xl: 12px;
+        --xc-transition: all 0.2s ease;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .xc_container {
+        color: #333;
+        line-height: 1.6;
+        margin: 0 auto;
+        padding: 10px 20px;
+    }
+
+    .xc_toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .xc_page-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1D2129;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .xc_page-title i {
+        color: var(--xc-primary);
+    }
+
+    .xc_btn-modern {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .xc_btn-modern:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    .xc_btn-modern i {
+        font-size: 14px;
+    }
+
+    .xc_btn-primary {
+        background: white;
+        color: #169F85;
+        border-color: #169F85;
+    }
+
+    .xc_btn-primary:hover {
+        background: #f0fdfa;
+        border-color: #14b89a;
+        color: #14b89a;
+    }
+
+    .xc_table-container {
+        overflow-x: auto;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        background: white;
+    }
+
+    .xc_table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .xc_table-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .xc_table-header th {
+        padding: 14px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #334155;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .xc_table-body tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.2s;
+    }
+
+    .xc_table-body tr:last-child {
+        border-bottom: none;
+    }
+
+    .xc_table-body tr:hover {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .xc_table-body td {
+        padding: 14px 16px;
+        color: #374151;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    .xc_interface-id {
+        display: inline-block;
+        padding: 4px 10px;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #475569;
+        font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+        font-weight: 500;
+    }
+
+    .xc_interface-code {
+        font-weight: 500;
+        color: #374151;
+        font-family: monospace;
+        font-size: 14px;
+    }
+
+    .xc_interface-name {
+        font-weight: 500;
+        color: #374151;
+        font-size: 14px;
+    }
+
+    .xc_badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .xc_badge-yes {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .xc_badge-no {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+
+    .xc_server-type {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .xc_server-text {
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .xc_time-text {
+        font-size: 13px;
+        color: #6b7280;
+        font-family: monospace;
+    }
+
+    .xc_action-group {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .xc_btn-action {
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+        font-weight: 500;
+    }
+
+    .xc_btn-action:hover {
+        background: #f0f9ff;
+        border-color: #3b82f6;
+        color: #3b82f6;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+    }
+
+    .xc_btn-action.delete:hover {
+        background: #fef2f2;
+        border-color: #ef4444;
+        color: #ef4444;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+    }
+
+    .xc_btn-action.test:hover {
+        background: #f0fdf4;
+        border-color: #10b981;
+        color: #10b981;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+    }
+
+    .xc_empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--xc-gray-400);
+    }
+
+    .xc_empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    .xc_empty-state p {
+        font-size: 16px;
+    }
+
+    .xc_loading-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #e5e7eb;
+        border-top-color: var(--xc-primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .xc_loading-text {
+        color: var(--xc-gray-500);
+        font-size: 14px;
+    }
+
+    .xc_modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        animation: xc_fadeIn 0.2s ease;
+        backdrop-filter: blur(2px);
+    }
+
+    .xc_modal-overlay.active {
+        display: block;
+    }
+
+    @keyframes xc_fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .xc_modal-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 720px;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+        animation: xc_slideIn 0.3s ease;
+    }
+
+    @keyframes xc_slideIn {
+        from {
+            transform: translate(-50%, -48%);
+            opacity: 0;
+        }
+        to {
+            transform: translate(-50%, -50%);
+            opacity: 1;
+        }
+    }
+
+    .xc_modal-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #e5e7eb;
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-radius: 12px 12px 0 0;
+        position: relative;
+    }
+
+    .xc_modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .xc_modal-title i {
+        color: #3b82f6;
+        font-size: 18px;
+    }
+
+    .xc_modal-close {
+        position: absolute;
+        top: 14px;
+        right: 20px;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .xc_modal-close:hover {
+        background: #e2e8f0;
+        color: #334155;
+        transform: rotate(90deg);
+    }
+
+    .xc_modal-body {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+    }
+
+    .xc_form-group {
+        margin-bottom: 18px;
+    }
+
+    .xc_form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .xc_form-label .required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+
+    .xc_form-input {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        transition: all 0.2s;
+        height: 42px;
+        box-sizing: border-box;
+    }
+
+    .xc_form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .xc_form-input:disabled {
+        background: #f8fafc;
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    .xc_form-textarea {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        transition: all 0.2s;
+        resize: vertical;
+        min-height: 80px;
+        box-sizing: border-box;
+        font-family: inherit;
+        line-height: 1.5;
+    }
+
+    .xc_form-textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .xc_radio-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .xc_radio-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        background: #fafafa;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .xc_radio-item:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+    .xc_radio-item input[type="radio"] {
+        width: 15px;
+        height: 15px;
+        cursor: pointer;
+        margin: 0;
+        accent-color: #3b82f6;
+    }
+
+    .xc_radio-item label {
+        font-size: 13px;
+        color: #374151;
+        cursor: pointer;
+        margin: 0;
+        user-select: none;
+    }
+
+    .xc_radio-item input[type="radio"]:checked + label {
+        color: #3b82f6;
+        font-weight: 500;
+    }
+
+    .xc_modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #e5e7eb;
+        text-align: right;
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-radius: 0 0 12px 12px;
+    }
+
+    .xc_modal-btn {
+        padding: 10px 24px;
+        font-size: 14px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        margin-left: 12px;
+        transition: all 0.2s;
+        font-weight: 600;
+    }
+
+    .xc_modal-btn-cancel {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .xc_modal-btn-cancel:hover {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .xc_modal-btn-submit {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    .xc_modal-btn-submit:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        transform: translateY(-1px);
+    }
+
+    .xc_test-modal-container {
+        max-width: 900px !important;
+        width: 90% !important;
+        max-height: 90vh !important;
+    }
+
+    .xc_test-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        min-height: 550px;
+    }
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+   <div class="xc_container">
+        <div class="xc_toolbar">
+            <div class="xc_page-title">
+                <i class="fa fa-plug"></i>
+                报警存储管理
+            </div>
+
+            <button class="xc_btn-modern xc_btn-primary" onclick="openAddModal()">
+                <i class="fa fa-plus"></i> 添加
+            </button>
+
+            <button class="xc_btn-modern" onclick="f_getNodeAlarmInterfaces()">
+                <i class="fa fa-refresh"></i> 刷新
+            </button>
+
+            <div>
+                <span id="top_loading" style="display: none;">
+                    <span class="xc_loading-spinner"></span>
+                    <span class="xc_loading-text">加载中...</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="xc_table-container" id="data">
+            <div class="xc_empty-state">
+                <i class="fa fa-plug"></i>
+                <p>请选择节点查看报警存储配置</p>
+            </div>
+        </div>
+    </div>
+              </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<div class="xc_modal-overlay" id="interfaceModal">
+    <div class="xc_modal-container">
+        <div class="xc_modal-header">
+            <div class="xc_modal-title">
+                <i class="fa fa-plug"></i>
+                <span id="modalTitle">添加存储</span>
+            </div>
+            <button class="xc_modal-close" onclick="closeInterfaceModal()">×</button>
+        </div>
+        <div class="xc_modal-body">
+            <div class="xc_form-group">
+                <label class="xc_form-label">编号</label>
+                <input type="text" id="input_code" class="xc_form-input" disabled>
+            </div>
+            
+            <div class="xc_form-group">
+                <label class="xc_form-label">名称<span class="required">*</span></label>
+                <input type="text" id="input_name" class="xc_form-input" placeholder="请输入名称">
+            </div>
+            
+            <div class="xc_form-group">
+                <label class="xc_form-label">是否保存本地<span class="required">*</span></label>
+                <div class="xc_radio-group">
+                    <label class="xc_radio-item">
+                        <input type="radio" id="save_local_no" name="is_save_local" value="0">
+                        <label for="save_local_no">不保存本地</label>
+                    </label>
+                    <label class="xc_radio-item">
+                        <input type="radio" id="save_local_yes" name="is_save_local" value="1" checked>
+                        <label for="save_local_yes">保存本地</label>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="xc_form-group">
+                <label class="xc_form-label">上传服务器类型<span class="required">*</span></label>
+                <div class="xc_radio-group">
+                    <label class="xc_radio-item">
+                        <input type="radio" id="server_type_0" name="request_server_type" value="0" checked>
+                        <label for="server_type_0">NO</label>
+                    </label>
+                    <label class="xc_radio-item">
+                        <input type="radio" id="server_type_1" name="request_server_type" value="1">
+                        <label for="server_type_1">HTTP</label>
+                    </label>
+                    <label class="xc_radio-item">
+                        <input type="radio" id="server_type_2" name="request_server_type" value="2">
+                        <label for="server_type_2">Redis</label>
+                    </label>
+                    <label class="xc_radio-item">
+                        <input type="radio" id="server_type_4" name="request_server_type" value="4">
+                        <label for="server_type_4">MongoDB</label>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="xc_form-group">
+                <label class="xc_form-label">上传服务器地址</label>
+                <input type="text" id="input_request_address" class="xc_form-input" placeholder="请输入服务器地址">
+            </div>
+            
+            <div class="xc_form-group">
+                <label class="xc_form-label">上传服务器参数</label>
+                <textarea id="input_request_params" class="xc_form-textarea" placeholder="请输入服务器参数"></textarea>
+            </div>
+            
+            <div class="xc_form-group">
+                <label class="xc_form-label">上传服务器内容扩展参数</label>
+                <textarea id="input_request_content_extend_params" class="xc_form-textarea" placeholder="请输入扩展参数"></textarea>
+            </div>
+        </div>
+        <div class="xc_modal-footer">
+            <button class="xc_modal-btn xc_modal-btn-cancel" onclick="closeInterfaceModal()">取消</button>
+            <button class="xc_modal-btn xc_modal-btn-submit" onclick="submitInterfaceForm()">提交</button>
+        </div>
+    </div>
+</div>
+
+<div class="xc_modal-overlay" id="testModal">
+    <div class="xc_modal-container xc_test-modal-container">
+        <div class="xc_modal-header">
+            <div class="xc_modal-title">
+                <i class="fa fa-play"></i>
+                <span>报警存储测试</span>
+            </div>
+            <button class="xc_modal-close" onclick="closeTestModal()">×</button>
+        </div>
+        <div class="xc_modal-body" style="padding: 0; overflow: hidden; flex: 1;">
+            <iframe id="testIframe" class="xc_test-iframe"></iframe>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+<script>
+    let eleTopLoading = $("#top_loading");
+    let eleData = $("#data");
+    let mNodeCode = "";
+    let mInterfaces = [];
+    let currentHandle = 'add';
+    let currentCode = '';
+
+    function initGlobalNode() {
+        var currentNode = window.GlobalNodeManager ? window.GlobalNodeManager.getCurrentNode() : null;
+        if (currentNode && currentNode.code) {
+            mNodeCode = currentNode.code;
+            f_getNodeAlarmInterfaces();
+        } else {
+            eleData.html("<div class='xc_empty-state'><i class='fa fa-server'></i><p>请在右上角选择节点</p></div>");
+        }
+    }
+
+    window.addEventListener('globalNodeChanged', function(e) {
+        mNodeCode = e.detail.code;
+        f_getNodeAlarmInterfaces();
+    });
+
+    $(document).ready(function() {
+        setTimeout(initGlobalNode, 500);
+    });
+
+    function f_getNodeAlarmInterfaces() {
+        if(!mNodeCode){
+            myToast2025("请选择节点！","error");
+            return;
+        }
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/alarmInterface/getNodeAlarmInterfaces',
+            type: "get",
+            async: true,
+            data: {"node_code": mNodeCode},
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast2025("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    mInterfaces = res.data || [];
+                    f_renderInterfaces();
+                }else{
+                    eleData.html("<div class='xc_empty-state'><i class='fa fa-exclamation-triangle'></i><p>"+res.msg+"</p></div>");
+                    myToast2025(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function f_renderInterfaces() {
+        if(mInterfaces.length === 0){
+            eleData.html("<div class='xc_empty-state'><i class='fa fa-plug'></i><p>暂无报警存储配置</p></div>");
+            return;
+        }
+
+        let html = "<table class='xc_table'>";
+        html += "<thead class='xc_table-header'>";
+        html += "<tr>";
+        html += "<th style='width: 60px;'>ID</th>";
+        html += "<th style='width: 150px;'>编号</th>";
+        html += "<th style='width: 150px;'>名称</th>";
+        html += "<th style='width: 100px;'>保存本地</th>";
+        html += "<th style='width: 120px;'>服务器类型</th>";
+        html += "<th style='width: 160px;'>更新时间</th>";
+        html += "<th style='width: 200px;'>操作</th>";
+        html += "</tr>";
+        html += "</thead>";
+        html += "<tbody class='xc_table-body'>";
+
+        for(let i = 0; i < mInterfaces.length; i++){
+            let d = mInterfaces[i];
+            html += "<tr>";
+            html += "<td><span class='xc_interface-id'>" + d.id + "</span></td>";
+            html += "<td><span class='xc_interface-code'>" + d.code + "</span></td>";
+            html += "<td><span class='xc_interface-name'>" + d.name + "</span></td>";
+            html += "<td>";
+            if(d.is_save_local == 1){
+                html += "<span class='xc_badge xc_badge-yes'>是</span>";
+            } else {
+                html += "<span class='xc_badge xc_badge-no'>否</span>";
+            }
+            html += "</td>";
+            html += "<td>";
+            html += "<div class='xc_server-type'>";
+            let serverTypeText = 'Other';
+            if(d.request_server_type == 0) serverTypeText = 'NO';
+            else if(d.request_server_type == 1) serverTypeText = 'HTTP';
+            else if(d.request_server_type == 2) serverTypeText = 'Redis';
+            else if(d.request_server_type == 3) serverTypeText = 'Kafka';
+            else if(d.request_server_type == 4) serverTypeText = 'MongoDB';
+            html += "<span class='xc_server-text'>" + serverTypeText + "</span>";
+            html += "</div>";
+            html += "</td>";
+            html += "<td><span class='xc_time-text'>" + (d.last_update_time || '-') + "</span></td>";
+            html += "<td>";
+            html += "<div class='xc_action-group'>";
+            html += "<button onclick=\"openEditModal('" + d.code + "')\" class='xc_btn-action' title='编辑'>";
+            html += "<i class='fa fa-edit'></i> 编辑";
+            html += "</button>";
+            html += "<button onclick=\"f_del('" + d.code + "')\" class='xc_btn-action delete' title='删除'>";
+            html += "<i class='fa fa-trash'></i> 删除";
+            html += "</button>";
+            html += "<button onclick=\"f_test('" + d.code + "')\" class='xc_btn-action test' title='测试'>";
+            html += "<i class='fa fa-play'></i> 测试";
+            html += "</button>";
+            html += "</div>";
+            html += "</td>";
+            html += "</tr>";
+        }
+
+        html += "</tbody>";
+        html += "</table>";
+
+        eleData.html(html);
+    }
+
+    function generateCode() {
+        let randomNum = Math.floor(Math.random() * 9000) + 1000;
+        let chars = '0123456789abcdef';
+        let randomStr = '';
+        for(let i = 0; i < 6; i++) {
+            randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return 'ai' + randomNum + randomStr;
+    }
+
+    function openAddModal() {
+        if(!mNodeCode){
+            myToast2025("请选择节点！","error");
+            return;
+        }
+
+        currentHandle = 'add';
+        currentCode = generateCode();
+        
+        $('#modalTitle').text('添加存储');
+        $('#input_code').val(currentCode);
+        $('#input_name').val('');
+        $('input[name="is_save_local"][value="1"]').prop('checked', true);
+        $('input[name="request_server_type"][value="0"]').prop('checked', true);
+        $('#input_request_address').val('');
+        $('#input_request_params').val('');
+        $('#input_request_content_extend_params').val('');
+        
+        $('#interfaceModal').addClass('active');
+    }
+
+    function openEditModal(code) {
+        if(!mNodeCode){
+            myToast2025("请选择节点！","error");
+            return;
+        }
+
+        currentHandle = 'edit';
+        currentCode = code;
+        
+        $('#modalTitle').text('编辑存储');
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/alarmInterface/openInfo',
+            type: 'get',
+            data: {
+                node_code: mNodeCode,
+                code: code
+            },
+            dataType: 'json',
+            success: function(res) {
+                eleTopLoading.hide();
+                if(res.code === 1000 && res.info) {
+                    let info = res.info;
+                    
+                    $('#input_code').val(info.code);
+                    $('#input_name').val(info.name);
+                    $('input[name="is_save_local"][value="' + info.is_save_local + '"]').prop('checked', true);
+                    $('input[name="request_server_type"][value="' + info.request_server_type + '"]').prop('checked', true);
+                    $('#input_request_address').val(info.request_address || '');
+                    $('#input_request_params').val(info.request_params || '');
+                    $('#input_request_content_extend_params').val(info.request_content_extend_params || '');
+                    
+                    $('#interfaceModal').addClass('active');
+                } else {
+                    myToast2025(res.msg || '报警存储不存在', 'error');
+                }
+            },
+            error: function() {
+                eleTopLoading.hide();
+                myToast2025('网络异常，请确定网络正常！', 'error');
+            }
+        });
+    }
+
+    function closeInterfaceModal() {
+        $('#interfaceModal').removeClass('active');
+    }
+
+    function submitInterfaceForm() {
+        if(!mNodeCode){
+            myToast2025("请选择节点！","error");
+            return;
+        }
+
+        let name = $('#input_name').val().trim();
+        let is_save_local = $('input[name="is_save_local"]:checked').val();
+        let request_server_type = $('input[name="request_server_type"]:checked').val();
+        let request_address = $('#input_request_address').val().trim();
+        let request_params = $('#input_request_params').val().trim();
+        let request_content_extend_params = $('#input_request_content_extend_params').val().trim();
+        
+        if(name === '') {
+            myToast2025('请输入名称！', 'error');
+            return;
+        }
+        
+        let handleUrl = currentHandle === 'add' ? '/alarmInterface/openAdd' : '/alarmInterface/openEdit';
+        
+        let formData = {
+            handle: currentHandle,
+            code: currentCode,
+            name: name,
+            is_save_local: is_save_local,
+            request_server_type: request_server_type,
+            request_address: request_address,
+            request_params: request_params,
+            request_content_extend_params: request_content_extend_params,
+            alarm_delay: 0,
+            node_code: mNodeCode
+        };
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: handleUrl,
+            type: 'post',
+            data: formData,
+            dataType: 'json',
+            success: function(res) {
+                eleTopLoading.hide();
+                if(res.code === 1000) {
+                    myToast2025(res.msg, 'success', 1000);
+                    setTimeout(function() {
+                        closeInterfaceModal();
+                        f_getNodeAlarmInterfaces();
+                    }, 1000);
+                } else {
+                    myToast2025(res.msg, 'error');
+                }
+            },
+            error: function() {
+                eleTopLoading.hide();
+                myToast2025('网络异常，请确定网络正常！', 'error');
+            }
+        });
+    }
+
+    function f_del(code) {
+        if(!mNodeCode){
+            myToast2025("请选择节点！","error");
+            return;
+        }
+
+        if(!confirm('确定要删除这个报警存储吗？')) {
+            return;
+        }
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/alarmInterface/openDel',
+            type: "post",
+            async: true,
+            data: {
+                node_code: mNodeCode,
+                code: code
+            },
+            dataType: "json",
+            timeout: 0,
+            error: function () {
+                eleTopLoading.hide();
+                myToast2025("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(1000 === res.code){
+                    myToast2025(res.msg, "success", 1000);
+                    setTimeout(function() {
+                        f_getNodeAlarmInterfaces();
+                    }, 1000);
+                }else{
+                    myToast2025(res.msg, "error");
+                }
+            }
+        });
+    }
+
+    function f_test(code) {
+        if(!mNodeCode){
+            myToast2025("请选择节点！","error");
+            return;
+        }
+
+        const iframe = document.getElementById('testIframe');
+        iframe.src = '/alarmInterface/openTest?node_code=' + encodeURIComponent(mNodeCode) + '&code=' + encodeURIComponent(code);
+        document.getElementById('testModal').classList.add('active');
+    }
+
+    function closeTestModal() {
+        const modal = document.getElementById('testModal');
+        const iframe = document.getElementById('testIframe');
+        iframe.src = '';
+        modal.classList.remove('active');
+    }
+
+    $('#interfaceModal').click(function(e) {
+        if (e.target === this) {
+            closeInterfaceModal();
+        }
+    });
+
+    $('#testModal').click(function(e) {
+        if (e.target === this) {
+            closeTestModal();
+        }
+    });
+
+    $(document).keydown(function(e) {
+        if (e.keyCode === 27) {
+            if ($('#interfaceModal').hasClass('active')) {
+                closeInterfaceModal();
+            }
+            if ($('#testModal').hasClass('active')) {
+                closeTestModal();
+            }
+        }
+    });
+
+    function myToast2025(text, icon, hideAfter) {
+        hideAfter = hideAfter || 2000;
+        const existingAlerts = document.querySelectorAll('.xc-toast');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const toastElement = document.createElement('div');
+        toastElement.className = 'xc-toast ' + icon;
+        toastElement.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);';
+        
+        if (icon === 'success') {
+            toastElement.style.backgroundColor = '#00b42a';
+        } else if (icon === 'error') {
+            toastElement.style.backgroundColor = '#f53f3f';
+        } else {
+            toastElement.style.backgroundColor = '#165DFF';
+        }
+        
+        toastElement.innerHTML = '<span>' + text + '</span>';
+        document.body.appendChild(toastElement);
+        
+        if (hideAfter > 0) {
+            setTimeout(function() {
+                toastElement.remove();
+            }, hideAfter);
+        }
+    }
+</script>
+
+{% endblock javascripts %}

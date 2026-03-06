@@ -1,0 +1,599 @@
+{% extends "app/base_site.html" %}
+{% block title %} 在线视频流 {% endblock title %}
+{% block stylesheets %}
+  {{ block.super }}
+<style>
+    .xc_container {
+        color: #333;
+        line-height: 1.6;
+        margin: 0 auto;
+        padding: 10px 20px;
+    }
+    .xc_toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .xc_page-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1D2129;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .xc_btn-modern {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+    .xc_btn-modern:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+    .xc_search-input {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        width: 200px;
+        transition: all 0.2s;
+    }
+    .xc_search-input:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    .xc_table-container {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .xc_table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .xc_table th {
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 500;
+        color: #6b7280;
+        font-size: 13px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .xc_table td {
+        padding: 12px 16px;
+        font-size: 14px;
+        color: #374151;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .xc_table tbody tr:hover {
+        background-color: rgba(16, 185, 129, 0.03);
+    }
+    .xc_status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .xc_status-badge.active {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+    }
+    .xc_status-badge.inactive {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+    .xc_action-link {
+        color: #6b7280;
+        text-decoration: none;
+        font-weight: 500;
+        margin-left: 12px;
+        cursor: pointer;
+        font-size: 13px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        background-color: #fafafa;
+        border: 1px solid #e5e5e5;
+    }
+    .xc_action-link:hover {
+        color: #374151;
+        background-color: #f5f5f5;
+        border-color: #d4d4d4;
+        text-decoration: none;
+    }
+    .xc_empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #9ca3af;
+    }
+    .xc_empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        display: block;
+    }
+    .xc_loading-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #e5e7eb;
+        border-top-color: #10b981;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    .xc_loading-text {
+        color: #6b7280;
+        font-size: 14px;
+    }
+    .xc_pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding-top: 20px;
+        padding-bottom: 10px;
+    }
+    .xc_page-btn {
+        min-width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .xc_page-btn:hover:not(.xc_active) {
+        border-color: #34495e;
+        color: #34495e;
+    }
+    .xc_page-btn.xc_active {
+        background-color: #34495e;
+        color: white;
+    }
+    .xc_page-info {
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+    .xc_detail-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+    .xc_detail-content {
+        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 16px;
+        padding: 0;
+        width: 90%;
+        max-width: 900px;
+        max-height: 85vh;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .xc_detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+    }
+    .xc_detail-title {
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .xc_detail-title i {
+        font-size: 20px;
+    }
+    .xc_detail-close {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: white;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+    .xc_detail-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+    .xc_detail-body {
+        padding: 24px;
+        max-height: calc(85vh - 80px);
+        overflow-y: auto;
+    }
+    .xc_detail-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    .xc_detail-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s;
+    }
+    .xc_detail-card:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    }
+    .xc_detail-card.full-width {
+        grid-column: 1 / -1;
+    }
+    .xc_detail-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .xc_detail-label i {
+        color: #3b82f6;
+        font-size: 14px;
+    }
+    .xc_detail-value {
+        font-size: 15px;
+        color: #1f2937;
+        font-weight: 500;
+        word-break: break-all;
+    }
+    .xc_detail-value.json {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+        white-space: pre-wrap;
+        overflow-x: auto;
+    }
+    .xc_detail-section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 20px 0 12px 0;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .xc_detail-section-title:first-child {
+        margin-top: 0;
+    }
+    @media (max-width: 768px) {
+        .xc_detail-info {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+    <div class="xc_container">
+        <div class="xc_toolbar">
+            <div class="xc_page-title">
+                <i class="fa fa-video-camera"></i>
+                在线视频流
+            </div>
+
+            <input type="text" id="search_input" class="xc_search-input" placeholder="输入流名称或地址">
+
+            <button class="xc_btn-modern" onclick="doSearch()">
+                <i class="fa fa-search"></i> 搜索
+            </button>
+
+            <div>
+                <span id="top_loading" style="display: none;">
+                    <span class="xc_loading-spinner"></span>
+                    <span class="xc_loading-text">加载中...</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="xc_table-container">
+            <table class="xc_table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>流名称</th>
+                        <th>流地址</th>
+                        <th>状态</th>
+                        <th>播放数量</th>
+                        <th>创建时间</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="data_table">
+                    <tr>
+                        <td colspan="8">
+                            <div class="xc_empty-state">
+                                <i class="fa fa-server"></i>
+                                <p>请在右上角选择节点</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+              </div>
+        </div>
+      </div>
+
+    <div class="row">
+        <div class="xc_pagination" id="pageData">
+        </div>
+    </div>
+
+    </div>
+  </div>
+
+  <!-- 详情弹窗 -->
+  <div class="xc_detail-modal" id="detailModal">
+    <div class="xc_detail-content">
+        <div class="xc_detail-header">
+            <h3 class="xc_detail-title"><i class="fa fa-video-camera"></i> 视频流详情</h3>
+            <button class="xc_detail-close" onclick="closeDetailModal()">&times;</button>
+        </div>
+        <div class="xc_detail-body">
+            <div class="xc_detail-info" id="detailInfo">
+                <!-- 详情信息将通过JavaScript动态填充 -->
+            </div>
+        </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+<script>
+    let eleTopLoading = $("#top_loading");
+    let eleDataTable = $("#data_table");
+    let elePageData = $("#pageData");
+    let eleSearchInput = $("#search_input");
+    let eleDetailModal = $("#detailModal");
+    let eleDetailInfo = $("#detailInfo");
+    let mNodeCode = "";
+    let mData = [];
+    let curPage = 1;
+    let curPageSize = 10;
+
+    function initGlobalNode() {
+        var currentNode = window.GlobalNodeManager ? window.GlobalNodeManager.getCurrentNode() : null;
+        if (currentNode && currentNode.code) {
+            mNodeCode = currentNode.code;
+            curPage = 1;
+            getData();
+        } else {
+            eleDataTable.html("<tr><td colspan='8'><div class='xc_empty-state'><i class='fa fa-server'></i><p>请在右上角选择节点</p></div></td></tr>");
+            elePageData.html("");
+        }
+    }
+
+    window.addEventListener('globalNodeChanged', function(e) {
+        mNodeCode = e.detail.code;
+        curPage = 1;
+        getData();
+    });
+
+    $(document).ready(function() {
+        setTimeout(initGlobalNode, 500);
+    });
+
+    function doSearch() {
+        curPage = 1;
+        getData();
+    }
+
+    function getData() {
+        let searchKey = eleSearchInput.val().trim();
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/system/getOnlineStreams',
+            type: "get",
+            async: true,
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    mData = res.data || [];
+                    
+                    // 根据搜索关键词过滤数据
+                    if (searchKey) {
+                        searchKey = searchKey.toLowerCase();
+                        mData = mData.filter(item => {
+                            return (item.name && item.name.toLowerCase().includes(searchKey)) ||
+                                   (item.url && item.url.toLowerCase().includes(searchKey));
+                        });
+                    }
+                    
+                    renderData();
+                }else{
+                    eleDataTable.html("<tr><td colspan='8'><div class='xc_empty-state'><i class='fa fa-exclamation-triangle'></i><p>"+res.msg+"</p></div></td></tr>");
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function renderData() {
+        if(mData.length === 0){
+            eleDataTable.html("<tr><td colspan='8'><div class='xc_empty-state'><i class='fa fa-video-camera'></i><p>暂无在线视频流数据</p></div></td></tr>");
+            elePageData.html("");
+            return;
+        }
+
+        let html = "";
+        for(let i = 0; i < mData.length; i++){
+            let item = mData[i];
+            
+            html += "<tr>";
+            html += "<td>" + (i + 1) + "</td>";
+            html += "<td>" + (item.app + '/' + item.name || '-') + "</td>";
+            html += "<td>" + (item.originUrl || '-') + "</td>";
+            html += "<td><span class='xc_status-badge active'>在线</span></td>";
+            html += "<td>" + (item.clients || 0) + "</td>";
+            html += "<td>-</td>";
+            html += "<td>-</td>";
+            html += "<td>";
+            html += "<a href='javascript:openDetail(" + JSON.stringify(item).replace(/'/g, "&#39;") + ")' class='xc_action-link'>详情</a>";
+            html += "</td>";
+            html += "</tr>";
+        }
+
+        eleDataTable.html(html);
+        elePageData.html("<div class='xc_page-info'>共" + mData.length + "条在线视频流</div>");
+    }
+
+    function openDetail(stream) {
+        const fieldIcons = {
+            'app': 'fa-cube',
+            'name': 'fa-tag',
+            'code': 'fa-code',
+            'an': 'fa-asterisk',
+            'originUrl': 'fa-link',
+            'originType': 'fa-plug',
+            'originTypeStr': 'fa-toggle-on',
+            'clients': 'fa-users',
+            'video': 'fa-video-camera',
+            'video_codec_name': 'fa-file-video-o',
+            'video_width': 'fa-arrows-h',
+            'video_height': 'fa-arrows-v',
+            'audio': 'fa-volume-up',
+            'produce_speed': 'fa-tachometer',
+            'schema_clients': 'fa-network-wired',
+            'videoUrl': 'fa-play-circle',
+            'wsHost': 'fa-server',
+            'wsMp4Url': 'fa-film',
+            'is_online': 'fa-check-circle'
+        };
+        
+        let html = "";
+        for (let key in stream) {
+            if (stream.hasOwnProperty(key)) {
+                let label = key.replace(/_/g, ' ');
+                label = label.charAt(0).toUpperCase() + label.slice(1);
+                let value = stream[key];
+                let isJson = false;
+                if (typeof value === 'object' && value !== null) {
+                    value = JSON.stringify(value, null, 2);
+                    isJson = true;
+                }
+                let icon = fieldIcons[key] || 'fa-info-circle';
+                let cardClass = (key === 'originUrl' || key === 'schema_clients') ? 'xc_detail-card full-width' : 'xc_detail-card';
+                html += "<div class='" + cardClass + "'>";
+                html += "<div class='xc_detail-label'><i class='fa " + icon + "'></i> " + label + "</div>";
+                if (isJson) {
+                    html += "<pre class='xc_detail-value json'>" + (value || '-') + "</pre>";
+                } else {
+                    html += "<div class='xc_detail-value'>" + (value || '-') + "</div>";
+                }
+                html += "</div>";
+            }
+        }
+        eleDetailInfo.html(html);
+        eleDetailModal.css('display', 'flex');
+    }
+
+    function closeDetailModal() {
+        eleDetailModal.css('display', 'none');
+    }
+
+    eleSearchInput.on("keydown", function(e){
+        if (e.key === 'Enter' || e.keyCode === 13 || e.which === 13) {
+            e.preventDefault();
+            doSearch();
+        }
+    });
+
+    function myToast(text, icon, hideAfter) {
+        hideAfter = hideAfter || 2000;
+        const existingAlerts = document.querySelectorAll('.xc-toast');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const toastElement = document.createElement('div');
+        toastElement.className = 'xc-toast ' + icon;
+        toastElement.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);';
+        
+        if (icon === 'success') {
+            toastElement.style.backgroundColor = '#10b981';
+        } else if (icon === 'error') {
+            toastElement.style.backgroundColor = '#ef4444';
+        } else {
+            toastElement.style.backgroundColor = '#6b7280';
+        }
+        
+        toastElement.innerHTML = '<span>' + text + '</span>';
+        document.body.appendChild(toastElement);
+        
+        if (hideAfter > 0) {
+            setTimeout(function() {
+                toastElement.remove();
+            }, hideAfter);
+        }
+    }
+</script>
+
+{% endblock javascripts %}

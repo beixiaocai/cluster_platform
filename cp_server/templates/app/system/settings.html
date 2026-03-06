@@ -1,0 +1,283 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} 系统配置 {% endblock title %}
+{% block stylesheets %}
+  {{ block.super }}
+<style>
+    .config-page {
+        padding: 15px 20px;
+    }
+    
+    .config-page-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .config-section {
+        margin-bottom: 20px;
+    }
+    
+    .config-section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 10px;
+        padding-left: 8px;
+        border-left: 3px solid #3b82f6;
+    }
+    
+    .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+    }
+    
+    .config-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .config-label {
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .config-label .req {
+        color: #e74c3c;
+    }
+    
+    .config-input {
+        padding: 8px 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+        transition: border-color 0.2s;
+    }
+    
+    .config-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+    
+    .config-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .config-checkbox-item input {
+        width: 16px;
+        height: 16px;
+        accent-color: #3b82f6;
+    }
+    
+    .config-checkbox-item span {
+        font-size: 13px;
+        color: #333;
+    }
+    
+    .config-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+    
+    .config-btn {
+        padding: 8px 20px;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        border: none;
+        transition: opacity 0.2s;
+    }
+    
+    .config-btn:hover {
+        opacity: 0.9;
+    }
+    
+    .config-btn-primary {
+        background: #3b82f6;
+        color: #fff;
+    }
+    
+    .config-btn-success {
+        background: #10b981;
+        color: #fff;
+    }
+    
+    .config-hint {
+        font-size: 11px;
+        color: #999;
+    }
+    
+    #top_loading {
+        display: none;
+        font-size: 12px;
+        color: #3b82f6;
+        margin-left: 10px;
+    }
+    
+    #top_loading img {
+        width: 14px;
+        height: 14px;
+        vertical-align: middle;
+        margin-right: 4px;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="right_col" role="main">
+    <div class="config-page">
+        <div class="config-page-title">
+            系统配置
+            <span id="top_loading"><img src="/static/images/load.gif" alt="">保存中</span>
+        </div>
+        
+        <form id="settingsForm">
+            <div class="config-section">
+                <div class="config-section-title">服务配置</div>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label class="config-label">管理端口 <span class="req">*</span></label>
+                        <input type="number" name="adminPort" value="{{config.adminPort}}" class="config-input">
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">日志调试</label>
+                        <label class="config-checkbox-item">
+                            <input type="checkbox" name="logDebug" {% if config.logDebug %}checked{% endif %}>
+                            <span>开启详细日志</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="config-section">
+                <div class="config-section-title">媒体服务</div>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label class="config-label">RTSP端口 <span class="req">*</span></label>
+                        <input type="number" name="mediaRtspPort" value="{{config.mediaRtspPort}}" class="config-input">
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">HTTP端口 <span class="req">*</span></label>
+                        <input type="number" name="mediaHttpPort" value="{{config.mediaHttpPort}}" class="config-input">
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">媒体密钥 <span class="req">*</span></label>
+                        <input type="text" name="mediaSecret" value="{{config.mediaSecret}}" class="config-input">
+                        <span class="config-hint">ZLMediaKit推流鉴权密钥</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="config-section">
+                <div class="config-section-title">安全配置</div>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label class="config-label">WebSocket Token <span class="req">*</span></label>
+                        <input type="text" name="wsToken" value="{{config.wsToken}}" class="config-input">
+                        <span class="config-hint">节点连接认证令牌</span>
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">登录验证码</label>
+                        <label class="config-checkbox-item">
+                            <input type="checkbox" name="isEnableLoginCaptcha" {% if config.isEnableLoginCaptcha %}checked{% endif %}>
+                            <span>启用登录验证码</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="config-section">
+                <div class="config-section-title">存储配置</div>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label class="config-label">上传目录 <span class="req">*</span></label>
+                        <input type="text" name="uploadDir" value="{{config.uploadDir}}" class="config-input">
+                    </div>
+                    <div class="config-item">
+                        <label class="config-label">存储目录 <span class="req">*</span></label>
+                        <input type="text" name="storageDir" value="{{config.storageDir}}" class="config-input">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="config-actions">
+                <button type="button" onclick="f_saveSettings()" class="config-btn config-btn-primary">保存配置</button>
+                <button type="button" onclick="f_exportLogs()" class="config-btn config-btn-success">导出日志</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+{{ block.super }}
+<script>
+    let ele_top_loading = $("#top_loading");
+
+    function f_exportLogs(){
+        ele_top_loading.show();
+        $.ajax({
+            url: "/system/postExportLogs",
+            type: "post",
+            data: {},
+            dataType: "json",
+            timeout: 0,
+            error: function () {
+                ele_top_loading.hide();
+                myAlert("网络异常","error");
+            },
+            success: function (res) {
+                ele_top_loading.hide();
+                if(res.code === 1000){
+                    window.open("/storage/download?filename=" + res.info.export_filename);
+                } else {
+                    myAlert(res.msg, "error");
+                }
+            }
+        });
+    }
+    
+    function f_saveSettings(){
+        ele_top_loading.show();
+        let data = {};
+        $("#settingsForm").find('input[type="text"], input[type="number"]').each(function() {
+            data[$(this).attr('name')] = $(this).val();
+        });
+        $("#settingsForm").find('input[type="checkbox"]').each(function() {
+            data[$(this).attr('name')] = $(this).is(':checked');
+        });
+        $.ajax({
+            url: "/system/postSaveSettings",
+            type: "post",
+            data: data,
+            dataType: "json",
+            timeout: 0,
+            error: function () {
+                ele_top_loading.hide();
+                myAlert("网络异常","error");
+            },
+            success: function (res) {
+                ele_top_loading.hide();
+                if(res.code === 1000){
+                    myAlert(res.msg, "success");
+                } else {
+                    myAlert(res.msg, "error");
+                }
+            }
+        });
+    }
+</script>
+{% endblock javascripts %}

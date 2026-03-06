@@ -1,0 +1,16 @@
+﻿# clion
+.idea/
+
+# vs
+.vs
+
+log*
+venv*
+__pycache__
+storage
+bin.arm.gcc9.4/log/*
+bin.x86.gcc9.4/log/*
+bin.x86.windows10/log/*
+
+
+

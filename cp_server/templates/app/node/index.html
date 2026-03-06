@@ -1,0 +1,606 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} 节点管理 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+<link rel="stylesheet" href="/static/lib/jquery/confirm/jquery-confirm.css" />
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .right_col {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    .x_panel {
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        overflow: hidden;
+        border: none;
+    }
+    
+    .x_title {
+        background-color: #fff;
+        border-bottom: 2px solid #e9ecef;
+        padding: 16px 20px;
+        margin-bottom: 0;
+    }
+    
+    .x_title h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #495057;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .btn {
+        border-radius: 6px;
+        font-size: 13px;
+        padding: 6px 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+    
+    .btn-sm {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+    
+    .btn-default {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #495057;
+    }
+    
+    .btn-default:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+        color: #212529;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .table-responsive {
+        border-radius: 0 0 8px 8px;
+        overflow: hidden;
+    }
+    
+    .table-bordered {
+        border: none;
+    }
+    
+    .table-bordered > thead > tr > th,
+    .table-bordered > tbody > tr > td {
+        border: 1px solid #e9ecef;
+        padding: 8px 12px;
+        vertical-align: middle;
+        line-height: 1.3;
+    }
+    
+    .table-bordered > thead > tr {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .table-bordered > thead > tr > th {
+        font-weight: 600;
+        color: #495057;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background-color: #f8f9fa;
+    }
+    
+    .table-bordered > tbody > tr {
+        transition: background-color 0.2s ease;
+        background-color: white;
+    }
+    
+    .table-bordered > tbody > tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .sun-state-success {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-right: 4px;
+        display: inline-block;
+    }
+    
+    .sun-state-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-right: 4px;
+        display: inline-block;
+    }
+    
+    .sun-state-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-right: 4px;
+        display: inline-block;
+    }
+    
+    .sun-a-label {
+        color: #6b7280;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 4px;
+        transition: all 0.2s;
+        background-color: #f5f5f5;
+        border: 1px solid #e5e5e5;
+        display: inline-block;
+        margin-right: 6px;
+    }
+    
+    .sun-a-label:last-child {
+        margin-right: 0;
+    }
+    
+    .sun-a-label:hover {
+        color: #374151;
+        background-color: #e5e5e5;
+        border-color: #d4d4d4;
+        text-decoration: none;
+    }
+    
+    .sun-a-label.btn-detail {
+        background-color: #eff6ff;
+        border-color: #bfdbfe;
+        color: #2563eb;
+    }
+    
+    .sun-a-label.btn-detail:hover {
+        background-color: #dbeafe;
+        border-color: #93c5fd;
+    }
+    
+    .sun-a-label.btn-delete {
+        background-color: #fef2f2;
+        border-color: #fecaca;
+        color: #dc2626;
+    }
+    
+    .sun-a-label.btn-delete:hover {
+        background-color: #fee2e2;
+        border-color: #fca5a5;
+    }
+    
+    .pagination {
+        margin: 20px 0 0 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .pagination > li > a {
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        margin: 0 4px;
+        color: #495057;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination > li > a:hover {
+        background-color: #f8f9fa;
+        border-color: #adb5bd;
+        color: #212529;
+    }
+    
+    .pagination > li.active > a {
+        background-color: #495057;
+        border-color: #495057;
+        color: white;
+    }
+    
+    .node-info {
+        line-height: 1.4;
+        padding: 8px 12px;
+        overflow: hidden;
+    }
+    
+    .node-status {
+        margin-bottom: 4px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+    
+    .node-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 11px;
+        color: #6c757d;
+        line-height: 1.2;
+    }
+    
+    .node-details span {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        white-space: nowrap;
+    }
+    
+    .node-version {
+        font-weight: 500;
+        color: #007bff;
+        background-color: #e7f3ff !important;
+        border-color: #b3d7ff !important;
+    }
+    
+    .node-flag {
+        color: #28a745;
+        background-color: #d4edda !important;
+        border-color: #c3e6cb !important;
+    }
+    
+    .node-machine {
+        color: #fd7e14;
+        background-color: #fff3cd !important;
+        border-color: #ffeeba !important;
+    }
+    
+    .node-system {
+        color: #6f42c1;
+        background-color: #e2d9f3 !important;
+        border-color: #d5c8e8 !important;
+    }
+    
+    .ws-connected {
+        color: #28a745;
+    }
+    
+    .ws-disconnected {
+        color: #dc3545;
+    }
+    
+    .detail-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+    }
+    
+    .detail-modal.show {
+        display: block;
+    }
+    
+    .detail-modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        border-radius: 8px;
+        width: 500px;
+        max-height: 80vh;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    
+    .detail-modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .detail-modal-header h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+    }
+    
+    .detail-modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #999;
+    }
+    
+    .detail-modal-body {
+        padding: 20px;
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+    
+    .detail-item {
+        margin-bottom: 12px;
+    }
+    
+    .detail-label {
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 4px;
+    }
+    
+    .detail-value {
+        font-size: 14px;
+        color: #333;
+        word-break: break-all;
+    }
+    
+    .detail-json {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="right_col" role="main">
+    <div class="">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>节点管理
+ 
+                            <span id="top_loading" style="display:none;">
+                                <img src="/static/images/load.gif" alt="loading" style="width:16px;height:16px;">加载中
+                            </span>
+                        </h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr class="headings">
+                                        <th style="width:50px;">ID</th>
+                                        <th style="width:120px;">节点编号</th>
+                                        <th style="width:100px;">名称</th>
+                                        <th style="width:100px;">连接状态</th>
+                                        <th style="width:auto;">节点信息</th>
+                                        <th style="width:150px;">更新时间</th>
+                                        <th style="width:150px;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for d in data %}
+                                    <tr>
+                                        <td>{{ d.id }}</td>
+                                        <td>{{ d.code }}</td>
+                                        <td>{{ d.name|default:"-" }}</td>
+                                        <td>
+                                            {% if d.online %}
+                                                <span class="sun-state-success">在线</span>
+                                            {% elif d.ws_connected %}
+                                                <span class="sun-state-warning">数据库记录在线</span>
+                                            {% else %}
+                                                <span class="sun-state-error">离线</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="node-info">
+                                            <div class="node-status">
+                                                {% if d.is_auth == 1 %}
+                                                    <span class="sun-state-success">
+                                                        {% if d.is_multi_process == 1 %}
+                                                            高级版({{ d.max_count }}路)
+                                                        {% else %}
+                                                            普通版
+                                                        {% endif %}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="sun-state-error">未授权</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="node-details">
+                                                <span class="node-version">v{{ d.version }}</span>
+                                                {% if d.flag %}
+                                                    <span class="node-flag">{{ d.flag }}</span>
+                                                {% endif %}
+                                                {% if d.machine_node %}
+                                                    <span class="node-machine">{{ d.machine_node }}</span>
+                                                {% endif %}
+                                                {% if d.system_name %}
+                                                    <span class="node-system">{{ d.system_name }}</span>
+                                                {% endif %}
+                                                {% if d.host %}
+                                                    <span>{{ d.host }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>{{ d.last_update_time|date:"Y-m-d H:i:s" }}</td>
+                                        <td style="white-space: nowrap;">
+                                            <a href="javascript:f_openDetail('{{ d.code }}')" class="sun-a-label btn-detail">详情</a>
+                                            <a href="javascript:f_openDel('{{ d.code }}')" class="sun-a-label btn-delete">删除</a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="8" style="text-align:center;padding:20px;color:#6c757d;">
+                                            暂无节点数据，请确保 cluster_client.py 已正确配置并连接到本服务器
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <ul class="pagination">
+                    <li>
+                        <span style="margin-right:10px;color:#000;">
+                            共<span>{{ pageData.page_num }}</span>页 / <span>{{ pageData.count }}</span>条
+                        </span>
+                    </li>
+                    {% for d in pageData.pageLabels %}
+                        {% if d.cur == 1 %}
+                            <li class="paginate_button active"><a href="#">{{ d.name }}</a></li>
+                        {% else %}
+                            <li class="paginate_button"><a href="/node/index?p={{ d.page }}&ps={{ pageData.page_size }}">{{ d.name }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="detail-modal" id="detailModal">
+    <div class="detail-modal-content">
+        <div class="detail-modal-header">
+            <h3>节点详情</h3>
+            <button class="detail-modal-close" onclick="f_closeDetail()">&times;</button>
+        </div>
+        <div class="detail-modal-body" id="detailModalBody">
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+{{ block.super }}
+<script src="/static/lib/jquery/confirm/jquery-confirm.js"></script>
+<script>
+    let ele_top_loading = $("#top_loading");
+    let m_node_data = {};
+    {% for d in data %}
+    m_node_data['{{ d.code }}'] = {
+        code: '{{ d.code }}',
+        name: '{{ d.name|default:"-" }}',
+        nickname: '{{ d.nickname|default:"-" }}',
+        host: '{{ d.host|default:"-" }}',
+        admin_port: {{ d.admin_port|default:9001 }},
+        version: '{{ d.version|default:"-" }}',
+        client_ip: '{{ d.client_ip|default:"-" }}',
+        ws_connect_time: '{{ d.ws_connect_time|date:"Y-m-d H:i:s"|default:"-" }}',
+        ws_last_heartbeat: '{{ d.ws_last_heartbeat|date:"Y-m-d H:i:s"|default:"-" }}',
+        register_info: {{ d.register_info|default:"{}"|safe }}
+    };
+    {% endfor %}
+
+    function f_openDetail(code) {
+        let node = m_node_data[code];
+        if (!node) {
+            myAlert('节点数据不存在', 'error');
+            return;
+        }
+        
+        let html = '';
+        html += '<div class="detail-item"><div class="detail-label">节点编号</div><div class="detail-value">' + node.code + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">节点名称</div><div class="detail-value">' + node.name + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">客户端IP</div><div class="detail-value">' + node.client_ip + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">内网地址</div><div class="detail-value">' + node.host + ':' + node.admin_port + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">版本号</div><div class="detail-value">' + node.version + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">连接时间</div><div class="detail-value">' + node.ws_connect_time + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">最后心跳</div><div class="detail-value">' + node.ws_last_heartbeat + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">注册信息</div><div class="detail-json">' + JSON.stringify(node.register_info, null, 2) + '</div></div>';
+        
+        document.getElementById('detailModalBody').innerHTML = html;
+        document.getElementById('detailModal').classList.add('show');
+    }
+    
+    function f_closeDetail() {
+        document.getElementById('detailModal').classList.remove('show');
+    }
+
+    function f_openDel(code) {
+        if (!confirm('确定要删除该节点吗？')) {
+            return;
+        }
+        ele_top_loading.show();
+        $.ajax({
+            url: '/node/openDel',
+            type: "post",
+            async: true,
+            data: {"code": code},
+            dataType: "json",
+            timeout: 0,
+            error: function () {
+                ele_top_loading.hide();
+                myAlert("网络异常，请确定网络正常！", "error");
+            },
+            success: function (res) {
+                ele_top_loading.hide();
+                if (res.code === 1000) {
+                    window.location.reload();
+                } else {
+                    myAlert(res.msg, "error");
+                }
+            }
+        });
+    }
+
+    function myAlert(text, icon = 'info', hideAfter = 2000) {
+        const existingAlerts = document.querySelectorAll('.xc-alert');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const alertElement = document.createElement('div');
+        alertElement.className = `xc-alert ${icon}`;
+        alertElement.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:16px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);display:flex;align-items:center;gap:10px;';
+        
+        if (icon === 'success') {
+            alertElement.style.backgroundColor = '#4CAF50';
+        } else if (icon === 'error') {
+            alertElement.style.backgroundColor = '#F44336';
+        } else {
+            alertElement.style.backgroundColor = '#2196F3';
+        }
+        
+        alertElement.innerHTML = `<span>${text}</span>`;
+        document.body.appendChild(alertElement);
+        
+        if (hideAfter > 0) {
+            setTimeout(() => {
+                alertElement.remove();
+            }, hideAfter);
+        }
+    }
+</script>
+
+{% endblock javascripts %}

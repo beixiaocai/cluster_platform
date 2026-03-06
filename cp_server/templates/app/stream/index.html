@@ -1,0 +1,656 @@
+{% extends "app/base_site.html" %}
+{% block title %} 视频管理 {% endblock title %}
+{% block stylesheets %}
+  {{ block.super }}
+<style>
+    :root {
+        --xc-primary: #10b981;
+        --xc-primary-light: #34d399;
+        --xc-primary-dark: #059669;
+        --xc-warning: #f59e0b;
+        --xc-danger: #ef4444;
+        --xc-gray-100: #f9fafb;
+        --xc-gray-200: #f3f4f6;
+        --xc-gray-300: #e5e7eb;
+        --xc-gray-400: #9ca3af;
+        --xc-gray-500: #6b7280;
+        --xc-gray-600: #4b5563;
+        --xc-gray-700: #374151;
+        --xc-white: #FFFFFF;
+        --xc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --xc-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --xc-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --xc-radius-sm: 4px;
+        --xc-radius: 6px;
+        --xc-radius-lg: 8px;
+        --xc-radius-xl: 12px;
+        --xc-transition: all 0.2s ease;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .xc_container {
+        color: #333;
+        line-height: 1.6;
+        margin: 0 auto;
+        padding: 10px 20px;
+    }
+
+    .xc_toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .xc_page-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1D2129;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .xc_page-title i {
+        color: var(--xc-primary);
+    }
+
+    .xc_btn-modern {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .xc_btn-modern:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    .xc_btn-modern i {
+        font-size: 14px;
+    }
+
+    .xc_search-input {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        width: 200px;
+        transition: all 0.2s;
+    }
+
+    .xc_search-input:focus {
+        outline: none;
+        border-color: var(--xc-primary);
+        box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+    }
+
+    .xc_status-filter {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+    }
+
+    .xc_camera_groups {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .xc_group {
+        background-color: var(--xc-white);
+        border-radius: var(--xc-radius-xl);
+        overflow: hidden;
+        box-shadow: var(--xc-shadow-sm);
+        transition: var(--xc-transition);
+    }
+
+    .xc_group:hover {
+        box-shadow: var(--xc-shadow);
+    }
+
+    .xc_group_header {
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-bottom: 1px solid #d1fae5;
+        cursor: pointer;
+    }
+
+    .xc_group_title {
+        color: #065f46;
+        display: flex;
+        font-size: 16px;
+        font-weight: 600;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .xc_device_id {
+        background: #f0fdf4;
+        color: #047857;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        border: 1px solid #d1fae5;
+    }
+
+    .xc_group_count {
+        background: #d1fae5;
+        color: #047857;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+    }
+
+    .xc_group_actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .xc_group_toggle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--xc-transition);
+        color: var(--xc-gray-500);
+    }
+
+    .xc_group_toggle.expanded {
+        transform: rotate(180deg);
+    }
+
+    .xc_camera_list {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .xc_camera_list.expanded {
+        max-height: 2000px;
+        overflow: auto;
+    }
+
+    .xc_camera_table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .xc_camera_table th {
+        padding: 10px 16px;
+        text-align: left;
+        font-weight: 500;
+        color: var(--xc-gray-500);
+        font-size: 13px;
+        background: #fafbfc;
+        border-bottom: 1px solid var(--xc-gray-200);
+    }
+
+    .xc_camera_table td {
+        padding: 10px 16px;
+        font-size: 14px;
+        color: var(--xc-gray-600);
+        border-bottom: 1px solid var(--xc-gray-100);
+    }
+
+    .xc_camera_table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .xc_camera_table tbody tr:hover {
+        background-color: rgba(22, 93, 255, 0.03);
+    }
+
+    .xc_stream-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .xc_stream-status-active {
+        background: rgba(0, 180, 42, 0.1);
+        color: #00b42a;
+    }
+
+    .xc_stream-status-inactive {
+        background: rgba(245, 63, 63, 0.1);
+        color: #f53f3f;
+    }
+
+    .xc_stream-status-icon {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .xc_action_buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .xc_action_btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        background-color: var(--xc-gray-100);
+        border: none;
+        color: var(--xc-gray-500);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--xc-transition);
+    }
+
+    .xc_action_btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .xc_action_btn.view:hover {
+        background-color: var(--xc-primary);
+        color: white;
+    }
+
+    .xc-icon {
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sun-a-label {
+        color: #6b7280;
+        text-decoration: none;
+        font-weight: 500;
+        margin-left: 12px;
+        cursor: pointer;
+        font-size: 13px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        background-color: #fafafa;
+        border: 1px solid #e5e5e5;
+    }
+
+    .sun-a-label:hover {
+        color: #374151;
+        background-color: #f5f5f5;
+        border-color: #d4d4d4;
+        text-decoration: none;
+    }
+
+    .sun-a-label:first-of-type {
+        margin-left: 12px;
+    }
+
+    .top_loading_img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .xc_empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--xc-gray-400);
+    }
+
+    .xc_empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    .xc_empty-state p {
+        font-size: 16px;
+    }
+
+    .xc_loading-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #e5e7eb;
+        border-top-color: var(--xc-primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .xc_loading-text {
+        color: var(--xc-gray-500);
+        font-size: 14px;
+    }
+
+    .xc_pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .xc_pagination>.xc_page-btn {
+        min-width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .xc_pagination>.xc_page-btn:hover:not(.xc_active) {
+        border-color: #34495e;
+        color: #34495e;
+    }
+
+    .xc_pagination>.xc_page-btn.xc_active {
+        background-color: #34495e;
+        color: white;
+    }
+
+    .xc_pagination>.xc_page-info {
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+
+    .xc_select {
+        width: 180px;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        background: white;
+    }
+
+    .xc_select:focus {
+        outline: none;
+        border-color: var(--xc-primary);
+        box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+    }
+
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+   <div class="xc_container">
+        <div class="xc_toolbar">
+            <div class="xc_page-title">
+                <i class="fa fa-video-camera"></i>
+                视频管理
+            </div>
+
+            <input type="text" id="search_input" class="xc_search-input" placeholder="输入视频流名称或编号">
+
+            <button class="xc_btn-modern" onclick="doSearch()">
+                <i class="fa fa-search"></i> 搜索
+            </button>
+
+            <div>
+                <span id="top_loading" style="display: none;">
+                    <span class="xc_loading-spinner"></span>
+                    <span class="xc_loading-text">加载中...</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="xc_camera_groups"  id="data">
+            <div class="xc_empty-state">
+                <i class="fa fa-video-camera"></i>
+                <p>请选择节点查看视频流</p>
+            </div>
+        </div>
+    </div>
+              </div>
+        </div>
+      </div>
+
+    <div class="row">
+        <div class="xc_pagination" id="pageData">
+        </div>
+    </div>
+
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+<script>
+    let eleTopLoading = $("#top_loading");
+    let eleData = $("#data");
+    let eleSearchInput = $("#search_input");
+    let mNodeCode = "";
+    let mStreams = [];
+    let mPusherKeys = {};
+
+    function initGlobalNode() {
+        var currentNode = window.GlobalNodeManager ? window.GlobalNodeManager.getCurrentNode() : null;
+        if (currentNode && currentNode.code) {
+            mNodeCode = currentNode.code;
+            f_getNodeStreams();
+        } else {
+            eleData.html("<div class='xc_empty-state'><i class='fa fa-server'></i><p>请在右上角选择节点</p></div>");
+        }
+    }
+
+    window.addEventListener('globalNodeChanged', function(e) {
+        mNodeCode = e.detail.code;
+        f_getNodeStreams();
+    });
+
+    $(document).ready(function() {
+        setTimeout(initGlobalNode, 500);
+    });
+
+    function doSearch() {
+        f_renderStreams();
+    }
+
+    function f_getNodeStreams() {
+        if(!mNodeCode){
+            myToast2025("请选择节点！","error");
+            return;
+        }
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/stream/getNodeStreams',
+            type: "get",
+            async: true,
+            data: {"node_code": mNodeCode},
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast2025("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    mStreams = res.data || [];
+                    f_renderStreams();
+                }else{
+                    eleData.html("<div class='xc_empty-state'><i class='fa fa-exclamation-triangle'></i><p>"+res.msg+"</p></div>");
+                    myToast2025(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function toggleGroup(actionsElement) {
+        const headerElement = actionsElement.parentNode;
+        const listElement = headerElement.nextElementSibling;
+        const toggleIcon = headerElement.querySelector('.xc_group_toggle');
+
+        listElement.classList.toggle('expanded');
+        toggleIcon.classList.toggle('expanded');
+    }
+
+    function f_renderStreams() {
+        let searchText = eleSearchInput.val().trim().toLowerCase();
+        let filteredStreams = mStreams;
+        
+        if(searchText){
+            filteredStreams = mStreams.filter(function(s){
+                return (s.code && s.code.toLowerCase().indexOf(searchText) >= 0) ||
+                       (s.nickname && s.nickname.toLowerCase().indexOf(searchText) >= 0) ||
+                       (s.camera_device_id && s.camera_device_id.toLowerCase().indexOf(searchText) >= 0);
+            });
+        }
+
+        if(filteredStreams.length === 0){
+            eleData.html("<div class='xc_empty-state'><i class='fa fa-video-camera'></i><p>暂无视频流数据</p></div>");
+            return;
+        }
+
+        let groupedData = {};
+        for(let i = 0; i < filteredStreams.length; i++){
+            let s = filteredStreams[i];
+            let deviceId = s.camera_device_id || 'default';
+            if(!groupedData[deviceId]){
+                groupedData[deviceId] = [];
+            }
+            groupedData[deviceId].push(s);
+        }
+
+        let html = "";
+        for(let deviceId in groupedData){
+            let streams = groupedData[deviceId];
+            let streamCount = streams.length;
+            
+            html += "<div class=\"xc_group\">";
+            html += "<div class=\"xc_group_header\">";
+            html += "<div class=\"xc_group_title\">";
+            html += "<span class=\"xc_device_id\">" + deviceId + "</span>";
+            html += "<span class=\"xc_group_count\">" + streamCount + " 个视频流</span>";
+            html += "</div>";
+            html += "<div class=\"xc_group_actions\" onclick=\"toggleGroup(this)\">";
+            html += "<div class=\"xc_group_toggle expanded\">";
+            html += "<svg class=\"xc-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">";
+            html += "<polyline points=\"6 9 12 15 18 9\"/>";
+            html += "</svg>";
+            html += "</div>";
+            html += "</div>";
+            html += "</div>";
+            html += "<div class=\"xc_camera_list expanded\">";
+            html += "<table class=\"xc_camera_table\">";
+            html += "<thead>";
+            html += "<tr>";
+            html += "<th>编号</th>";
+            html += "<th>名称</th>";
+            html += "<th>应用</th>";
+            html += "<th>操作</th>";
+            html += "</tr>";
+            html += "</thead>";
+            html += "<tbody>";
+
+            for(let i = 0; i < streams.length; i++){
+                let s = streams[i];
+                
+                html += "<tr>";
+                html += "<td style='width:15%;'>" + (s.code || '-') + "</td>";
+                html += "<td>" + (s.nickname || s.name || '-') + "</td>";
+                html += "<td style='width:10%;'>" + (s.app || '-') + "</td>";
+                html += "<td style='width:30%;'>";
+                html += "<a href=\"javascript:f_open_player('" + s.app + "','" + s.name + "')\" class=\"sun-a-label\">播放</a>";
+                html += "</td>";
+                html += "</tr>";
+            }
+
+            html += "</tbody>";
+            html += "</table>";
+            html += "</div>";
+            html += "</div>";
+        }
+
+        eleData.html(html);
+    }
+
+    function f_open_player(stream_app, stream_name) {
+        window.open("/stream/player?app=" + stream_app + "&name=" + stream_name + "&node_code=" + mNodeCode);
+    }
+
+    eleSearchInput.on("keydown", function(e){
+        if (e.key === 'Enter' || e.keyCode === 13 || e.which === 13) {
+            e.preventDefault();
+            doSearch();
+        }
+    });
+
+    function myToast2025(text, icon, hideAfter) {
+        hideAfter = hideAfter || 2000;
+        const existingAlerts = document.querySelectorAll('.xc-toast');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const toastElement = document.createElement('div');
+        toastElement.className = 'xc-toast ' + icon;
+        toastElement.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);';
+        
+        if (icon === 'success') {
+            toastElement.style.backgroundColor = '#00b42a';
+        } else if (icon === 'error') {
+            toastElement.style.backgroundColor = '#f53f3f';
+        } else {
+            toastElement.style.backgroundColor = '#165DFF';
+        }
+        
+        toastElement.innerHTML = '<span>' + text + '</span>';
+        document.body.appendChild(toastElement);
+        
+        if (hideAfter > 0) {
+            setTimeout(function() {
+                toastElement.remove();
+            }, hideAfter);
+        }
+    }
+</script>
+
+{% endblock javascripts %}

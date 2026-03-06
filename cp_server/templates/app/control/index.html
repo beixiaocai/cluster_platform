@@ -1,0 +1,1759 @@
+{% extends "app/base_site.html" %}
+{% block title %} 布控管理 {% endblock title %}
+{% block stylesheets %}
+  {{ block.super }}
+<style>
+    :root {
+        --xc-primary: #10b981;
+        --xc-primary-light: #34d399;
+        --xc-primary-dark: #059669;
+        --xc-warning: #f59e0b;
+        --xc-danger: #ef4444;
+        --xc-gray-100: #f9fafb;
+        --xc-gray-200: #f3f4f6;
+        --xc-gray-300: #e5e7eb;
+        --xc-gray-400: #9ca3af;
+        --xc-gray-500: #6b7280;
+        --xc-gray-600: #4b5563;
+        --xc-gray-700: #374151;
+        --xc-white: #FFFFFF;
+        --xc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --xc-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --xc-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --xc-radius-sm: 4px;
+        --xc-radius: 6px;
+        --xc-radius-lg: 8px;
+        --xc-radius-xl: 12px;
+        --xc-transition: all 0.2s ease;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .xc_container {
+        color: #333;
+        line-height: 1.6;
+        margin: 0 auto;
+        padding: 10px 20px;
+    }
+
+    .xc_toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .xc_page-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1D2129;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .xc_btn-modern {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .xc_btn-modern:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    .xc_btn-modern i {
+        font-size: 14px;
+    }
+
+    .xc_search-input {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        width: 200px;
+        transition: all 0.2s;
+    }
+
+    .xc_search-input:focus {
+        outline: none;
+        border-color: var(--xc-primary);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .xc_status-filter {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+    }
+
+    .xc_camera_groups {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .xc_group {
+        background-color: var(--xc-white);
+        border-radius: var(--xc-radius-xl);
+        overflow: hidden;
+        box-shadow: var(--xc-shadow-sm);
+        transition: var(--xc-transition);
+    }
+
+    .xc_group:hover {
+        box-shadow: var(--xc-shadow);
+    }
+
+    .xc_group_header {
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 1px solid var(--xc-gray-200);
+        cursor: pointer;
+    }
+
+    .xc_group_title {
+        color: #1D2129;
+        display: flex;
+        font-size: 16px;
+        font-weight: 600;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .xc_group_count {
+        background: var(--xc-gray-200);
+        color: var(--xc-gray-600);
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+    }
+
+    .xc_group_actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .xc_group_toggle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--xc-transition);
+        color: var(--xc-gray-500);
+    }
+
+    .xc_group_toggle.expanded {
+        transform: rotate(180deg);
+    }
+
+    .xc_camera_list {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .xc_camera_list.expanded {
+        max-height: 2000px;
+        overflow: auto;
+    }
+
+    .xc_camera_table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .xc_camera_table th {
+        padding: 10px 16px;
+        text-align: left;
+        font-weight: 500;
+        color: var(--xc-gray-500);
+        font-size: 13px;
+        background: #fafbfc;
+        border-bottom: 1px solid var(--xc-gray-200);
+    }
+
+    .xc_camera_table td {
+        padding: 10px 16px;
+        font-size: 14px;
+        color: var(--xc-gray-600);
+        border-bottom: 1px solid var(--xc-gray-100);
+    }
+
+    .xc_camera_table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .xc_camera_table tbody tr:hover {
+        background-color: rgba(16, 185, 129, 0.03);
+    }
+
+    .xc_stream-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .xc_stream-status-active {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+    }
+
+    .xc_stream-status-inactive {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+
+    .xc_stream-status-icon {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .sun-a-label {
+        color: #6b7280;
+        text-decoration: none;
+        font-weight: 500;
+        margin-left: 12px;
+        cursor: pointer;
+        font-size: 13px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        background-color: #fafafa;
+        border: 1px solid #e5e5e5;
+    }
+
+    .sun-a-label:hover {
+        color: #374151;
+        background-color: #f5f5f5;
+        border-color: #d4d4d4;
+        text-decoration: none;
+    }
+
+    .sun-a-label:first-of-type {
+        margin-left: 12px;
+    }
+
+    .sun-state-success {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: #059669;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-right: 4px;
+        display: inline-block;
+    }
+
+    .sun-state-error {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        margin-right: 4px;
+        display: inline-block;
+    }
+
+    .top_loading_img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .xc_empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--xc-gray-400);
+    }
+
+    .xc_empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    .xc_empty-state p {
+        font-size: 16px;
+    }
+
+    .xc_loading-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #e5e7eb;
+        border-top-color: var(--xc-primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .xc_loading-text {
+        color: var(--xc-gray-500);
+        font-size: 14px;
+    }
+
+    .xc_pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .xc_pagination>.xc_page-btn {
+        min-width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .xc_pagination>.xc_page-btn:hover:not(.xc_active) {
+        border-color: #34495e;
+        color: #34495e;
+    }
+
+    .xc_pagination>.xc_page-btn.xc_active {
+        background-color: #34495e;
+        color: white;
+    }
+
+    .xc_pagination>.xc_page-info {
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+
+    .xc_select {
+        width: 180px;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        background: white;
+    }
+
+    .xc_select:focus {
+        outline: none;
+        border-color: var(--xc-primary);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .xc_action_buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .xc_action_btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        background-color: var(--xc-gray-100);
+        border: none;
+        color: var(--xc-gray-500);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--xc-transition);
+    }
+
+    .xc_action_btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .xc_action_btn.view:hover {
+        background-color: var(--xc-primary);
+        color: white;
+    }
+
+    .xc-icon {
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .xc_modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+    }
+
+    .xc_modal-overlay.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: xc_fadeIn 0.2s ease;
+    }
+
+    @keyframes xc_fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .xc_modal-container {
+        background: white;
+        border-radius: 8px;
+        width: 95%;
+        max-width: 900px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: xc_slideIn 0.3s ease;
+    }
+
+    @keyframes xc_slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .xc_modal-header {
+        position: relative;
+        padding: 14px 18px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fafafa;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .xc_modal-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .xc_modal-close {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        width: 30px;
+        height: 30px;
+        border: none;
+        background: white;
+        color: #6b7280;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
+        border-radius: 4px;
+        border: 1px solid #d1d5db;
+        transition: all 0.2s;
+    }
+
+    .xc_modal-close:hover {
+        background: #f3f4f6;
+        color: #374151;
+        border-color: #9ca3af;
+    }
+
+    .xc_modal-body {
+        flex: 1;
+        padding: 18px 20px;
+        overflow-y: auto;
+    }
+
+    .xc_modal-content-wrapper {
+        display: flex;
+        gap: 16px;
+    }
+
+    .xc_modal-left {
+        flex: 1.4;
+        min-width: 350px;
+    }
+
+    .xc_modal-right {
+        flex: 0.8;
+        min-width: 280px;
+    }
+
+    .xc_video-container {
+        width: 100%;
+        background: #000;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .xc_video-player {
+        background-color: black;
+        aspect-ratio: 16 / 9;
+    }
+
+    .xc_video-controls {
+        margin-top: 8px;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+
+    .xc_form-group {
+        margin-bottom: 10px;
+    }
+
+    .xc_form-label {
+        display: block;
+        font-size: 14px;
+        color: #374151;
+        margin-bottom: 4px;
+        font-weight: 500;
+    }
+
+    .xc_form-label .required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+
+    .xc_form-input {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background: white;
+        color: #374151;
+        transition: all 0.2s;
+        height: 36px;
+    }
+
+    .xc_form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .xc_form-input:disabled {
+        background: #f9fafb;
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    .xc_form-textarea {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background: white;
+        color: #374151;
+        resize: vertical;
+        min-height: 60px;
+        transition: all 0.2s;
+    }
+
+    .xc_form-textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .xc_modal-footer {
+        padding: 14px 18px;
+        border-top: 1px solid #e5e7eb;
+        text-align: right;
+        background: #fafafa;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .xc_modal-btn {
+        padding: 8px 20px;
+        font-size: 14px;
+        border-radius: 4px;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
+        margin-left: 10px;
+        transition: all 0.2s;
+        font-weight: 400;
+        background: white;
+        color: #374151;
+    }
+
+    .xc_modal-btn:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+        color: #374151;
+    }
+
+    .xc_modal-btn-primary {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    .xc_modal-btn-primary:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .xc_modal-content-wrapper {
+            flex-direction: column;
+        }
+        .xc_modal-left, .xc_modal-right {
+            min-width: 100%;
+        }
+    }
+
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+   <div class="xc_container">
+        <div class="xc_toolbar">
+            <div class="xc_page-title">
+                <i class="fa fa-shield"></i>
+                布控管理
+            </div>
+
+            <select id="search_status" class="xc_status-filter">
+                <option value="-1">全部状态</option>
+                <option value="0">未布控</option>
+                <option value="1">布控中</option>
+            </select>
+
+            <input type="text" id="search_input" class="xc_search-input" placeholder="输入视频流名称或编号">
+
+            <button class="xc_btn-modern" onclick="doSearch()">
+                <i class="fa fa-search"></i> 搜索
+            </button>
+
+            <button class="xc_btn-modern" onclick="openAdd()">
+                <i class="fa fa-plus"></i> 添加布控
+            </button>
+
+            <button class="xc_btn-modern" onclick="handleAllControl('addAll')">
+                <i class="fa fa-play"></i> 全部执行
+            </button>
+
+            <button class="xc_btn-modern" onclick="handleAllControl('cancelAll')">
+                <i class="fa fa-stop"></i> 全部取消
+            </button>
+
+            <div>
+                <span id="top_loading" style="display: none;">
+                    <span class="xc_loading-spinner"></span>
+                    <span class="xc_loading-text">加载中...</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="xc_camera_groups"  id="data">
+            <div class="xc_empty-state">
+                <i class="fa fa-shield"></i>
+                <p>请选择节点查看布控</p>
+            </div>
+        </div>
+    </div>
+              </div>
+        </div>
+      </div>
+
+    <div class="row">
+        <div class="xc_pagination" id="pageData">
+        </div>
+    </div>
+
+    </div>
+  </div>
+
+      <!--日志弹窗start -->
+      <div id="control_log_dialog" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                  <h4 class="modal-title" >布控日志</h4>
+              </div>
+              <div class="modal-body">
+                <div style="padding: 5px 20px;">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>日志内容</th>
+                        <th>时间</th>
+                      </tr>
+                    </thead>
+                    <tbody id="control_log_data">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+       </div>
+      <!--日志弹窗end -->
+
+      <!-- 布控添加/编辑弹窗start -->
+      <div class="xc_modal-overlay" id="controlModal">
+        <div class="xc_modal-container">
+            <div class="xc_modal-header">
+                <div class="xc_modal-title" id="modalTitle">添加布控</div>
+                <button class="xc_modal-close" onclick="closeControlModal()">×</button>
+            </div>
+            <div class="xc_modal-body">
+                <div class="xc_modal-content-wrapper">
+                    <div class="xc_modal-left">
+                        <div class="xc_video-container">
+                            <div id="video_player" class="xc_video-player">
+                            </div>
+                        </div>
+                        
+                        <div class="xc_video-controls">
+                            <button type="button" onclick="f_clickPlayStart()" class="xc_btn-modern">
+                                <i class="fa fa-play"></i> 播放
+                            </button>
+                            <button type="button" onclick="f_clickPlayStop()" class="xc_btn-modern" style="margin-left: 8px; background: #f3f4f6; color: #6b7280;">
+                                <i class="fa fa-stop"></i> 停止
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="xc_modal-right">
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">布控编号</label>
+                            <input type="text" id="input_code" class="xc_form-input" disabled>
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">选择视频流<span class="required">*</span></label>
+                            <select id="select_stream" class="xc_form-input" required="required">
+                                <option value="">请选择视频流</option>
+                            </select>
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">视频信息</label>
+                            <input type="text" id="input_video" class="xc_form-input" disabled>
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">音频信息</label>
+                            <input type="text" id="input_audio" class="xc_form-input" disabled>
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">播放地址</label>
+                            <input type="text" id="input_video_url" class="xc_form-input" disabled>
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">报警音频<span class="required">*</span></label>
+                            <select id="select_audio" class="xc_form-input" required="required">
+                                <option value="">请选择报警音频</option>
+                            </select>
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">报警接口<span class="required">*</span></label>
+                            <select id="select_alarm_interface" class="xc_form-input" required="required">
+                                <option value="">请选择报警接口</option>
+                            </select>
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">报警间隔(秒)<span class="required">*</span></label>
+                            <input type="number" id="min_interval" class="xc_form-input" value="180">
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">重叠阈值<span class="required">*</span></label>
+                            <input type="number" id="overlap_thresh" class="xc_form-input" value="0.5" step="0.01">
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">分配进程</label>
+                            <input type="number" id="deploy_process_index" class="xc_form-input" value="0" min="0">
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">OSD参数</label>
+                            <textarea id="osd_params" class="xc_form-textarea" rows="2"></textarea>
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">扩展参数</label>
+                            <textarea id="extend_params" class="xc_form-textarea" rows="2"></textarea>
+                        </div>
+
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">备注</label>
+                            <textarea id="remark" class="xc_form-textarea" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="xc_modal-footer">
+                <button class="xc_modal-btn" onclick="closeControlModal()">取消</button>
+                <button class="xc_modal-btn xc_modal-btn-primary" onclick="submitControlForm()">
+                    <span id="submit_loading" style="display: none;">
+                        <span class="xc_loading-spinner"></span>
+                    </span>
+                    <span id="submit_text">提交</span>
+                </button>
+            </div>
+        </div>
+      </div>
+      <!-- 布控添加/编辑弹窗end -->
+
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+<script src="/static/lib/easyPlayer/js/easyplayer-pro.js?02"></script>
+<script>
+    let eleTopLoading = $("#top_loading");
+    let eleData = $("#data");
+    let elePageData = $("#pageData");
+    let eleSearchInput = $("#search_input");
+    let eleSearchStatus = $("#search_status");
+    let mNodeCode = "";
+    let mControls = [];
+    let mContext = {};
+    let curPage = 1;
+    let curPageSize = 12;
+
+    let currentHandle = 'add';
+    let currentControlCode = '';
+    let mVideoUrl = null;
+    let ePlayer = null;
+    let streamCodeDict = {};
+    let audioCodeDict = {};
+    let alarmInterfaceCodeDict = {};
+
+    function initGlobalNode() {
+        var currentNode = window.GlobalNodeManager ? window.GlobalNodeManager.getCurrentNode() : null;
+        if (currentNode && currentNode.code) {
+            mNodeCode = currentNode.code;
+            curPage = 1;
+            getNodeControls();
+        } else {
+            eleData.html("<div class='xc_empty-state'><i class='fa fa-server'></i><p>请在右上角选择节点</p></div>");
+            elePageData.html("");
+        }
+    }
+
+    window.addEventListener('globalNodeChanged', function(e) {
+        mNodeCode = e.detail.code;
+        curPage = 1;
+        getNodeControls();
+    });
+
+    $(document).ready(function() {
+        setTimeout(initGlobalNode, 500);
+    });
+
+    function doSearch() {
+        curPage = 1;
+        getNodeControls();
+    }
+
+    function getNodeControls() {
+        if(!mNodeCode){
+            myToast("请选择节点！","error");
+            return;
+        }
+        
+        let searchText = eleSearchInput.val().trim();
+        let searchStatus = eleSearchStatus.val();
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/control/getNodeControls',
+            type: "get",
+            async: true,
+            data: {
+                "node_code": mNodeCode,
+                "p": curPage,
+                "ps": curPageSize,
+                "search_text": searchText,
+                "search_status": searchStatus
+            },
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    mControls = res.data || [];
+                    renderControls(res.pageData);
+                }else{
+                    eleData.html("<div class='xc_empty-state'><i class='fa fa-exclamation-triangle'></i><p>"+res.msg+"</p></div>");
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function renderControls(pageData) {
+        if(mControls.length === 0){
+            eleData.html("<div class='xc_empty-state'><i class='fa fa-shield'></i><p>暂无布控数据</p></div>");
+            elePageData.html("");
+            return;
+        }
+
+        let groupedData = {};
+        for(let i = 0; i < mControls.length; i++){
+            let c = mControls[i];
+            let streamKey = c.stream_app + "_" + c.stream_name;
+            if(!groupedData[streamKey]){
+                groupedData[streamKey] = {
+                    stream_app: c.stream_app,
+                    stream_name: c.stream_name,
+                    stream_nickname: c.stream_nickname || c.stream_name,
+                    stream_active: c.stream_active,
+                    controls: []
+                };
+            }
+            groupedData[streamKey].controls.push(c);
+        }
+
+        let html = "";
+        for(let streamKey in groupedData){
+            let group = groupedData[streamKey];
+            
+            html += "<div class=\"xc_group\">";
+            html += "<div class=\"xc_group_header\">";
+            html += "<div class=\"xc_group_title\">";
+            if(group.stream_active === 1){
+                html += "<span class='sun-state-success' style='cursor:pointer;' onclick=\"openPlayer('" + group.stream_app + "','" + group.stream_name + "')\"><i class='fa fa-play'></i>播放</span>";
+            }else{
+                html += "<span class='sun-state-error'>离线</span>";
+            }
+            html += group.stream_nickname;
+            html += "<span class=\"xc_group_count\">" + group.controls.length + " 个布控</span>";
+            html += "</div>";
+            html += "<div class=\"xc_group_actions\" onclick=\"toggleGroup(this)\">";
+            html += "<div class=\"xc_group_toggle expanded\">";
+            html += "<svg class=\"xc-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">";
+            html += "<polyline points=\"6 9 12 15 18 9\"/>";
+            html += "</svg>";
+            html += "</div>";
+            html += "</div>";
+            html += "</div>";
+            html += "<div class=\"xc_camera_list expanded\">";
+            html += "<table class=\"xc_camera_table\">";
+            html += "<thead>";
+            html += "<tr>";
+            html += "<th>ID</th>";
+            html += "<th>编号</th>";
+            html += "<th>算法</th>";
+            html += "<th>计算频率</th>";
+            html += "<th>状态</th>";
+            html += "<th>操作</th>";
+            html += "</tr>";
+            html += "</thead>";
+            html += "<tbody>";
+
+            for(let i = 0; i < group.controls.length; i++){
+                let c = group.controls[i];
+                
+                html += "<tr>";
+                html += "<td>" + (c.id || '-') + "</td>";
+                html += "<td style='width:15%;'>" + (c.code || '-') + "</td>";
+                html += "<td style='width:20%;'>";
+                if(c.algorithms && c.algorithms.length > 0){
+                    for(let j = 0; j < c.algorithms.length; j++){
+                        let algo = c.algorithms[j];
+                        html += "<span class='sun-a-label' style='font-size:11px;margin-left:0;margin-bottom:4px;'>" + (algo.flow_nickname || algo.flow_code) + "</span> ";
+                    }
+                }else{
+                    html += "-";
+                }
+                html += "</td>";
+                html += "<td>" + (c.checkFps || '-') + "</td>";
+                html += "<td>";
+                if(c.cur_state === 1){
+                    html += "<span class='xc_stream-status xc_stream-status-active'><span class='xc_stream-status-icon'></span>布控中</span>";
+                }else{
+                    html += "<span class='xc_stream-status xc_stream-status-inactive'><span class='xc_stream-status-icon'></span>未布控</span>";
+                }
+                html += "</td>";
+                html += "<td>";
+                if(c.cur_state === 1){
+                    html += "<a href=\"javascript:handleControl('" + c.code + "', 'cancel')\" class=\"sun-a-label\">取消</a>";
+                }else{
+                    html += "<a href=\"javascript:handleControl('" + c.code + "', 'add')\" class=\"sun-a-label\">执行</a>";
+                }
+                html += "<a href=\"javascript:openEdit('" + c.code + "')\" class=\"sun-a-label\">编辑</a>";
+                html += "<a href=\"javascript:openLog('" + c.code + "')\" class=\"sun-a-label\">日志</a>";
+                html += "<a href=\"javascript:deleteControl('" + c.code + "')\" class=\"sun-a-label\">删除</a>";
+                html += "</td>";
+                html += "</tr>";
+            }
+
+            html += "</tbody>";
+            html += "</table>";
+            html += "</div>";
+            html += "</div>";
+        }
+
+        eleData.html(html);
+        showPageData(pageData);
+    }
+
+    function showPageData(pageData) {
+        if(!pageData){
+            elePageData.html("");
+            return;
+        }
+        
+        let html = "";
+        html += "<div class=\"xc_page-info\">共" + (pageData.page_num || 1) + "页 / " + (pageData.count || 0) + "条</div>";
+        
+        let pageLabels = pageData.pageLabels || [];
+        for (let i = 0; i < pageLabels.length; i++) {
+            let cur = pageLabels[i].cur;
+            if(cur === 1){
+                html += "<div class=\"xc_page-btn xc_active\">" + pageLabels[i].name + "</div>";
+            }else{
+                html += "<div class=\"xc_page-btn\" onclick='goToPage(" + pageLabels[i].page + ")'>" + pageLabels[i].name + "</div>";
+            }
+        }
+        elePageData.html(html);
+    }
+
+    function goToPage(page) {
+        curPage = page;
+        getNodeControls();
+    }
+
+    function toggleGroup(actionsElement) {
+        const headerElement = actionsElement.parentNode;
+        const listElement = headerElement.nextElementSibling;
+        const toggleIcon = headerElement.querySelector('.xc_group_toggle');
+
+        listElement.classList.toggle('expanded');
+        toggleIcon.classList.toggle('expanded');
+    }
+
+    function openPlayer(stream_app, stream_name) {
+        window.open("/stream/player?app=" + stream_app + "&name=" + stream_name + "&node_code=" + mNodeCode);
+    }
+
+    function handleControl(code, handle) {
+        if(!mNodeCode){
+            myToast("请选择节点！","error");
+            return;
+        }
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/control/openHandle',
+            type: "post",
+            async: true,
+            data: {
+                "node_code": mNodeCode,
+                "handle": handle,
+                "code": code
+            },
+            dataType: "json",
+            timeout: 60000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    myToast("操作成功！","success");
+                    getNodeControls();
+                }else{
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function handleAllControl(handle) {
+        if(!mNodeCode){
+            myToast("请选择节点！","error");
+            return;
+        }
+        
+        let msg = handle === 'addAll' ? '确认全部执行吗？' : '确认全部取消吗？';
+        if(!confirm(msg)){
+            return;
+        }
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/control/openHandle',
+            type: "post",
+            async: true,
+            data: {
+                "node_code": mNodeCode,
+                "handle": handle,
+                "state": 10
+            },
+            dataType: "json",
+            timeout: 120000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    myToast("操作成功！","success");
+                    getNodeControls();
+                }else{
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function deleteControl(code) {
+        if(!confirm('确认删除吗？')){
+            return;
+        }
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/control/openDel',
+            type: "post",
+            async: true,
+            data: {
+                "node_code": mNodeCode,
+                "code": code
+            },
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    myToast("删除成功！","success");
+                    getNodeControls();
+                }else{
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function openLog(code) {
+        eleTopLoading.show();
+        $.ajax({
+            url: '/control/openLog',
+            type: "get",
+            async: true,
+            data: {
+                "node_code": mNodeCode,
+                "controlCode": code
+            },
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    $("#control_log_dialog").modal("toggle");
+                    let logHtml = "";
+                    let data = res.data || [];
+                    if(data.length === 0){
+                        logHtml = "<tr><td colspan='3'>暂无日志</td></tr>";
+                    }else{
+                        for(let i = 0; i < data.length; i++){
+                            let d = data[i];
+                            logHtml += "<tr>";
+                            logHtml += "<td>" + (d.id || '-') + "</td>";
+                            logHtml += "<td>" + (d.content || '-') + "</td>";
+                            logHtml += "<td>" + (d.create_time_str || '-') + "</td>";
+                            logHtml += "</tr>";
+                        }
+                    }
+                    $("#control_log_data").html(logHtml);
+                }else{
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function openAdd() {
+        if(!mNodeCode){
+            myToast("请选择节点！","error");
+            return;
+        }
+        
+        currentHandle = 'add';
+        currentControlCode = '';
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/control/openAddContext',
+            type: "get",
+            async: true,
+            data: {"node_code": mNodeCode},
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    mContext = res.context || {};
+                    loadAddFormData();
+                }else{
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function loadAddFormData() {
+        $("#modalTitle").text("添加布控");
+        
+        resetControlForm();
+        
+        if(mContext.control && mContext.control.code){
+            $("#input_code").val(mContext.control.code);
+        }
+        
+        if(mContext.control){
+            if(mContext.control.min_interval !== undefined){
+                $("#min_interval").val(mContext.control.min_interval);
+            }
+            if(mContext.control.overlap_thresh !== undefined){
+                $("#overlap_thresh").val(mContext.control.overlap_thresh);
+            }
+            if(mContext.control.deploy_process_index !== undefined){
+                $("#deploy_process_index").val(mContext.control.deploy_process_index);
+            }
+        }
+        
+        let streamHtml = "<option value=''>请选择视频流</option>";
+        let streams = mContext.streams || [];
+        for(let i = 0; i < streams.length; i++){
+            let stream = streams[i];
+            streamCodeDict[stream.app + "_" + stream.name] = {
+                'app': stream.app,
+                "name": stream.name,
+                "video": stream.video,
+                "video_codec_name": stream.video_codec_name,
+                "video_width": parseInt(stream.video_width) || 0,
+                "video_height": parseInt(stream.video_height) || 0,
+                "audio": stream.audio,
+                "videoUrl": stream.videoUrl,
+                "wsHost": stream.wsHost,
+                "wsMp4Url": stream.wsMp4Url,
+                "nickname": stream.nickname || stream.name
+            };
+            streamHtml += "<option value='" + stream.app + "|" + stream.name + "'>" + (stream.nickname || stream.name) + "</option>";
+        }
+        $("#select_stream").html(streamHtml);
+        $("#select_stream").prop('disabled', false);
+        
+        let audioHtml = "<option value=''>请选择报警音频</option>";
+        let audios = mContext.audios || [];
+        for(let i = 0; i < audios.length; i++){
+            audioCodeDict[audios[i].code] = audios[i];
+            audioHtml += "<option value='" + audios[i].code + "'>" + (audios[i].nickname || audios[i].name) + "</option>";
+        }
+        $("#select_audio").html(audioHtml);
+        
+        let interfaceHtml = "<option value=''>请选择报警接口</option>";
+        let interfaces = mContext.alarmInterfaces || [];
+        for(let i = 0; i < interfaces.length; i++){
+            alarmInterfaceCodeDict[interfaces[i].code] = interfaces[i];
+            interfaceHtml += "<option value='" + interfaces[i].code + "'>" + (interfaces[i].nickname || interfaces[i].name) + "</option>";
+        }
+        $("#select_alarm_interface").html(interfaceHtml);
+        
+        $("#controlModal").addClass('active');
+    }
+
+    function openEdit(code) {
+        if(!mNodeCode){
+            myToast("请选择节点！","error");
+            return;
+        }
+        
+        currentHandle = 'edit';
+        currentControlCode = code;
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/control/openEditContext',
+            type: "get",
+            async: true,
+            data: {
+                "node_code": mNodeCode,
+                "code": code
+            },
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    mContext = res.context || {};
+                    loadEditFormData();
+                }else{
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function loadEditFormData() {
+        $("#modalTitle").text("编辑布控");
+        
+        resetControlForm();
+        
+        let control = mContext.control || {};
+        let control_stream = mContext.control_stream || {};
+        
+        $("#input_code").val(control.code || '');
+        
+        let streamHtml = "<option value=''>请选择视频流</option>";
+        if(control_stream && control_stream.app && control_stream.name){
+            streamCodeDict[control_stream.app + "_" + control_stream.name] = {
+                'app': control_stream.app,
+                "name": control_stream.name,
+                "video": control_stream.video,
+                "video_codec_name": control_stream.video_codec_name,
+                "video_width": parseInt(control_stream.video_width) || 0,
+                "video_height": parseInt(control_stream.video_height) || 0,
+                "audio": control_stream.audio,
+                "videoUrl": control_stream.videoUrl,
+                "wsHost": control_stream.wsHost,
+                "wsMp4Url": control_stream.wsMp4Url,
+                "nickname": control_stream.nickname || control_stream.name
+            };
+            streamHtml += "<option value='" + control_stream.app + "|" + control_stream.name + "'>" + (control_stream.nickname || control_stream.name) + "</option>";
+            $("#select_stream").prop('disabled', true);
+            
+            $("#input_video_url").val(control_stream.wsMp4Url || '');
+            $("#input_video").val(control_stream.video || '');
+            $("#input_audio").val(control_stream.audio || '');
+            mVideoUrl = control_stream.wsMp4Url;
+        }
+        $("#select_stream").html(streamHtml);
+        
+        let audioHtml = "<option value=''>请选择报警音频</option>";
+        let audios = mContext.audios || [];
+        for(let i = 0; i < audios.length; i++){
+            audioCodeDict[audios[i].code] = audios[i];
+            let selected = audios[i].code === control.audio_code ? 'selected' : '';
+            audioHtml += "<option value='" + audios[i].code + "' " + selected + ">" + (audios[i].nickname || audios[i].name) + "</option>";
+        }
+        $("#select_audio").html(audioHtml);
+        
+        let interfaceHtml = "<option value=''>请选择报警接口</option>";
+        let interfaces = mContext.alarmInterfaces || [];
+        for(let i = 0; i < interfaces.length; i++){
+            alarmInterfaceCodeDict[interfaces[i].code] = interfaces[i];
+            let selected = interfaces[i].code === control.alarm_interface_code ? 'selected' : '';
+            interfaceHtml += "<option value='" + interfaces[i].code + "' " + selected + ">" + (interfaces[i].nickname || interfaces[i].name) + "</option>";
+        }
+        $("#select_alarm_interface").html(interfaceHtml);
+        
+        $("#min_interval").val(control.min_interval || 180);
+        $("#overlap_thresh").val(control.overlap_thresh || 0.5);
+        $("#deploy_process_index").val(control.deploy_process_index || 0);
+        $("#osd_params").val(control.osd_params || '');
+        $("#extend_params").val(control.extend_params || '');
+        $("#remark").val(control.remark || '');
+        
+        $("#controlModal").addClass('active');
+        
+        if(mVideoUrl){
+            setTimeout(function() {
+                f_playStart(mVideoUrl);
+            }, 300);
+        }
+    }
+
+    function resetControlForm() {
+        $("#input_code").val('');
+        $("#select_stream").val('');
+        $("#select_stream").prop('disabled', false);
+        $("#input_video").val('');
+        $("#input_audio").val('');
+        $("#input_video_url").val('');
+        $("#select_audio").val('');
+        $("#select_alarm_interface").val('');
+        $("#min_interval").val('180');
+        $("#overlap_thresh").val('0.5');
+        $("#deploy_process_index").val('0');
+        $("#osd_params").val('');
+        $("#extend_params").val('');
+        $("#remark").val('');
+        mVideoUrl = null;
+        streamCodeDict = {};
+        audioCodeDict = {};
+        alarmInterfaceCodeDict = {};
+        
+        if(ePlayer){
+            f_playStop();
+        }
+    }
+
+    function closeControlModal() {
+        $("#controlModal").removeClass('active');
+        if(ePlayer){
+            f_playStop();
+        }
+    }
+
+    $('#controlModal').click(function(e) {
+        if (e.target === this) {
+            closeControlModal();
+        }
+    });
+
+    $(document).keydown(function(e) {
+        if (e.keyCode === 27 && $('#controlModal').hasClass('active')) {
+            closeControlModal();
+        }
+    });
+
+    $("#select_stream").change(function () {
+        let streamVal = $(this).val();
+        if(!streamVal){
+            $("#input_video_url").val('');
+            $("#input_video").val('');
+            $("#input_audio").val('');
+            mVideoUrl = null;
+            if(ePlayer){
+                f_playStop();
+            }
+            return;
+        }
+        
+        let stream = streamCodeDict[streamVal];
+        if (stream) {
+            mVideoUrl = stream.wsMp4Url;
+            $("#input_video_url").val(stream.wsMp4Url || '');
+            $("#input_video").val(stream.video || '');
+            $("#input_audio").val(stream.audio || '');
+            
+            if(ePlayer){
+                f_playStop();
+            }
+            
+            setTimeout(function() {
+                if(mVideoUrl){
+                    f_playStart(mVideoUrl);
+                }
+            }, 300);
+        }
+    });
+
+    function f_createEPlayer() {
+        ePlayer = new EasyPlayerPro({
+            container: document.getElementById('video_player'),
+            videoBuffer: 0.1,
+            videoBufferDelay: Number(3),
+            decoder: '/static/lib/easyPlayer/js/decoder-pro.js',
+            isResize: true,
+            text: "布控预览",
+            loadingText: "加载中",
+            debug: false,
+            debugLevel: "debug",
+            useMSE: true,
+            useSIMD: false,
+            useWCS: true,
+            hasAudio: true,
+            websocket1006ErrorReplay: true,
+            networkDelayTimeoutReplay: true,
+            useMThreading: true,
+            showBandwidth: false,
+            showPerformance: false,
+            operateBtns: {
+                fullscreen: false,
+                screenshot: false,
+                play: true,
+                audio: false,
+                ptz: false,
+                quality: false,
+                performance: false,
+            },
+            background: "/static/images/player_poster.jpg",
+            timeout: 10,
+            qualityConfig: ['普清', '高清', '超清'],
+            forceNoOffscreen: true,
+            isNotMute: false,
+            heartTimeout: Number(7),
+            ptzClickType: 'mouseDownAndUp',
+            ptzZoomShow: true,
+            ptzMoreArrowShow: true,
+            ptzApertureShow: true,
+            ptzFocusShow: true,
+            pauseAndNextPlayUseLastFrameShow: true,
+            heartTimeoutReplayUseLastFrameShow: true,
+            replayUseLastFrameShow: true,
+            fullscreenWatermarkConfig: {
+                text: "",
+            }
+        });
+    }
+    
+    function f_playStart(video_url){
+        if(!video_url){
+            myToast("请先选择视频流！","error");
+            return false;
+        }
+        if(video_url.startsWith("ws://") || video_url.startsWith("http://") || video_url.startsWith("wss://") || video_url.startsWith("https://")){
+            if (ePlayer) {
+                ePlayer.destroy().then(() => {
+                    f_createEPlayer();
+                    ePlayer.play(video_url);
+                });
+            } else {
+                f_createEPlayer();
+                ePlayer.play(video_url);
+            }
+        }else{
+            myToast("视频流地址格式不正确！","error");
+            return false;
+        }
+    }
+    
+    function f_playStop(){
+        if(ePlayer){
+            ePlayer.destroy();
+            ePlayer = null;
+        }
+    }
+    
+    function f_clickPlayStart() {
+        if(mVideoUrl){
+            f_playStart(mVideoUrl);
+        }else{
+            myToast("请先选择视频流！","error");
+        }
+    }
+    
+    function f_clickPlayStop() {
+        f_playStop();
+    }
+
+    function submitControlForm() {
+        if(!mNodeCode){
+            myToast("请选择节点！","error");
+            return;
+        }
+        
+        let streamVal = $("#select_stream").val();
+        let audioCode = $("#select_audio").val();
+        let alarmInterfaceCode = $("#select_alarm_interface").val();
+        let minInterval = parseInt($("#min_interval").val());
+        let overlapThresh = parseFloat($("#overlap_thresh").val());
+        let deployProcessIndex = parseInt($("#deploy_process_index").val()) || 0;
+        let osdParams = $("#osd_params").val().trim();
+        let extendParams = $("#extend_params").val().trim();
+        let remark = $("#remark").val().trim();
+        
+        if(!streamVal && currentHandle === 'add'){
+            myToast("请选择视频流！","error");
+            return;
+        }
+        
+        if(!audioCode){
+            myToast("请选择报警音频！","error");
+            return;
+        }
+        
+        if(!alarmInterfaceCode){
+            myToast("请选择报警接口！","error");
+            return;
+        }
+        
+        if(isNaN(minInterval) || minInterval < 0){
+            myToast("报警间隔时间不能小于0秒！","error");
+            return;
+        }
+        
+        if(isNaN(overlapThresh) || overlapThresh <= 0 || overlapThresh > 1){
+            myToast("重叠阈值必须在0-1之间！","error");
+            return;
+        }
+        
+        let streamApp = '';
+        let streamName = '';
+        let streamVideo = '';
+        let streamAudio = '';
+        
+        if(streamVal){
+            let parts = streamVal.split('|');
+            streamApp = parts[0];
+            streamName = parts[1];
+            let stream = streamCodeDict[streamVal];
+            if(stream){
+                streamVideo = stream.video || '';
+                streamAudio = stream.audio || '';
+            }
+        }
+        
+        let url = currentHandle === 'add' ? '/control/openAdd' : '/control/openEdit';
+        let controlCode = currentHandle === 'add' ? $("#input_code").val() : currentControlCode;
+        
+        let data = {
+            "node_code": mNodeCode,
+            "controlCode": controlCode,
+            "audioCode": audioCode,
+            "alarmInterfaceCode": alarmInterfaceCode,
+            "minInterval": minInterval,
+            "overlapThresh": overlapThresh,
+            "deployProcessIndex": deployProcessIndex,
+            "osd_params": osdParams,
+            "extend_params": extendParams,
+            "remark": remark
+        };
+        
+        if(currentHandle === 'add'){
+            data.streamApp = streamApp;
+            data.streamName = streamName;
+            data.streamVideo = streamVideo;
+            data.streamAudio = streamAudio;
+        }
+        
+        $("#submit_loading").show();
+        $("#submit_text").text('提交中...');
+        
+        $.ajax({
+            url: url,
+            type: "post",
+            async: true,
+            data: data,
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                $("#submit_loading").hide();
+                $("#submit_text").text('提交');
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                $("#submit_loading").hide();
+                $("#submit_text").text('提交');
+                if(res.code === 1000){
+                    myToast("操作成功！","success");
+                    setTimeout(function() {
+                        closeControlModal();
+                        getNodeControls();
+                    }, 500);
+                }else{
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    eleSearchInput.on("keydown", function(e){
+        if (e.key === 'Enter' || e.keyCode === 13 || e.which === 13) {
+            e.preventDefault();
+            doSearch();
+        }
+    });
+
+    function myToast(text, icon, hideAfter) {
+        hideAfter = hideAfter || 2000;
+        const existingAlerts = document.querySelectorAll('.xc-toast');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const toastElement = document.createElement('div');
+        toastElement.className = 'xc-toast ' + icon;
+        toastElement.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);';
+        
+        if (icon === 'success') {
+            toastElement.style.backgroundColor = '#10b981';
+        } else if (icon === 'error') {
+            toastElement.style.backgroundColor = '#ef4444';
+        } else {
+            toastElement.style.backgroundColor = '#6b7280';
+        }
+        
+        toastElement.innerHTML = '<span>' + text + '</span>';
+        document.body.appendChild(toastElement);
+        
+        if (hideAfter > 0) {
+            setTimeout(function() {
+                toastElement.remove();
+            }, hideAfter);
+        }
+    }
+</script>
+
+{% endblock javascripts %}

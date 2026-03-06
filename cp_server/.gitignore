@@ -1,0 +1,19 @@
+﻿# clion
+.idea/
+
+# vs
+.vs
+.log
+log/*
+venv/*
+
+__pycache__
+app/__pycache__
+app/utils/__pycache__
+app/consumers/__pycache__
+app/views/__pycache__
+framework/__pycache__
+static/storage/*
+
+
+

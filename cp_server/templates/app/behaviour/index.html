@@ -1,0 +1,444 @@
+{% extends "app/base_site.html" %}
+{% block title %} 行为算法管理 {% endblock title %}
+{% block stylesheets %}
+  {{ block.super }}
+<style>
+    .xc_container {
+        color: #333;
+        line-height: 1.6;
+        margin: 0 auto;
+        padding: 10px 20px;
+    }
+    .xc_toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .xc_page-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1D2129;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .xc_btn-modern {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+    .xc_btn-modern:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+    .xc_search-input {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        width: 200px;
+        transition: all 0.2s;
+    }
+    .xc_search-input:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    .xc_table-container {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .xc_table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .xc_table th {
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 500;
+        color: #6b7280;
+        font-size: 13px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .xc_table td {
+        padding: 12px 16px;
+        font-size: 14px;
+        color: #374151;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .xc_table tbody tr:hover {
+        background-color: rgba(16, 185, 129, 0.03);
+    }
+    .xc_action-link {
+        color: #6b7280;
+        text-decoration: none;
+        font-weight: 500;
+        margin-left: 12px;
+        cursor: pointer;
+        font-size: 13px;
+        padding: 5px 12px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        background-color: #fafafa;
+        border: 1px solid #e5e5e5;
+    }
+    .xc_action-link:hover {
+        color: #374151;
+        background-color: #f5f5f5;
+        border-color: #d4d4d4;
+        text-decoration: none;
+    }
+    .xc_empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #9ca3af;
+    }
+    .xc_empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        display: block;
+    }
+    .xc_loading-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #e5e7eb;
+        border-top-color: #10b981;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    .xc_loading-text {
+        color: #6b7280;
+        font-size: 14px;
+    }
+    .xc_pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding-top: 20px;
+        padding-bottom: 10px;
+    }
+    .xc_page-btn {
+        min-width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .xc_page-btn:hover:not(.xc_active) {
+        border-color: #34495e;
+        color: #34495e;
+    }
+    .xc_page-btn.xc_active {
+        background-color: #34495e;
+        color: white;
+    }
+    .xc_page-info {
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+    <div class="xc_container">
+        <div class="xc_toolbar">
+            <div class="xc_page-title">
+                <i class="fa fa-running"></i>
+                行为算法管理
+            </div>
+
+            <input type="text" id="search_input" class="xc_search-input" placeholder="输入算法名称或编号">
+
+            <button class="xc_btn-modern" onclick="doSearch()">
+                <i class="fa fa-search"></i> 搜索
+            </button>
+
+            <div>
+                <span id="top_loading" style="display: none;">
+                    <span class="xc_loading-spinner"></span>
+                    <span class="xc_loading-text">加载中...</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="xc_table-container">
+            <table class="xc_table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>编号</th>
+                        <th>名称</th>
+                        <th>更新时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="data_table">
+                    <tr>
+                        <td colspan="5">
+                            <div class="xc_empty-state">
+                                <i class="fa fa-server"></i>
+                                <p>请在右上角选择节点</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+              </div>
+        </div>
+      </div>
+
+    <div class="row">
+        <div class="xc_pagination" id="pageData">
+        </div>
+    </div>
+
+    </div>
+  </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+<script>
+    let eleTopLoading = $("#top_loading");
+    let eleDataTable = $("#data_table");
+    let elePageData = $("#pageData");
+    let eleSearchInput = $("#search_input");
+    let mNodeCode = "";
+    let mData = [];
+    let curPage = 1;
+    let curPageSize = 10;
+
+    function initGlobalNode() {
+        var currentNode = window.GlobalNodeManager ? window.GlobalNodeManager.getCurrentNode() : null;
+        if (currentNode && currentNode.code) {
+            mNodeCode = currentNode.code;
+            curPage = 1;
+            getData();
+        } else {
+            eleDataTable.html("<tr><td colspan='5'><div class='xc_empty-state'><i class='fa fa-server'></i><p>请在右上角选择节点</p></div></td></tr>");
+            elePageData.html("");
+        }
+    }
+
+    window.addEventListener('globalNodeChanged', function(e) {
+        mNodeCode = e.detail.code;
+        curPage = 1;
+        getData();
+    });
+
+    $(document).ready(function() {
+        setTimeout(initGlobalNode, 500);
+    });
+
+    function doSearch() {
+        curPage = 1;
+        getData();
+    }
+
+    function getData() {
+        if(!mNodeCode){
+            myToast("请选择节点！","error");
+            return;
+        }
+        
+        let searchKey = eleSearchInput.val().trim();
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/behaviour/getList',
+            type: "get",
+            async: true,
+            data: {
+                "node_code": mNodeCode,
+                "p": curPage,
+                "ps": curPageSize,
+                "search": searchKey
+            },
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    mData = res.data || [];
+                    renderData(res.pageData);
+                }else{
+                    eleDataTable.html("<tr><td colspan='5'><div class='xc_empty-state'><i class='fa fa-exclamation-triangle'></i><p>"+res.msg+"</p></div></td></tr>");
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    function renderData(pageData) {
+        if(mData.length === 0){
+            eleDataTable.html("<tr><td colspan='5'><div class='xc_empty-state'><i class='fa fa-running'></i><p>暂无行为算法数据</p></div></td></tr>");
+            elePageData.html("");
+            return;
+        }
+
+        let html = "";
+        for(let i = 0; i < mData.length; i++){
+            let item = mData[i];
+            
+            html += "<tr>";
+            html += "<td>" + (item.id || '-') + "</td>";
+            html += "<td>" + (item.code || '-') + "</td>";
+            html += "<td>" + (item.name || '-') + "</td>";
+            html += "<td>" + (item.last_update_time || '-') + "</td>";
+            html += "<td>";
+            html += "<a href='javascript:openInfo(\"" + item.code + "\")' class='xc_action-link'>详情</a>";
+            html += "<a href='javascript:openEdit(\"" + item.code + "\")' class='xc_action-link'>编辑</a>";
+            html += "<a href='javascript:openDel(\"" + item.code + "\")' class='xc_action-link'>删除</a>";
+            html += "</td>";
+            html += "</tr>";
+        }
+
+        eleDataTable.html(html);
+        showPageData(pageData);
+    }
+
+    function showPageData(pageData) {
+        if(!pageData){
+            elePageData.html("");
+            return;
+        }
+        
+        let html = "";
+        html += "<div class=\"xc_page-info\">共" + (pageData.page_num || 1) + "页 / " + (pageData.count || 0) + "条</div>";
+        
+        let pageLabels = pageData.pageLabels || [];
+        for (let i = 0; i < pageLabels.length; i++) {
+            let cur = pageLabels[i].cur;
+            if(cur === 1){
+                html += "<div class=\"xc_page-btn xc_active\">" + pageLabels[i].name + "</div>";
+            }else{
+                html += "<div class=\"xc_page-btn\" onclick='goToPage(" + pageLabels[i].page + ")'>" + pageLabels[i].name + "</div>";
+            }
+        }
+        elePageData.html(html);
+    }
+
+    function goToPage(page) {
+        curPage = page;
+        getData();
+    }
+
+    function openInfo(code) {
+        myToast("详情功能开发中...","info");
+    }
+
+    function openEdit(code) {
+        myToast("编辑功能开发中...","info");
+    }
+
+    function openDel(code) {
+        if(!confirm("确定要删除该行为算法吗？")){
+            return;
+        }
+        
+        if(!mNodeCode){
+            myToast("请选择节点！","error");
+            return;
+        }
+        
+        eleTopLoading.show();
+        $.ajax({
+            url: '/behaviour/openDel',
+            type: "post",
+            async: true,
+            data: {
+                "node_code": mNodeCode,
+                "code": code
+            },
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast("网络异常，请确定网络正常！","error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if(res.code === 1000){
+                    myToast("删除成功！","success");
+                    getData();
+                }else{
+                    myToast(res.msg,"error");
+                }
+            }
+        });
+    }
+
+    eleSearchInput.on("keydown", function(e){
+        if (e.key === 'Enter' || e.keyCode === 13 || e.which === 13) {
+            e.preventDefault();
+            doSearch();
+        }
+    });
+
+    function myToast(text, icon, hideAfter) {
+        hideAfter = hideAfter || 2000;
+        const existingAlerts = document.querySelectorAll('.xc-toast');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const toastElement = document.createElement('div');
+        toastElement.className = 'xc-toast ' + icon;
+        toastElement.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);';
+        
+        if (icon === 'success') {
+            toastElement.style.backgroundColor = '#10b981';
+        } else if (icon === 'error') {
+            toastElement.style.backgroundColor = '#ef4444';
+        } else {
+            toastElement.style.backgroundColor = '#6b7280';
+        }
+        
+        toastElement.innerHTML = '<span>' + text + '</span>';
+        document.body.appendChild(toastElement);
+        
+        if (hideAfter > 0) {
+            setTimeout(function() {
+                toastElement.remove();
+            }, hideAfter);
+        }
+    }
+</script>
+
+{% endblock javascripts %}
