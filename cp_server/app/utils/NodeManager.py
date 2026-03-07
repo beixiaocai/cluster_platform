@@ -27,7 +27,6 @@ class NodeManager:
     def register_node(self, node_code, channel_name, discover_info, client_ip=None):
         with self._lock:
             auth_info = discover_info.get('auth', {})
-            auth_info_data = auth_info.get('info', {}) if auth_info else {}
             
             node_data = {
                 'code': node_code,
@@ -39,12 +38,13 @@ class NodeManager:
                 'admin_port': discover_info.get('adminPort', 9001),
                 'version': discover_info.get('project_version', 0),
                 'flag': discover_info.get('project_flag', ''),
-                'is_auth': auth_info_data.get('isAuth', 0),
-                'is_multi_process': auth_info_data.get('isMultiProcess', 0),
-                'max_count': auth_info_data.get('maxCount', 0),
-                'auth_desc': auth_info_data.get('desc', ''),
-                'machine_mac': auth_info_data.get('machineMac', ''),
-                'start_timestamp': discover_info.get('project_start_timestamp', 0),
+                'is_auth': 1 if auth_info.get('state', 0) == 1 else 0,
+                'is_multi_process': 1 if auth_info.get('isMultiProcess', False) else 0,
+                'max_count': auth_info.get('maxCount', 0),
+                'auth_msg': auth_info.get('authMsg', ''),
+                'finger': auth_info.get('finger', ''),
+                'project_start_timestamp': discover_info.get('project_start_timestamp', 0),
+                'os_boot_timestamp': discover_info.get('os_boot_timestamp', 0),
                 'channel_name': channel_name,
                 'connected': True,
                 'connect_time': datetime.now(),
@@ -143,9 +143,10 @@ class NodeManager:
                     'is_auth': node_data.get('is_auth', 0),
                     'is_multi_process': node_data.get('is_multi_process', 0),
                     'max_count': node_data.get('max_count', 0),
-                    'auth_desc': node_data.get('auth_desc', ''),
-                    'machine_mac': node_data.get('machine_mac', ''),
-                    'start_timestamp': node_data.get('start_timestamp', 0),
+                    'auth_msg': node_data.get('auth_msg', ''),
+                    'finger': node_data.get('finger', ''),
+                    'project_start_timestamp': node_data.get('project_start_timestamp', 0),
+                    'os_boot_timestamp': node_data.get('os_boot_timestamp', 0),
                     'ws_connected': True,
                     'ws_channel': node_data.get('channel_name', ''),
                     'ws_connect_time': node_data.get('connect_time'),

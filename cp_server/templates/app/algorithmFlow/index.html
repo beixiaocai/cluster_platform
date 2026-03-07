@@ -118,6 +118,11 @@
         border-color: #d4d4d4;
         text-decoration: none;
     }
+    .xc_action-link.delete:hover {
+        color: #dc2626;
+        background-color: #fef2f2;
+        border-color: #fecaca;
+    }
     .xc_empty-state {
         text-align: center;
         padding: 60px 20px;
@@ -178,6 +183,106 @@
         font-size: 14px;
         color: #7f8c8d;
     }
+    /* 弹框样式 */
+    .xc_modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+    .xc_modal-overlay.active { display: flex; }
+    .xc_modal-container {
+        width: 90%; max-width: 750px; max-height: 90vh;
+        background: white; border-radius: 6px;
+        display: flex; flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: xc_modalSlideIn 0.3s ease;
+    }
+    @keyframes xc_modalSlideIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .xc_modal-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 14px 18px; border-bottom: 1px solid #e5e7eb;
+        background: #fafafa; border-radius: 6px 6px 0 0;
+    }
+    .xc_modal-title {
+        font-size: 15px; font-weight: 500; color: #374151;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .xc_modal-title i { color: #3b82f6; font-size: 14px; }
+    .xc_modal-close {
+        width: 28px; height: 28px; border: none;
+        background: white; border-radius: 4px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s; color: #6b7280; font-size: 16px;
+    }
+    .xc_modal-close:hover { background: #f3f4f6; color: #374151; }
+    .xc_modal-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+    .xc_modal-footer {
+        padding: 12px 18px; border-top: 1px solid #e5e7eb;
+        display: flex; justify-content: flex-end; gap: 8px; background: #fafafa;
+    }
+    .xc_form-row { display: flex; gap: 12px; margin-bottom: 10px; }
+    .xc_form-col { flex: 1; }
+    .xc_form-col.full { flex: 0 0 100%; }
+    .xc_form-group { margin-bottom: 10px; }
+    .xc_form-label {
+        display: block; font-size: 12px; color: #606266; margin-bottom: 4px;
+    }
+    .xc_form-label .required { color: #f56c6c; margin-left: 2px; }
+    .xc_form-input, .xc_form-select, .xc_form-textarea {
+        width: 100%; padding: 0 10px; font-size: 12px;
+        border: 1px solid #dcdfe6; border-radius: 4px;
+        transition: border-color 0.2s; background: white;
+    }
+    .xc_form-input { height: 30px; }
+    .xc_form-select { height: 30px; }
+    .xc_form-select[multiple] { height: auto; min-height: 150px; padding: 4px; }
+    .xc_form-select[multiple] option { padding: 3px 8px; margin: 1px 0; border-radius: 2px; font-size: 11px; }
+    .xc_form-textarea { min-height: 50px; padding: 6px 10px; resize: vertical; line-height: 1.4; }
+    .xc_form-input:focus, .xc_form-select:focus, .xc_form-textarea:focus { border-color: #3b82f6; outline: none; }
+    .xc_form-input:disabled, .xc_form-select:disabled { background: #f5f7fa; color: #909399; cursor: not-allowed; }
+    /* 流程图样式 */
+    .xc_flow-hint {
+        background: linear-gradient(90deg, #e8f5f1 0%, #f0f9f6 100%);
+        border-left: 3px solid #169F85;
+        padding: 8px 12px; margin-bottom: 14px; border-radius: 4px;
+        font-size: 12px; color: #169F85;
+    }
+    .xc_flow-hint i { margin-right: 4px; }
+    .xc_flow-step {
+        background: #fafbfc; border: 1px solid #e4e7ed;
+        border-radius: 5px; padding: 10px 12px; margin: 8px 0; transition: all 0.2s;
+    }
+    .xc_flow-step:hover { border-color: #169F85; box-shadow: 0 2px 8px rgba(22, 159, 133, 0.1); }
+    .xc_step-header { display: flex; align-items: center; margin-bottom: 8px; }
+    .xc_step-icon {
+        width: 24px; height: 24px; border-radius: 50%;
+        background: linear-gradient(135deg, #169F85 0%, #14b89a 100%);
+        color: white; display: flex; align-items: center; justify-content: center;
+        font-size: 12px; margin-right: 8px;
+    }
+    .xc_step-title { font-size: 12px; font-weight: 600; color: #303133; }
+    .xc_step-body { padding-left: 32px; }
+    .xc_flow-arrow { text-align: center; margin: 4px 0; color: #169F85; font-size: 16px; }
+    /* 按钮样式 */
+    .xc_btn { padding: 6px 14px; font-size: 12px; border-radius: 4px; border: 1px solid; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+    .xc_btn-cancel { background: white; color: #606266; border-color: #dcdfe6; }
+    .xc_btn-cancel:hover { background: #f5f7fa; color: #374151; }
+    .xc_btn-submit { background: #3b82f6; color: white; border-color: #3b82f6; }
+    .xc_btn-submit:hover { background: #2563eb; border-color: #2563eb; }
+    .xc_btn-submit:disabled { background: #9ca3af; border-color: #9ca3af; cursor: not-allowed; }
+    .xc_loading-icon {
+        display: inline-block; width: 12px; height: 12px;
+        border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+        border-radius: 50%; animation: xc_spinBtn 0.6s linear infinite;
+    }
+    @keyframes xc_spinBtn { to { transform: rotate(360deg); } }
 </style>
 
 {% endblock stylesheets %}
@@ -199,6 +304,10 @@
 
             <button class="xc_btn-modern" onclick="doSearch()">
                 <i class="fa fa-search"></i> 搜索
+            </button>
+
+            <button class="xc_btn-modern" onclick="openAddFlowModal()">
+                <i class="fa fa-plus"></i> 添加
             </button>
 
             <div>
@@ -246,6 +355,182 @@
     </div>
   </div>
 
+<!-- 业务算法弹窗 -->
+<div id="flowModal" class="xc_modal-overlay">
+    <div class="xc_modal-container">
+        <div class="xc_modal-header">
+            <div class="xc_modal-title">
+                <i class="fa fa-sitemap"></i>
+                <span id="flowModalTitle">业务算法</span>
+            </div>
+            <button class="xc_modal-close" onclick="closeFlowModal()"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="xc_modal-body">
+            <div class="xc_form-row">
+                <div class="xc_form-col">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">算法编号<span class="required">*</span></label>
+                        <input type="text" id="flow_code" class="xc_form-input" disabled>
+                    </div>
+                </div>
+                <div class="xc_form-col">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">算法名称<span class="required">*</span></label>
+                        <input type="text" id="flow_name" class="xc_form-input" placeholder="请输入算法名称">
+                    </div>
+                </div>
+            </div>
+            <div class="xc_form-row">
+                <div class="xc_form-col full">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">算法模式<span class="required">*</span></label>
+                        <select id="flow_mode" class="xc_form-select">
+                            <option value="0">请选择算法模式</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!-- 流程图容器 -->
+            <div id="flow_diagram" style="display:none; flex-direction:column;">
+                <div id="flow_mode_name" class="xc_flow-hint"></div>
+                <div id="flow_box_detect" class="xc_flow-step" style="display:none;">
+                    <div class="xc_step-header">
+                        <div class="xc_step-icon"><i class="fa fa-search"></i></div>
+                        <div class="xc_step-title">检测算法</div>
+                    </div>
+                    <div class="xc_step-body">
+                        <select id="select_algorithm_detect" class="xc_form-select"><option value="0">选择检测算法</option></select>
+                        <div id="flow_box_detect_class" style="display:none; margin-top:8px;">
+                            <select id="select_detect_class_name" class="xc_form-select" multiple><option value="0">选择检测目标</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="arrow_after_detect" class="xc_flow-arrow" style="display:none;"><i class="fa fa-angle-down"></i></div>
+                <div id="flow_box_detect2" class="xc_flow-step" style="display:none;">
+                    <div class="xc_step-header">
+                        <div class="xc_step-icon"><i class="fa fa-search-plus"></i></div>
+                        <div class="xc_step-title">二次检测</div>
+                    </div>
+                    <div class="xc_step-body">
+                        <select id="select_algorithm_detect2" class="xc_form-select"><option value="0">选择检测算法</option></select>
+                        <div id="flow_box_detect2_class" style="display:none; margin-top:8px;">
+                            <select id="select_detect2_class_name" class="xc_form-select" multiple><option value="0">选择检测目标</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="arrow_after_detect2" class="xc_flow-arrow" style="display:none;"><i class="fa fa-angle-down"></i></div>
+                <div id="flow_box_classify" class="xc_flow-step" style="display:none;">
+                    <div class="xc_step-header">
+                        <div class="xc_step-icon"><i class="fa fa-sitemap"></i></div>
+                        <div class="xc_step-title">分类算法</div>
+                    </div>
+                    <div class="xc_step-body">
+                        <select id="select_algorithm_classify" class="xc_form-select"><option value="0">选择分类算法</option></select>
+                        <div id="flow_box_classify_class" style="display:none; margin-top:8px;">
+                            <select id="select_classify_class_name" class="xc_form-select" multiple><option value="0">选择分类目标</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div id="arrow_after_classify" class="xc_flow-arrow" style="display:none;"><i class="fa fa-angle-down"></i></div>
+                <div id="flow_box_track" class="xc_flow-step" style="display:none;">
+                    <div class="xc_step-header">
+                        <div class="xc_step-icon"><i class="fa fa-fingerprint"></i></div>
+                        <div class="xc_step-title">特征算法</div>
+                    </div>
+                    <div class="xc_step-body">
+                        <select id="select_algorithm_track" class="xc_form-select"><option value="0">选择特征算法</option></select>
+                    </div>
+                </div>
+                <div id="arrow_after_track" class="xc_flow-arrow" style="display:none;"><i class="fa fa-angle-down"></i></div>
+                <div id="flow_box_behaviour" class="xc_flow-step" style="display:none;">
+                    <div class="xc_step-header">
+                        <div class="xc_step-icon"><i class="fa fa-cogs"></i></div>
+                        <div class="xc_step-title">行为算法</div>
+                    </div>
+                    <div class="xc_step-body">
+                        <select id="select_behaviour" class="xc_form-select"><option value="0">选择行为算法</option></select>
+                    </div>
+                </div>
+            </div>
+            <!-- 运行配置 -->
+            <div id="flow_config" style="display:none; margin-top:14px;">
+                <div class="xc_form-row">
+                    <div class="xc_form-col" style="display: none;">
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">分析进程<span class="required">*</span></label>
+                            <input type="number" id="deploy_process_index" class="xc_form-input" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="xc_form-col">
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">最大实例数<span class="required">*</span></label>
+                            <input type="number" id="max_concurrency" class="xc_form-input" value="1" min="1">
+                        </div>
+                    </div>
+                    <div class="xc_form-col">
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">并发单元长度<span class="required">*</span></label>
+                            <input type="number" id="concurrency_unit_length" class="xc_form-input" value="1" min="1">
+                        </div>
+                    </div>
+                </div>
+                <div id="mode3_config" class="xc_form-row" style="display:none;">
+                    <div class="xc_form-col">
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">分类是否计算背景<span class="required">*</span></label>
+                            <select id="m3ClassifyInputIsBg" class="xc_form-select">
+                                <option value="0">否</option><option value="1">是</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="xc_form-col">
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">分类结果是否覆盖<span class="required">*</span></label>
+                            <select id="m3ClassifyOutputIsCover" class="xc_form-select">
+                                <option value="0">否</option><option value="1" selected>是</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="mode8_config" class="xc_form-row" style="display:none;">
+                    <div class="xc_form-col">
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">二步检测是否计算背景<span class="required">*</span></label>
+                            <select id="m8Detect2InputIsBg" class="xc_form-select">
+                                <option value="0">否</option><option value="1" selected>是</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="xc_form-col">
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">计算逻辑<span class="required">*</span></label>
+                            <select id="m8m9Type" class="xc_form-select">
+                                <option value="0" selected>0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="mode9_config" class="xc_form-row" style="display:none;">
+                    <div class="xc_form-col">
+                        <div class="xc_form-group">
+                            <label class="xc_form-label">计算逻辑<span class="required">*</span></label>
+                            <select id="m8m9Type_mode9" class="xc_form-select">
+                                <option value="0" selected>0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="xc_modal-footer">
+            <button class="xc_btn xc_btn-cancel" onclick="closeFlowModal()">取消</button>
+            <button class="xc_btn xc_btn-submit" id="flowSubmitBtn" onclick="submitFlowForm()">
+                <span id="submitBtnText">提交</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 {% endblock content %}
 
 {% block javascripts %}
@@ -259,6 +544,13 @@
     let mData = [];
     let curPage = 1;
     let curPageSize = 10;
+    let modeNameDict = {
+        1: '【模式一】检测>>行为', 2: '【模式二】检测>>特征>>行为',
+        3: '【模式三】检测>>分类>>行为', 4: '【模式四】分类>>行为',
+        5: '【模式五】行为', 6: '【模式六】分类>>检测>>行为',
+        7: '【模式七】检测>>分类>>特征>>行为', 8: '【模式八】检测>>检测>>行为',
+        9: '【模式九】检测>>特征>>检测>>行为'
+    };
 
     function initGlobalNode() {
         var currentNode = window.GlobalNodeManager ? window.GlobalNodeManager.getCurrentNode() : null;
@@ -340,12 +632,11 @@
             html += "<td>" + (item.id || '-') + "</td>";
             html += "<td>" + (item.code || '-') + "</td>";
             html += "<td>" + (item.name || '-') + "</td>";
-            html += "<td>" + (item.mode_name || item.mode || '-') + "</td>";
-            html += "<td>" + (item.last_update_time || '-') + "</td>";
+            html += "<td>" + (modeNameDict[item.mode] || item.mode_name || item.mode || '-') + "</td>";
+            html += "<td>" + formatTime(item.last_update_time) + "</td>";
             html += "<td>";
-            html += "<a href='javascript:openInfo(\"" + item.code + "\")' class='xc_action-link'>详情</a>";
             html += "<a href='javascript:openEdit(\"" + item.code + "\")' class='xc_action-link'>编辑</a>";
-            html += "<a href='javascript:openDel(\"" + item.code + "\")' class='xc_action-link'>删除</a>";
+            html += "<a href='javascript:openDel(\"" + item.code + "\")' class='xc_action-link delete'>删除</a>";
             html += "</td>";
             html += "</tr>";
         }
@@ -381,11 +672,11 @@
     }
 
     function openInfo(code) {
-        myToast("详情功能开发中...","info");
+        // reserved
     }
 
     function openEdit(code) {
-        myToast("编辑功能开发中...","info");
+        openEditFlowModal(code);
     }
 
     function openDel(code) {
@@ -431,6 +722,367 @@
             doSearch();
         }
     });
+
+    // ========== 业务算法弹窗逻辑 ==========
+    let currentFlowMode = 'add';
+    let currentFlowCode = '';
+    let modeDict = {};
+    let algorithmDetectDict = {};
+    let algorithmDetect2Dict = {};
+    let algorithmClassifyDict = {};
+    let algorithmTrackDict = {};
+    let behaviourDict = {};
+
+    // DOM elements for modal
+    let elModal, elModalTitle, elFlowCode, elFlowName, elFlowMode, elFlowDiagram, elFlowModeName, elFlowConfig;
+    let elDeployProcessIndex, elMaxConcurrency, elConcurrencyUnitLength, elSubmitBtn, elSubmitBtnText;
+
+    function initFlowElements() {
+        elModal = $('#flowModal');
+        elModalTitle = $('#flowModalTitle');
+        elFlowCode = $('#flow_code');
+        elFlowName = $('#flow_name');
+        elFlowMode = $('#flow_mode');
+        elFlowDiagram = $('#flow_diagram');
+        elFlowModeName = $('#flow_mode_name');
+        elFlowConfig = $('#flow_config');
+        elDeployProcessIndex = $('#deploy_process_index');
+        elMaxConcurrency = $('#max_concurrency');
+        elConcurrencyUnitLength = $('#concurrency_unit_length');
+        elSubmitBtn = $('#flowSubmitBtn');
+        elSubmitBtnText = $('#submitBtnText');
+    }
+
+    function openAddFlowModal() {
+        if (!mNodeCode) { myToast('请先选择节点！', 'error'); return; }
+        currentFlowMode = 'add';
+        currentFlowCode = '';
+        elModalTitle.text('添加业务算法');
+        elModal.addClass('active');
+        $.ajax({
+            url: '/algorithmFlow/openAddContext',
+            type: 'post',
+            data: { node_code: mNodeCode },
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 1000) { loadFormData(res.data, 'add'); }
+                else { myToast(res.msg, 'error'); }
+            },
+            error: function() { myToast('网络异常！', 'error'); }
+        });
+    }
+
+    function openEditFlowModal(code) {
+        if (!mNodeCode) { myToast('请先选择节点！', 'error'); return; }
+        currentFlowMode = 'edit';
+        currentFlowCode = code;
+        elModalTitle.text('编辑业务算法');
+        elModal.addClass('active');
+        $.ajax({
+            url: '/algorithmFlow/openEditContext',
+            type: 'post',
+            data: { node_code: mNodeCode, code: code },
+            dataType: 'json',
+            success: function(res) {
+                if (res.code === 1000) { loadFormData(res.data, 'edit'); }
+                else { myToast(res.msg, 'error'); }
+            },
+            error: function() { myToast('网络异常！', 'error'); }
+        });
+    }
+
+    function closeFlowModal() {
+        elModal.removeClass('active');
+        setTimeout(function() { resetFlowForm(); }, 300);
+    }
+
+    function loadFormData(data, mode) {
+        modeDict = {};
+        if (data.modes) {
+            data.modes.forEach(function(m) { modeDict[m.id] = m; });
+            let modeHtml = '<option value="0">请选择算法模式</option>';
+            data.modes.forEach(function(m) {
+                if (m.state === 1) modeHtml += '<option value="' + m.id + '">' + m.name + '</option>';
+            });
+            elFlowMode.html(modeHtml);
+        }
+        algorithmDetectDict = buildAlgorithmDict(data.algorithm_detect_data);
+        algorithmDetect2Dict = buildAlgorithmDict(data.algorithm_detect_data);
+        algorithmClassifyDict = buildAlgorithmDict(data.algorithm_classify_data);
+        algorithmTrackDict = buildAlgorithmDict(data.algorithm_track_data);
+        fillAlgorithmSelect('#select_algorithm_detect', data.algorithm_detect_data);
+        fillAlgorithmSelect('#select_algorithm_detect2', data.algorithm_detect_data);
+        fillAlgorithmSelect('#select_algorithm_classify', data.algorithm_classify_data);
+        fillAlgorithmSelect('#select_algorithm_track', data.algorithm_track_data);
+        behaviourDict = {};
+        if (data.behaviours) {
+            let bHtml = '<option value="0">选择行为算法</option>';
+            data.behaviours.forEach(function(b) {
+                behaviourDict[b.code] = b;
+                bHtml += '<option value="' + b.code + '">' + b.name + ' (' + b.way_code + '/' + b.way_value + ')</option>';
+            });
+            $('#select_behaviour').html(bHtml);
+        }
+        if (mode === 'add') {
+            elFlowCode.val(data.flow_code);
+            elFlowName.val('');
+            elFlowMode.val('0');
+            elDeployProcessIndex.val(data.deploy_process_index || 0);
+            elMaxConcurrency.val(data.max_concurrency || 1);
+            elConcurrencyUnitLength.val(data.concurrency_unit_length || 1);
+            $('#m3ClassifyInputIsBg').val('0'); $('#m3ClassifyOutputIsCover').val('1');
+            $('#m8Detect2InputIsBg').val('1'); $('#m8m9Type').val('0'); $('#m8m9Type_mode9').val('0');
+            elFlowDiagram.hide(); elFlowConfig.hide();
+        } else {
+            var flow = data.flow;
+            elFlowCode.val(flow.code);
+            elFlowName.val(flow.name);
+            elFlowMode.val(flow.mode);
+            elDeployProcessIndex.val(flow.deploy_process_index);
+            elMaxConcurrency.val(flow.max_concurrency);
+            elConcurrencyUnitLength.val(flow.concurrency_unit_length);
+            $('#m3ClassifyInputIsBg').val(String(flow.m3_classify_input_is_bg != null ? flow.m3_classify_input_is_bg : 0));
+            $('#m3ClassifyOutputIsCover').val(String(flow.m3_classify_output_is_cover != null ? flow.m3_classify_output_is_cover : 1));
+            $('#m8Detect2InputIsBg').val(String(flow.m8_detect2_input_is_bg != null ? flow.m8_detect2_input_is_bg : 1));
+            $('#m8m9Type').val(String(flow.m8m9_type != null ? flow.m8m9_type : 0));
+            $('#m8m9Type_mode9').val(String(flow.m8m9_type != null ? flow.m8m9_type : 0));
+            showFlow(flow.mode);
+            $('#select_algorithm_detect').val(flow.algorithm_detect_code || '0');
+            $('#select_algorithm_detect2').val(flow.algorithm_detect2_code || '0');
+            $('#select_algorithm_classify').val(flow.algorithm_classify_code || '0');
+            $('#select_algorithm_track').val(flow.algorithm_track_code || '0');
+            $('#select_behaviour').val(flow.behaviour_code || '0');
+            if (flow.algorithm_detect_code && flow.algorithm_detect_code !== '0')
+                showDetectOptions(flow.algorithm_detect_code, flow.detect_class_names || '');
+            if (flow.algorithm_detect2_code && flow.algorithm_detect2_code !== '0')
+                showDetect2Options(flow.algorithm_detect2_code, flow.detect2_class_names || '');
+            if (flow.algorithm_classify_code && flow.algorithm_classify_code !== '0')
+                showClassifyOptions(flow.algorithm_classify_code, flow.classify_class_names || '');
+            elFlowConfig.show();
+        }
+    }
+
+    function buildAlgorithmDict(arr) {
+        var d = {};
+        if (arr) arr.forEach(function(a) { d[a.code] = a; });
+        return d;
+    }
+
+    function fillAlgorithmSelect(sel, arr) {
+        var h = '<option value="0">选择算法</option>';
+        if (arr) arr.forEach(function(a) {
+            h += '<option value="' + a.code + '">' + a.name + ' (' + a.framework + '/' + a.inference + '/' + a.inference_device + ')</option>';
+        });
+        $(sel).html(h);
+    }
+
+    function showFlow(mode) {
+        $('#flow_box_detect, #flow_box_detect_class, #flow_box_detect2, #flow_box_detect2_class, ' +
+          '#flow_box_classify, #flow_box_classify_class, #flow_box_track, #flow_box_behaviour, ' +
+          '#arrow_after_detect, #arrow_after_detect2, #arrow_after_classify, #arrow_after_track').hide();
+        $('#mode3_config, #mode8_config, #mode9_config').hide();
+        // reset flex order
+        $('#flow_mode_name, #flow_box_detect, #arrow_after_detect, #flow_box_detect2, #arrow_after_detect2, ' +
+          '#flow_box_classify, #arrow_after_classify, #flow_box_track, #arrow_after_track, #flow_box_behaviour').css('order', '');
+        if (mode === 0 || mode === '0') { elFlowDiagram.hide(); elFlowConfig.hide(); return; }
+        mode = parseInt(mode);
+        elFlowDiagram.css('display', 'flex').css('flex-direction', 'column');
+        elFlowConfig.show();
+        var modeName = modeDict[mode] ? modeDict[mode].name : '未知模式';
+        elFlowModeName.html('<i class="fa fa-info-circle"></i> 当前选择：' + modeName);
+        switch (mode) {
+            case 1:
+                $('#flow_box_detect, #arrow_after_detect, #flow_box_behaviour').show(); break;
+            case 2:
+                $('#flow_box_detect, #arrow_after_detect, #flow_box_track, #arrow_after_track, #flow_box_behaviour').show(); break;
+            case 3:
+                $('#flow_box_detect, #arrow_after_detect, #flow_box_classify, #arrow_after_classify, #flow_box_behaviour').show();
+                $('#mode3_config').show(); break;
+            case 4:
+                $('#flow_box_classify, #arrow_after_classify, #flow_box_behaviour').show(); break;
+            case 5:
+                $('#flow_box_behaviour').show(); break;
+            case 6:
+                $('#flow_box_classify, #arrow_after_classify, #flow_box_detect, #arrow_after_detect, #flow_box_behaviour').show(); break;
+            case 7:
+                $('#flow_box_detect, #arrow_after_detect, #flow_box_classify, #arrow_after_classify, #flow_box_track, #arrow_after_track, #flow_box_behaviour').show(); break;
+            case 8:
+                $('#flow_box_detect, #arrow_after_detect, #flow_box_detect2, #arrow_after_detect2, #flow_box_behaviour').show();
+                $('#mode8_config').show(); break;
+            case 9:
+                $('#flow_mode_name').css('order','0'); $('#flow_box_detect').css('order','1'); $('#arrow_after_detect').css('order','2');
+                $('#flow_box_track').css('order','3'); $('#arrow_after_track').css('order','4');
+                $('#flow_box_detect2').css('order','5'); $('#arrow_after_detect2').css('order','6'); $('#flow_box_behaviour').css('order','7');
+                $('#flow_box_detect, #arrow_after_detect, #flow_box_track, #arrow_after_track, #flow_box_detect2, #arrow_after_detect2, #flow_box_behaviour').show();
+                $('#mode9_config').show(); break;
+        }
+    }
+
+    function showDetectOptions(code, selected) {
+        var alg = algorithmDetectDict[code];
+        if (!alg || !alg.model_class_names) { $('#flow_box_detect_class').hide(); return; }
+        var names = alg.model_class_names.split(','), sel = selected.split(','), h = '';
+        names.forEach(function(n) { h += '<option ' + (sel.indexOf(n) > -1 ? 'selected' : '') + ' value="' + n + '">' + n + '</option>'; });
+        $('#select_detect_class_name').html(h); $('#flow_box_detect_class').show();
+    }
+    function showDetect2Options(code, selected) {
+        var alg = algorithmDetect2Dict[code];
+        if (!alg || !alg.model_class_names) { $('#flow_box_detect2_class').hide(); return; }
+        var names = alg.model_class_names.split(','), sel = selected.split(','), h = '';
+        names.forEach(function(n) { h += '<option ' + (sel.indexOf(n) > -1 ? 'selected' : '') + ' value="' + n + '">' + n + '</option>'; });
+        $('#select_detect2_class_name').html(h); $('#flow_box_detect2_class').show();
+    }
+    function showClassifyOptions(code, selected) {
+        var alg = algorithmClassifyDict[code];
+        if (!alg || !alg.model_class_names) { $('#flow_box_classify_class').hide(); return; }
+        var names = alg.model_class_names.split(','), sel = selected.split(','), h = '';
+        names.forEach(function(n) { h += '<option ' + (sel.indexOf(n) > -1 ? 'selected' : '') + ' value="' + n + '">' + n + '</option>'; });
+        $('#select_classify_class_name').html(h); $('#flow_box_classify_class').show();
+    }
+
+    function calcFlowOptionStr(arr) {
+        if (!arr || arr.length === 0) return '';
+        return arr.filter(function(i) { return i !== '0' && i !== ''; }).join(',');
+    }
+
+    function submitFlowForm() {
+        var mode = parseInt(elFlowMode.val());
+        var name = elFlowName.val().trim();
+        if (!name) { myToast('请输入算法名称', 'error'); return; }
+        if (mode === 0) { myToast('请选择算法模式', 'error'); return; }
+        var adc = '0', dcn = '', ad2c = '0', d2cn = '', acc = '0', ccn = '', atc = '0', bc = '0';
+        switch (mode) {
+            case 1:
+                adc = $('#select_algorithm_detect').val(); if (adc === '0') { myToast('请选择检测算法','error'); return; }
+                dcn = calcFlowOptionStr($('#select_detect_class_name').val()); if (!dcn) { myToast('请至少选择1个检测目标','error'); return; }
+                bc = $('#select_behaviour').val(); if (bc === '0') { myToast('请选择行为算法','error'); return; }
+                break;
+            case 2:
+                adc = $('#select_algorithm_detect').val(); if (adc === '0') { myToast('请选择检测算法','error'); return; }
+                dcn = calcFlowOptionStr($('#select_detect_class_name').val()); if (!dcn) { myToast('请至少选择1个检测目标','error'); return; }
+                atc = $('#select_algorithm_track').val(); if (atc === '0') { myToast('请选择特征算法','error'); return; }
+                bc = $('#select_behaviour').val(); if (bc === '0') { myToast('请选择行为算法','error'); return; }
+                break;
+            case 3:
+                adc = $('#select_algorithm_detect').val(); if (adc === '0') { myToast('请选择检测算法','error'); return; }
+                dcn = calcFlowOptionStr($('#select_detect_class_name').val()); if (!dcn) { myToast('请至少选择1个检测目标','error'); return; }
+                acc = $('#select_algorithm_classify').val(); if (acc === '0') { myToast('请选择分类算法','error'); return; }
+                ccn = calcFlowOptionStr($('#select_classify_class_name').val()); if (!ccn) { myToast('请至少选择1个分类目标','error'); return; }
+                bc = $('#select_behaviour').val(); if (bc === '0') { myToast('请选择行为算法','error'); return; }
+                break;
+            case 4:
+                acc = $('#select_algorithm_classify').val(); if (acc === '0') { myToast('请选择分类算法','error'); return; }
+                ccn = calcFlowOptionStr($('#select_classify_class_name').val()); if (!ccn) { myToast('请至少选择1个分类目标','error'); return; }
+                bc = $('#select_behaviour').val(); if (bc === '0') { myToast('请选择行为算法','error'); return; }
+                break;
+            case 5:
+                bc = $('#select_behaviour').val(); if (bc === '0') { myToast('请选择行为算法','error'); return; }
+                break;
+            case 6:
+                acc = $('#select_algorithm_classify').val(); if (acc === '0') { myToast('请选择分类算法','error'); return; }
+                ccn = calcFlowOptionStr($('#select_classify_class_name').val()); if (!ccn) { myToast('请至少选择1个分类目标','error'); return; }
+                adc = $('#select_algorithm_detect').val(); if (adc === '0') { myToast('请选择检测算法','error'); return; }
+                dcn = calcFlowOptionStr($('#select_detect_class_name').val()); if (!dcn) { myToast('请至少选择1个检测目标','error'); return; }
+                bc = $('#select_behaviour').val(); if (bc === '0') { myToast('请选择行为算法','error'); return; }
+                break;
+            case 7:
+                adc = $('#select_algorithm_detect').val(); if (adc === '0') { myToast('请选择检测算法','error'); return; }
+                dcn = calcFlowOptionStr($('#select_detect_class_name').val()); if (!dcn) { myToast('请至少选择1个检测目标','error'); return; }
+                acc = $('#select_algorithm_classify').val(); if (acc === '0') { myToast('请选择分类算法','error'); return; }
+                ccn = calcFlowOptionStr($('#select_classify_class_name').val()); if (!ccn) { myToast('请至少选择1个分类目标','error'); return; }
+                atc = $('#select_algorithm_track').val(); if (atc === '0') { myToast('请选择特征算法','error'); return; }
+                bc = $('#select_behaviour').val(); if (bc === '0') { myToast('请选择行为算法','error'); return; }
+                break;
+            case 8:
+                adc = $('#select_algorithm_detect').val(); if (adc === '0') { myToast('请选择检测算法','error'); return; }
+                dcn = calcFlowOptionStr($('#select_detect_class_name').val()); if (!dcn) { myToast('请至少选择1个检测目标','error'); return; }
+                ad2c = $('#select_algorithm_detect2').val(); if (ad2c === '0') { myToast('请选择第二个检测算法','error'); return; }
+                d2cn = calcFlowOptionStr($('#select_detect2_class_name').val()); if (!d2cn) { myToast('请至少选择1个二次检测目标','error'); return; }
+                bc = $('#select_behaviour').val(); if (bc === '0') { myToast('请选择行为算法','error'); return; }
+                break;
+            case 9:
+                adc = $('#select_algorithm_detect').val(); if (adc === '0') { myToast('请选择检测算法','error'); return; }
+                dcn = calcFlowOptionStr($('#select_detect_class_name').val()); if (!dcn) { myToast('请至少选择1个检测目标','error'); return; }
+                atc = $('#select_algorithm_track').val(); if (atc === '0') { myToast('请选择特征算法','error'); return; }
+                ad2c = $('#select_algorithm_detect2').val(); if (ad2c === '0') { myToast('请选择二次检测算法','error'); return; }
+                d2cn = calcFlowOptionStr($('#select_detect2_class_name').val()); if (!d2cn) { myToast('请至少选择1个二次检测目标','error'); return; }
+                bc = $('#select_behaviour').val(); if (bc === '0') { myToast('请选择行为算法','error'); return; }
+                break;
+        }
+        var m8m9Val = '0';
+        if (mode === 8) m8m9Val = $('#m8m9Type').val();
+        else if (mode === 9) m8m9Val = $('#m8m9Type_mode9').val();
+        var postData = {
+            node_code: mNodeCode, handle: currentFlowMode, flow_code: elFlowCode.val(),
+            name: name, mode: mode,
+            algorithm_detect_code: adc, detect_class_names: dcn,
+            algorithm_detect2_code: ad2c, detect2_class_names: d2cn,
+            algorithm_classify_code: acc, classify_class_names: ccn,
+            algorithm_track_code: atc, behaviour_code: bc,
+            deploy_process_index: elDeployProcessIndex.val(),
+            max_concurrency: elMaxConcurrency.val(),
+            concurrency_unit_length: elConcurrencyUnitLength.val(),
+            m3_classify_input_is_bg: $('#m3ClassifyInputIsBg').val(),
+            m3_classify_output_is_cover: $('#m3ClassifyOutputIsCover').val(),
+            m8_detect2_input_is_bg: $('#m8Detect2InputIsBg').val(),
+            m8m9_type: m8m9Val
+        };
+        var url = currentFlowMode === 'add' ? '/algorithmFlow/openAdd' : '/algorithmFlow/openEdit';
+        elSubmitBtn.prop('disabled', true);
+        elSubmitBtnText.html('<span class="xc_loading-icon"></span> 提交中...');
+        $.ajax({
+            url: url, type: 'post', data: postData, dataType: 'json',
+            success: function(res) {
+                elSubmitBtn.prop('disabled', false); elSubmitBtnText.text('提交');
+                if (res.code === 1000) {
+                    myToast(res.msg || '操作成功', 'success');
+                    setTimeout(function() { closeFlowModal(); getData(); }, 1000);
+                } else { myToast(res.msg, 'error'); }
+            },
+            error: function() {
+                elSubmitBtn.prop('disabled', false); elSubmitBtnText.text('提交');
+                myToast('网络异常！', 'error');
+            }
+        });
+    }
+
+    function resetFlowForm() {
+        elFlowName.val(''); elFlowMode.val('0');
+        elFlowDiagram.hide(); elFlowConfig.hide();
+        $('#select_algorithm_detect, #select_algorithm_detect2, #select_algorithm_classify, #select_algorithm_track, #select_behaviour').val('0');
+        $('#flow_box_detect_class, #flow_box_detect2_class, #flow_box_classify_class').hide();
+        $('#mode3_config, #mode8_config, #mode9_config').hide();
+        $('#m3ClassifyInputIsBg').val('0'); $('#m3ClassifyOutputIsCover').val('1');
+        $('#m8Detect2InputIsBg').val('1'); $('#m8m9Type').val('0'); $('#m8m9Type_mode9').val('0');
+    }
+
+    // 绑定弹窗事件
+    $(document).ready(function() {
+        initFlowElements();
+        elFlowMode.on('change', function() { showFlow(parseInt($(this).val())); });
+        $('#select_algorithm_detect').on('change', function() {
+            var c = $(this).val(); c !== '0' ? showDetectOptions(c, '') : $('#flow_box_detect_class').hide();
+        });
+        $('#select_algorithm_detect2').on('change', function() {
+            var c = $(this).val(); c !== '0' ? showDetect2Options(c, '') : $('#flow_box_detect2_class').hide();
+        });
+        $('#select_algorithm_classify').on('change', function() {
+            var c = $(this).val(); c !== '0' ? showClassifyOptions(c, '') : $('#flow_box_classify_class').hide();
+        });
+    });
+    // ========== 业务算法弹窗逻辑 END ==========
+
+    function formatTime(t) {
+        if (!t) return '-';
+        var d = new Date(t);
+        if (isNaN(d.getTime())) return t;
+        var Y = d.getFullYear();
+        var M = String(d.getMonth()+1).padStart(2,'0');
+        var D = String(d.getDate()).padStart(2,'0');
+        var h = String(d.getHours()).padStart(2,'0');
+        var m = String(d.getMinutes()).padStart(2,'0');
+        return Y+'/'+M+'/'+D+' '+h+':'+m;
+    }
 
     function myToast(text, icon, hideAfter) {
         hideAfter = hideAfter || 2000;

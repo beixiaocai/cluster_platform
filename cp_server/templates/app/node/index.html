@@ -1,6 +1,7 @@
 {% extends "app/base_site.html" %}
+{% load custom_filters %}
 
-{% block title %} 节点管理 {% endblock title %}
+{% block title %} 平台节点管理 {% endblock title %}
 
 {% block stylesheets %}
   {{ block.super }}
@@ -193,6 +194,76 @@
         border-color: #fca5a5;
     }
     
+    .xc_toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+        align-items: center;
+        background: #FFFFFF;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        flex-wrap: wrap;
+    }
+    
+    .xc_search-input {
+        padding: 0 10px;
+        border: 1px solid #E5E6EB;
+        border-radius: 6px;
+        font-size: 13px;
+        width: 200px;
+        transition: all 0.2s;
+        outline: none;
+        height: 32px;
+        line-height: 32px;
+        box-sizing: border-box;
+    }
+    
+    .xc_search-input:focus {
+        border-color: #165DFF;
+        box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+    }
+    
+    .xc_search-input::placeholder {
+        color: #C9CDD4;
+    }
+    
+    .xc_btn-modern {
+        padding: 0 12px;
+        background: #F2F3F5;
+        color: #4E5969;
+        border: 1px solid #E5E6EB;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        white-space: nowrap;
+        height: 32px;
+        line-height: 1;
+    }
+    
+    .xc_btn-modern:hover {
+        background: #E5E6EB;
+        border-color: #C9CDD4;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .xc_btn-modern.primary {
+        background: #165DFF;
+        border-color: #165DFF;
+        color: white;
+    }
+    
+    .xc_btn-modern.primary:hover {
+        background: #4080FF;
+        border-color: #4080FF;
+    }
+
     .pagination {
         margin: 20px 0 0 0;
         display: flex;
@@ -272,12 +343,37 @@
         border-color: #ffeeba !important;
     }
     
+    .node-finger {
+        color: #17a2b8;
+        background-color: #d1ecf1 !important;
+        border-color: #bee5eb !important;
+    }
+    
     .node-system {
         color: #6f42c1;
         background-color: #e2d9f3 !important;
         border-color: #d5c8e8 !important;
     }
     
+    .node-boot-time {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 11px;
+        color: #6c757d;
+        line-height: 1.2;
+        margin-top: 4px;
+    }
+    
+    .node-boot-time span {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        white-space: nowrap;
+    }
+
     .ws-connected {
         color: #28a745;
     }
@@ -380,11 +476,21 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>节点管理
- 
+                        <h2 style="display: inline-flex; align-items: center; gap: 15px;">平台节点管理
                             <span id="top_loading" style="display:none;">
                                 <img src="/static/images/load.gif" alt="loading" style="width:16px;height:16px;">加载中
                             </span>
+                            <div style="display: flex; gap: 8px; align-items: center; margin-left: 10px;">
+                                <input type="text" id="search_input" class="xc_search-input" placeholder="搜索编号/名称/指纹" value="{{ keyword|default:'' }}">
+                                <button class="xc_btn-modern" onclick="doSearch()">
+                                    <i class="fa fa-search"></i> 搜索
+                                </button>
+                                {% if keyword %}
+                                <button class="xc_btn-modern" onclick="doClear()">
+                                    <i class="fa fa-times"></i> 清除
+                                </button>
+                                {% endif %}
+                            </div>
                         </h2>
                         <div class="clearfix"></div>
                     </div>
@@ -394,12 +500,11 @@
                                 <thead>
                                     <tr class="headings">
                                         <th style="width:50px;">ID</th>
-                                        <th style="width:120px;">节点编号</th>
+                                        <th style="width:120px;">编号</th>
                                         <th style="width:100px;">名称</th>
                                         <th style="width:100px;">连接状态</th>
                                         <th style="width:auto;">节点信息</th>
-                                        <th style="width:150px;">更新时间</th>
-                                        <th style="width:150px;">操作</th>
+                                        <th style="width:220px;">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -421,7 +526,9 @@
                                             <div class="node-status">
                                                 {% if d.is_auth == 1 %}
                                                     <span class="sun-state-success">
-                                                        {% if d.is_multi_process == 1 %}
+                                                        {% if d.auth_msg %}
+                                                            {{ d.auth_msg }}
+                                                        {% elif d.is_multi_process == 1 %}
                                                             高级版({{ d.max_count }}路)
                                                         {% else %}
                                                             普通版
@@ -439,24 +546,44 @@
                                                 {% if d.machine_node %}
                                                     <span class="node-machine">{{ d.machine_node }}</span>
                                                 {% endif %}
+                                                {% if d.finger %}
+                                                    <span>{{ d.finger }}</span>
+                                                {% endif %}
                                                 {% if d.system_name %}
                                                     <span class="node-system">{{ d.system_name }}</span>
                                                 {% endif %}
-                                                {% if d.host %}
-                                                    <span>{{ d.host }}</span>
+                                                {% if d.client_ip %}
+                                                    <span>{{ d.client_ip }}</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="node-boot-time">
+                                                {% if d.project_start_timestamp %}
+                                                    <span>软件: {{ d.project_start_timestamp|timestamp:"%Y/%m/%d %H:%M" }}</span>
+                                                {% endif %}
+                                                {% if d.os_boot_timestamp %}
+                                                    <span>系统: {{ d.os_boot_timestamp|timestamp:"%Y/%m/%d %H:%M" }}</span>
+                                                {% endif %}
+                                                {% if d.ws_last_heartbeat %}
+                                                    <span>心跳: {{ d.ws_last_heartbeat|date:"Y/m/d H:i" }}</span>
                                                 {% endif %}
                                             </div>
                                         </td>
-                                        <td>{{ d.last_update_time|date:"Y-m-d H:i:s" }}</td>
-                                        <td style="white-space: nowrap;">
-                                            <a href="javascript:f_openDetail('{{ d.code }}')" class="sun-a-label btn-detail">详情</a>
-                                            <a href="javascript:f_openDel('{{ d.code }}')" class="sun-a-label btn-delete">删除</a>
+                                        <td>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                                                <a href="javascript:f_openDetail('{{ d.code }}')" class="sun-a-label btn-detail">详情</a>
+                                                <a href="javascript:f_openExportLogs('{{ d.code }}')" class="sun-a-label" style="background-color: #e3f2fd; border-color: #90caf9; color: #1565c0;">导出日志</a>
+                                                <a href="javascript:f_openUpgrade('{{ d.code }}')" class="sun-a-label" style="background-color: #e8f5e9; border-color: #a5d6a7; color: #2e7d32;">升级</a>
+                                                <a href="javascript:f_restartApp('{{ d.code }}')" class="sun-a-label" style="background-color: #fff3e0; border-color: #ffcc80; color: #e65100;">重启软件</a>
+                                                <a href="javascript:f_openDel('{{ d.code }}')" class="sun-a-label btn-delete">删除</a>
+												<a href="javascript:f_restartOS('{{ d.code }}')" class="sun-a-label" style="background-color: #ffebee; border-color: #ef9a9a; color: #c62828;">重启系统</a>
+                                                
+                                            </div>
                                         </td>
                                     </tr>
                                 {% empty %}
                                     <tr>
                                         <td colspan="8" style="text-align:center;padding:20px;color:#6c757d;">
-                                            暂无节点数据，请确保 cluster_client.py 已正确配置并连接到本服务器
+                                            暂无节点数据
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -480,7 +607,7 @@
                         {% if d.cur == 1 %}
                             <li class="paginate_button active"><a href="#">{{ d.name }}</a></li>
                         {% else %}
-                            <li class="paginate_button"><a href="/node/index?p={{ d.page }}&ps={{ pageData.page_size }}">{{ d.name }}</a></li>
+                            <li class="paginate_button"><a href="/node/index?p={{ d.page }}&ps={{ pageData.page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ d.name }}</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>
@@ -501,6 +628,123 @@
     </div>
 </div>
 
+<div class="detail-modal" id="upgradeModal">
+    <div class="detail-modal-content" style="width: 450px;">
+        <div class="detail-modal-header">
+            <h3>升级节点版本</h3>
+            <button class="detail-modal-close" onclick="f_closeUpgrade()">&times;</button>
+        </div>
+        <div class="detail-modal-body">
+            <div class="detail-item">
+                <div class="detail-label">节点编号</div>
+                <div class="detail-value" id="upgrade_node_code"></div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">升级包文件</div>
+                <input type="file" id="upgrade_file" accept=".xcupdate" style="width: 100%; margin-top: 5px;">
+                <div style="font-size: 11px; color: #999; margin-top: 5px;">请选择 .xcupdate 格式的升级包</div>
+            </div>
+            <div class="detail-item" style="margin-top: 20px; text-align: right;">
+                <button class="btn btn-default" onclick="f_closeUpgrade()">取消</button>
+                <button class="btn btn-primary" onclick="f_submitUpgrade()" style="background-color: #2e7d32; border-color: #2e7d32; color: white; margin-left: 10px;">开始升级</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="detail-modal" id="exportLogsModal">
+    <div class="detail-modal-content" style="width: 400px;">
+        <div class="detail-modal-header">
+            <h3>导出日志</h3>
+            <button class="detail-modal-close" onclick="f_closeExportLogs()">&times;</button>
+        </div>
+        <div class="detail-modal-body">
+            <div class="detail-item">
+                <div class="detail-label">节点编号</div>
+                <div class="detail-value" id="export_logs_node_code"></div>
+            </div>
+            <div class="detail-item" style="margin-top: 12px;">
+                <label class="xc_switch_container">
+                    <label class="xc_switch">
+                        <input type="checkbox" id="export_stream_log" value="1">
+                        <span class="xc_switch_slider"></span>
+                    </label>
+                    <span class="xc_switch_label">导出流日志</span>
+                </label>
+            </div>
+            <div style="font-size: 11px; color: #999; margin-top: 8px;">导出日志文件，提供给开发者排查问题</div>
+            <div class="detail-item" style="margin-top: 20px; text-align: right;">
+                <button class="btn btn-default" onclick="f_closeExportLogs()">取消</button>
+                <button class="btn btn-primary" onclick="f_submitExportLogs()" style="background-color: #1565c0; border-color: #1565c0; color: white; margin-left: 10px;">导出日志</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .xc_switch_container {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .xc_switch {
+        position: relative;
+        display: inline-block;
+        width: 42px;
+        height: 22px;
+    }
+
+    .xc_switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .xc_switch_slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #dcdfe6;
+        transition: .3s;
+        border-radius: 22px;
+    }
+
+    .xc_switch_slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .xc_switch input:checked + .xc_switch_slider {
+        background-color: #169F85;
+    }
+
+    .xc_switch input:focus + .xc_switch_slider {
+        box-shadow: 0 0 1px #169F85;
+    }
+
+    .xc_switch input:checked + .xc_switch_slider:before {
+        transform: translateX(20px);
+    }
+
+    .xc_switch_label {
+        font-size: 12px;
+        color: #606266;
+        user-select: none;
+    }
+</style>
+
 {% endblock content %}
 
 {% block javascripts %}
@@ -511,18 +755,34 @@
     let m_node_data = {};
     {% for d in data %}
     m_node_data['{{ d.code }}'] = {
-        code: '{{ d.code }}',
-        name: '{{ d.name|default:"-" }}',
-        nickname: '{{ d.nickname|default:"-" }}',
-        host: '{{ d.host|default:"-" }}',
+        code: '{{ d.code|escapejs }}',
+        name: '{{ d.name|default:"-"|escapejs }}',
+        describe: '{{ d.describe|default:"-"|escapejs }}',
+        client_ip: '{% if d.client_ip %}{{ d.client_ip|escapejs }}{% else %}-{% endif %}',
         admin_port: {{ d.admin_port|default:9001 }},
         version: '{{ d.version|default:"-" }}',
-        client_ip: '{{ d.client_ip|default:"-" }}',
+        is_auth: {{ d.is_auth }},
+        auth_msg: '{% if d.auth_msg %}{{ d.auth_msg|escapejs }}{% else %}-{% endif %}',
         ws_connect_time: '{{ d.ws_connect_time|date:"Y-m-d H:i:s"|default:"-" }}',
         ws_last_heartbeat: '{{ d.ws_last_heartbeat|date:"Y-m-d H:i:s"|default:"-" }}',
-        register_info: {{ d.register_info|default:"{}"|safe }}
+        register_info: {% if d.register_info %}{{ d.register_info|safe }}{% else %}{}{% endif %},
     };
     {% endfor %}
+
+    function doSearch() {
+        let keyword = $('#search_input').val().trim();
+        window.location.href = '/node/index?keyword=' + encodeURIComponent(keyword);
+    }
+
+    function doClear() {
+        window.location.href = '/node/index';
+    }
+
+    $('#search_input').on('keydown', function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            doSearch();
+        }
+    });
 
     function f_openDetail(code) {
         let node = m_node_data[code];
@@ -531,18 +791,45 @@
             return;
         }
         
+        let registerInfo = node.register_info;
+        if (typeof registerInfo === 'string') {
+            try {
+                registerInfo = JSON.parse(registerInfo);
+            } catch (e) {
+                registerInfo = {};
+            }
+        }
+        
         let html = '';
         html += '<div class="detail-item"><div class="detail-label">节点编号</div><div class="detail-value">' + node.code + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">节点名称</div><div class="detail-value">' + node.name + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">节点描述</div><div class="detail-value">' + node.describe + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">客户端IP</div><div class="detail-value">' + node.client_ip + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">内网地址</div><div class="detail-value">' + node.host + ':' + node.admin_port + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">内网地址</div><div class="detail-value">' + node.client_ip + ':' + node.admin_port + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">版本号</div><div class="detail-value">' + node.version + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">授权状态</div><div class="detail-value">' + (node.is_auth == 1 ? node.auth_msg : '未授权') + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">软件启动时间</div><div class="detail-value">' + formatTimestamp(node.project_start_timestamp) + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">系统启动时间</div><div class="detail-value">' + formatTimestamp(node.os_boot_timestamp) + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">连接时间</div><div class="detail-value">' + node.ws_connect_time + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">最后心跳</div><div class="detail-value">' + node.ws_last_heartbeat + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">注册信息</div><div class="detail-json">' + JSON.stringify(node.register_info, null, 2) + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">更新时间</div><div class="detail-value">' + node.last_update_time + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">注册信息</div><div class="detail-json">' + JSON.stringify(registerInfo, null, 2) + '</div></div>';
         
         document.getElementById('detailModalBody').innerHTML = html;
         document.getElementById('detailModal').classList.add('show');
+    }
+    
+    function formatTimestamp(timestamp) {
+        if (!timestamp || timestamp === 0) return '-';
+        var d = new Date(timestamp * 1000);
+        if (isNaN(d.getTime())) return '-';
+        var Y = d.getFullYear();
+        var M = String(d.getMonth() + 1).padStart(2, '0');
+        var D = String(d.getDate()).padStart(2, '0');
+        var h = String(d.getHours()).padStart(2, '0');
+        var m = String(d.getMinutes()).padStart(2, '0');
+        var s = String(d.getSeconds()).padStart(2, '0');
+        return Y + '/' + M + '/' + D + ' ' + h + ':' + m + ':' + s;
     }
     
     function f_closeDetail() {
@@ -576,6 +863,121 @@
         });
     }
 
+    let m_upgrade_node_code = '';
+    
+    function f_openUpgrade(code) {
+        m_upgrade_node_code = code;
+        document.getElementById('upgrade_node_code').innerText = code;
+        document.getElementById('upgrade_file').value = '';
+        document.getElementById('upgradeModal').classList.add('show');
+    }
+    
+    function f_closeUpgrade() {
+        document.getElementById('upgradeModal').classList.remove('show');
+    }
+    
+    function f_submitUpgrade() {
+        let fileInput = document.getElementById('upgrade_file');
+        if (!fileInput.files || fileInput.files.length === 0) {
+            myAlert('请选择升级包文件', 'error');
+            return;
+        }
+        
+        let file = fileInput.files[0];
+        if (!file.name.endsWith('.xcupdate')) {
+            myAlert('请选择 .xcupdate 格式的升级包', 'error');
+            return;
+        }
+        
+        let formData = new FormData();
+        formData.append('node_code', m_upgrade_node_code);
+        formData.append('file', file);
+        
+        f_closeUpgrade();
+        ele_top_loading.show();
+        myAlert('正在上传升级包，请稍候...', 'info', 0);
+        
+        $.ajax({
+            url: '/node/upgrade',
+            type: "post",
+            data: formData,
+            processData: false,
+            contentType: false,
+            timeout: 300000,
+            error: function () {
+                ele_top_loading.hide();
+                myAlert("网络异常，请确定网络正常！", "error");
+            },
+            success: function (res) {
+                ele_top_loading.hide();
+                if (res.code === 1000) {
+                    myAlert(res.msg || '升级包上传成功，节点正在升级中...', 'success', 3000);
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    myAlert(res.msg || '升级失败', "error");
+                }
+            }
+        });
+    }
+
+    function f_restartApp(code) {
+        if (!confirm('确定要重启节点 [' + code + '] 的软件吗？')) {
+            return;
+        }
+        
+        ele_top_loading.show();
+        $.ajax({
+            url: '/node/restartApp',
+            type: "post",
+            data: {
+                node_code: code
+            },
+            timeout: 30000,
+            error: function () {
+                ele_top_loading.hide();
+                myAlert("网络异常，请确定网络正常！", "error");
+            },
+            success: function (res) {
+                ele_top_loading.hide();
+                if (res.code === 1000) {
+                    myAlert(res.msg || '重启软件指令已发送', 'success');
+                } else {
+                    myAlert(res.msg || '重启软件失败', "error");
+                }
+            }
+        });
+    }
+    
+    function f_restartOS(code) {
+        if (!confirm('确定要重启节点 [' + code + '] 的操作系统吗？此操作将重启整个服务器！')) {
+            return;
+        }
+        
+        ele_top_loading.show();
+        $.ajax({
+            url: '/node/restartOS',
+            type: "post",
+            data: {
+                node_code: code
+            },
+            timeout: 30000,
+            error: function () {
+                ele_top_loading.hide();
+                myAlert("网络异常，请确定网络正常！", "error");
+            },
+            success: function (res) {
+                ele_top_loading.hide();
+                if (res.code === 1000) {
+                    myAlert(res.msg || '重启系统指令已发送', 'success');
+                } else {
+                    myAlert(res.msg || '重启系统失败', "error");
+                }
+            }
+        });
+    }
+
     function myAlert(text, icon = 'info', hideAfter = 2000) {
         const existingAlerts = document.querySelectorAll('.xc-alert');
         existingAlerts.forEach(alert => alert.remove());
@@ -600,6 +1002,55 @@
                 alertElement.remove();
             }, hideAfter);
         }
+    }
+
+    let m_export_logs_node_code = '';
+
+    function f_openExportLogs(code) {
+        m_export_logs_node_code = code;
+        document.getElementById('export_logs_node_code').innerText = code;
+        document.getElementById('export_stream_log').checked = false;
+        document.getElementById('exportLogsModal').classList.add('show');
+    }
+
+    function f_closeExportLogs() {
+        document.getElementById('exportLogsModal').classList.remove('show');
+    }
+
+    function f_submitExportLogs() {
+        let isExportStream = document.getElementById('export_stream_log').checked ? 1 : 0;
+
+        f_closeExportLogs();
+        ele_top_loading.show();
+        myAlert('正在导出日志，请稍候...', 'info', 0);
+
+        $.ajax({
+            url: '/node/exportLogs',
+            type: "post",
+            data: {
+                node_code: m_export_logs_node_code,
+                is_export_stream: isExportStream
+            },
+            timeout: 180000,
+            error: function () {
+                ele_top_loading.hide();
+                myAlert("网络异常，请确定网络正常！", "error");
+            },
+            success: function (res) {
+                ele_top_loading.hide();
+                if (res.code === 1000) {
+                    myAlert(res.msg || '导出成功', 'success');
+                    let info = res.info || {};
+                    let exportFilename = info.export_filename;
+                    if (exportFilename) {
+                        let downloadUrl = "/node/downloadLog?node_code=" + m_export_logs_node_code + "&filename=" + exportFilename;
+                        window.open(downloadUrl);
+                    }
+                } else {
+                    myAlert(res.msg || '导出失败', "error");
+                }
+            }
+        });
     }
 </script>
 

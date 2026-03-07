@@ -17,6 +17,8 @@ def index(request):
 
     page = params.get('p', 1)
     page_size = params.get('ps', 10)
+    search_keyword = params.get('keyword', '').strip()
+    
     try:
         page = int(page)
     except:
@@ -31,8 +33,16 @@ def index(request):
 
     skip = (page - 1) * page_size
     
-    nodes = NodeModel.objects.all().order_by('-id')[skip:skip+page_size]
-    count = NodeModel.objects.count()
+    if search_keyword:
+        from django.db.models import Q
+        nodes_query = NodeModel.objects.filter(
+            Q(code__icontains=search_keyword) | Q(name__icontains=search_keyword) | Q(finger__icontains=search_keyword)
+        ).order_by('-id')
+        count = nodes_query.count()
+        nodes = nodes_query[skip:skip+page_size]
+    else:
+        nodes = NodeModel.objects.all().order_by('-id')[skip:skip+page_size]
+        count = NodeModel.objects.count()
 
     data = []
     for node in nodes:
@@ -45,15 +55,22 @@ def index(request):
             'system_name': node.system_name,
             'machine_node': node.machine_node,
             'host': node.host,
+            'admin_port': node.admin_port,
             'version': node.version,
             'flag': node.flag,
             'is_auth': node.is_auth,
             'is_multi_process': node.is_multi_process,
             'max_count': node.max_count,
+            'auth_msg': node.auth_msg,
+            'finger': node.finger,
             'ws_connected': node.ws_connected,
             'ws_channel': node.ws_channel,
             'ws_connect_time': node.ws_connect_time,
             'ws_last_heartbeat': node.ws_last_heartbeat,
+            'client_ip': node.client_ip,
+            'register_info': node.register_info,
+            'project_start_timestamp': node.project_start_timestamp,
+            'os_boot_timestamp': node.os_boot_timestamp,
             'create_time': node.create_time,
             'last_update_time': node.last_update_time,
         }
@@ -81,6 +98,7 @@ def index(request):
 
     context["data"] = data
     context["pageData"] = pageData
+    context["keyword"] = search_keyword
     return render(request, 'app/node/index.html', context)
 
 
@@ -260,3 +278,208 @@ def api_getOnlineNodes(request):
         "data": data
     }
     return f_responseJson(res)
+
+
+def api_upgradeVersion(request):
+    ret = False
+    msg = "未知错误"
+    
+    if request.method == 'POST':
+        try:
+            node_code = request.POST.get('node_code', '').strip()
+            if not node_code:
+                msg = "node_code is required"
+            else:
+                upload_file = request.FILES.get('file')
+                if not upload_file:
+                    msg = "请选择升级包文件"
+                else:
+                    if not upload_file.name.endswith('.xcupdate'):
+                        msg = "升级包必须是.xcupdate格式"
+                    else:
+                        file_content = upload_file.read()
+                        file_base64 = base64.b64encode(file_content).decode('utf-8')
+                        
+                        result = send_command_to_node_sync(node_code, 'upgrade_version', {
+                            'filename': upload_file.name,
+                            'content': file_base64
+                        }, timeout=600)
+                        
+                        if result.get('code') == 1000:
+                            ret = True
+                            msg = result.get('msg', '升级成功')
+                        else:
+                            msg = result.get('msg', '升级失败')
+        except Exception as e:
+            msg = f"升级失败：{str(e)}"
+            g_logger.error(f"NodeView.api_upgradeVersion() error: {str(e)}")
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg
+    }
+    g_logger.info(f"NodeView.api_upgradeVersion() res: {str(res)}")
+    return f_responseJson(res)
+
+
+def api_restartApp(request):
+    ret = False
+    msg = "未知错误"
+    
+    if request.method == 'POST':
+        try:
+            node_code = request.POST.get('node_code', '').strip()
+            if not node_code:
+                msg = "node_code is required"
+            else:
+                result = send_command_to_node_sync(node_code, 'restart_app', {}, timeout=120)
+                
+                if result.get('code') == 1000:
+                    ret = True
+                    msg = result.get('msg', '重启软件指令已发送')
+                else:
+                    msg = result.get('msg', '重启软件失败')
+        except Exception as e:
+            msg = f"重启软件失败：{str(e)}"
+            g_logger.error(f"NodeView.api_restartApp() error: {str(e)}")
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg
+    }
+    g_logger.info(f"NodeView.api_restartApp() res: {str(res)}")
+    return f_responseJson(res)
+
+
+def api_restartOS(request):
+    ret = False
+    msg = "未知错误"
+    
+    if request.method == 'POST':
+        try:
+            node_code = request.POST.get('node_code', '').strip()
+            if not node_code:
+                msg = "node_code is required"
+            else:
+                result = send_command_to_node_sync(node_code, 'restart_os', {}, timeout=120)
+                
+                if result.get('code') == 1000:
+                    ret = True
+                    msg = result.get('msg', '重启系统指令已发送')
+                else:
+                    msg = result.get('msg', '重启系统失败')
+        except Exception as e:
+            msg = f"重启系统失败：{str(e)}"
+            g_logger.error(f"NodeView.api_restartOS() error: {str(e)}")
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg
+    }
+    g_logger.info(f"NodeView.api_restartOS() res: {str(res)}")
+    return f_responseJson(res)
+
+
+def api_getList(request):
+    ret = False
+    msg = "未知错误"
+    data = []
+    
+    if request.method == 'GET':
+        try:
+            nodes = NodeModel.objects.all().order_by('-id')
+            for node in nodes:
+                data.append({
+                    'id': node.id,
+                    'code': node.code,
+                    'name': node.name,
+                    'nickname': node.nickname,
+                })
+            ret = True
+            msg = "success"
+        except Exception as e:
+            msg = str(e)
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg,
+        "data": data
+    }
+    return f_responseJson(res)
+
+
+def api_exportLogs(request):
+    ret = False
+    msg = "未知错误"
+    info = {}
+    
+    if request.method == 'POST':
+        try:
+            node_code = request.POST.get('node_code', '').strip()
+            is_export_stream = int(request.POST.get('is_export_stream', 0))
+            
+            if not node_code:
+                msg = "node_code is required"
+            else:
+                result = send_command_to_node_sync(node_code, 'export_logs', {
+                    'isExportStream': is_export_stream
+                }, timeout=120)
+                
+                if result.get('code') == 1000:
+                    ret = True
+                    msg = result.get('msg', '导出成功')
+                    info = result.get('info', {})
+                else:
+                    msg = result.get('msg', '导出失败')
+        except Exception as e:
+            msg = f"导出失败：{str(e)}"
+            g_logger.error(f"NodeView.api_exportLogs() error: {str(e)}")
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg,
+        "info": info
+    }
+    g_logger.info(f"NodeView.api_exportLogs() res: {str(res)}")
+    return f_responseJson(res)
+
+
+def api_downloadLog(request):
+    """通过WebSocket下载节点上的日志文件"""
+    try:
+        node_code = request.GET.get('node_code', '').strip()
+        filename = request.GET.get('filename', '').strip()
+        
+        if not node_code or not filename:
+            return f_responseJson({'code': 0, 'msg': 'Missing parameters'})
+        
+        result = send_command_to_node_sync(node_code, 'download_file', {
+            'filename': filename
+        }, timeout=300)
+        
+        if result.get('code') == 1000:
+            file_content_base64 = result.get('data', {}).get('content', '')
+            file_content = base64.b64decode(file_content_base64)
+            
+            http_response = HttpResponse(
+                content=file_content,
+                content_type='application/octet-stream'
+            )
+            http_response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return http_response
+        else:
+            return f_responseJson({'code': 0, 'msg': result.get('msg', 'Download failed')})
+            
+    except Exception as e:
+        g_logger.error(f"NodeView.api_downloadLog() error: {str(e)}")
+        return f_responseJson({'code': 0, 'msg': str(e)})

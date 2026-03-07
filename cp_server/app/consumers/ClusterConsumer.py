@@ -21,7 +21,7 @@ def get_ws_token():
     except:
         return 'cp_server_safe_key_2026'
 
-CP_SERVER_SAFE = get_ws_token()
+CP_WS_TOKEN = get_ws_token()
 
 class ClusterConsumer(WebsocketConsumer):
     
@@ -60,7 +60,7 @@ class ClusterConsumer(WebsocketConsumer):
     
     def handle_register(self, data):
         token = data.get('token')
-        if token != CP_SERVER_SAFE:
+        if token != CP_WS_TOKEN:
             self.send_error("authentication failed")
             self.close()
             return
@@ -102,6 +102,13 @@ class ClusterConsumer(WebsocketConsumer):
             x_forwarded_for = headers.get(b'x-forwarded-for', b'').decode()
             if x_forwarded_for:
                 client_ip = x_forwarded_for.split(',')[0].strip()
+            else:
+                x_real_ip = headers.get(b'x-real-ip', b'').decode()
+                if x_real_ip:
+                    client_ip = x_real_ip
+        
+        if client_ip == 'unknown':
+            client_ip = None
         
         ret, node_data = node_manager.register_node(
             node_code=node_code,
@@ -189,6 +196,13 @@ class ClusterConsumer(WebsocketConsumer):
             }
         }))
     
+    def send_error(self, msg):
+        self.send(json.dumps({
+            'type': 'error',
+            'code': 0,
+            'msg': msg
+        }))
+    
     def send_error_msg(self, msg):
         self.send(json.dumps({
             'type': 'error',
@@ -201,7 +215,7 @@ class ClusterConsumer(WebsocketConsumer):
         return g_node_manager
 
 
-def send_command_to_node(node_code, action, params=None, timeout=30):
+def send_command_to_node(node_code, action, params=None, timeout=120):
     from channels.layers import get_channel_layer
     from asgiref.sync import async_to_sync
     from app.utils.NodeManager import g_node_manager
@@ -224,7 +238,7 @@ def send_command_to_node(node_code, action, params=None, timeout=30):
     return True, command_id
 
 
-def send_command_to_node_sync(node_code, action, params=None, timeout=30):
+def send_command_to_node_sync(node_code, action, params=None, timeout=120):
     from channels.layers import get_channel_layer
     from asgiref.sync import async_to_sync
     from app.utils.NodeManager import g_node_manager

@@ -1,7 +1,6 @@
 from app.views.ViewsBase import *
 from app.models import *
 from django.shortcuts import render, redirect
-from app.consumers.ClusterConsumer import send_command_to_node_sync
 
 
 def index(request):
@@ -46,7 +45,7 @@ def api_getList(request):
                 'p': page,
                 'ps': page_size,
                 'search': search_key
-            }, timeout=30)
+            }, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -101,7 +100,7 @@ def api_getInfo(request):
         else:
             result = send_command_to_node_sync(node_code, 'get_basic_algorithm_info', {
                 'code': code
-            }, timeout=30)
+            }, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -133,7 +132,7 @@ def api_openEdit(request):
         if not node_code:
             msg = "node_code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'edit_basic_algorithm', params, timeout=30)
+            result = send_command_to_node_sync(node_code, 'edit_basic_algorithm', params, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -169,7 +168,7 @@ def api_openDel(request):
         else:
             result = send_command_to_node_sync(node_code, 'del_basic_algorithm', {
                 'code': code
-            }, timeout=30)
+            }, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -184,4 +183,161 @@ def api_openDel(request):
         "msg": msg
     }
     g_logger.info("AlgorithmView.openDel() res:%s" % str(res))
+    return f_responseJson(res)
+
+
+def api_openEditContext(request):
+    ret = False
+    msg = "未知错误"
+    data = {}
+    
+    if request.method == 'POST':
+        params = f_parsePostParams(request)
+        g_logger.info("AlgorithmView.openEditContext() params:%s" % str(params))
+        
+        node_code = params.get('node_code', '').strip()
+        code = params.get('code', '').strip()
+        
+        if not node_code:
+            msg = "node_code is required"
+        elif not code:
+            msg = "code is required"
+        else:
+            result = send_command_to_node_sync(node_code, 'get_basic_algorithm_edit_context', {
+                'code': code
+            }, timeout=120)
+            
+            if result.get('code') == 1000:
+                ret = True
+                msg = "success"
+                data = result.get('data', {})
+            else:
+                msg = result.get('msg', 'failed to get edit context')
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg,
+        "data": data
+    }
+    g_logger.info("AlgorithmView.openEditContext() res:%s" % str(res))
+    return f_responseJson(res)
+
+
+def api_openTypeAttrs(request):
+    ret = False
+    msg = "未知错误"
+    info = {}
+    
+    if request.method == 'GET':
+        params = f_parseGetParams(request)
+        g_logger.info("AlgorithmView.openTypeAttrs() params:%s" % str(params))
+        
+        node_code = params.get('node_code', '').strip()
+        algorithm_type_code = params.get('algorithm_type_code', '').strip()
+        
+        if not node_code:
+            msg = "node_code is required"
+        elif not algorithm_type_code:
+            msg = "algorithm_type_code is required"
+        else:
+            result = send_command_to_node_sync(node_code, 'get_basic_algorithm_type_attrs', {
+                'algorithm_type_code': algorithm_type_code
+            }, timeout=120)
+            
+            if result.get('code') == 1000:
+                ret = True
+                msg = "success"
+                info = result.get('info', {})
+            else:
+                msg = result.get('msg', 'failed to get type attrs')
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg,
+        "info": info
+    }
+    g_logger.info("AlgorithmView.openTypeAttrs() res:%s" % str(res))
+    return f_responseJson(res)
+
+
+def api_openAdd(request):
+    ret = False
+    msg = "未知错误"
+    
+    if request.method == 'POST':
+        params = f_parsePostParams(request)
+        g_logger.info("AlgorithmView.openAdd() params keys:%s" % str(list(params.keys())))
+        
+        node_code = params.get('node_code', '').strip()
+        
+        if not node_code:
+            msg = "node_code is required"
+        else:
+            # 从 request.FILES 获取上传的模型文件，转为 base64 通过 WebSocket 传递
+            model_file = request.FILES.get('model')
+            if model_file:
+                try:
+                    file_bytes = model_file.read()
+                    params['model_base64'] = base64.b64encode(file_bytes).decode('utf-8')
+                    params['model_filename'] = model_file.name
+                    g_logger.info("AlgorithmView.openAdd() file: %s, size: %d bytes" % (model_file.name, len(file_bytes)))
+                except Exception as e:
+                    g_logger.error("AlgorithmView.openAdd() read file error: %s" % str(e))
+                    res = {"code": 0, "msg": "读取上传文件失败: " + str(e)}
+                    return f_responseJson(res)
+            
+            # 转发到节点，包含base64文件数据，需要更长超时（大模型转换可能需要20分钟+）
+            result = send_command_to_node_sync(node_code, 'add_basic_algorithm', params, timeout=1800)
+            
+            if result.get('code') == 1000:
+                ret = True
+                msg = result.get('msg', 'success')
+            else:
+                msg = result.get('msg', 'failed to add basic algorithm')
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg
+    }
+    g_logger.info("AlgorithmView.openAdd() res:%s" % str(res))
+    return f_responseJson(res)
+
+
+def api_openAddContext(request):
+    ret = False
+    msg = "未知错误"
+    data = {}
+    
+    if request.method == 'POST':
+        params = f_parsePostParams(request)
+        g_logger.info("AlgorithmView.openAddContext() params:%s" % str(params))
+        
+        node_code = params.get('node_code', '').strip()
+        
+        if not node_code:
+            msg = "node_code is required"
+        else:
+            result = send_command_to_node_sync(node_code, 'get_basic_algorithm_add_context', {}, timeout=120)
+            
+            if result.get('code') == 1000:
+                ret = True
+                msg = "success"
+                data = result.get('data', {})
+            else:
+                msg = result.get('msg', 'failed to get add context')
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg,
+        "data": data
+    }
+    g_logger.info("AlgorithmView.openAddContext() res:%s" % str(res))
     return f_responseJson(res)

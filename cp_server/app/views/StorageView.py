@@ -1,5 +1,4 @@
 from app.views.ViewsBase import *
-import base64
 import os
 import mimetypes
 
@@ -57,7 +56,6 @@ def openAccess(request):
     if not node_code:
         return f_responseJson({"code": 0, "msg": "node_code is required"})
     
-    from app.consumers.ClusterConsumer import send_command_to_node_sync
     result = send_command_to_node_sync(node_code, 'get_file', {
         'filename': filename
     })

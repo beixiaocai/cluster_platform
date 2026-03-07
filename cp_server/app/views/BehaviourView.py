@@ -1,7 +1,6 @@
 from app.views.ViewsBase import *
 from app.models import *
 from django.shortcuts import render, redirect
-from app.consumers.ClusterConsumer import send_command_to_node_sync
 
 
 def index(request):
@@ -46,7 +45,7 @@ def api_getList(request):
                 'p': page,
                 'ps': page_size,
                 'search': search_key
-            }, timeout=30)
+            }, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -101,7 +100,7 @@ def api_getInfo(request):
         else:
             result = send_command_to_node_sync(node_code, 'get_behavior_algorithm_info', {
                 'code': code
-            }, timeout=30)
+            }, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -133,7 +132,7 @@ def api_openEdit(request):
         if not node_code:
             msg = "node_code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'edit_behavior_algorithm', params, timeout=30)
+            result = send_command_to_node_sync(node_code, 'edit_behavior_algorithm', params, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -169,7 +168,7 @@ def api_openDel(request):
         else:
             result = send_command_to_node_sync(node_code, 'del_behavior_algorithm', {
                 'code': code
-            }, timeout=30)
+            }, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -184,4 +183,74 @@ def api_openDel(request):
         "msg": msg
     }
     g_logger.info("BehaviourView.openDel() res:%s" % str(res))
+    return f_responseJson(res)
+
+
+def api_openAdd(request):
+    ret = False
+    msg = "未知错误"
+    
+    if request.method == 'POST':
+        params = f_parsePostParams(request)
+        g_logger.info("BehaviourView.openAdd() params:%s" % str(params))
+        
+        node_code = params.get('node_code', '').strip()
+        
+        if not node_code:
+            msg = "node_code is required"
+        else:
+            result = send_command_to_node_sync(node_code, 'add_behavior_algorithm', params, timeout=120)
+            
+            if result.get('code') == 1000:
+                ret = True
+                msg = result.get('msg', 'success')
+            else:
+                msg = result.get('msg', 'failed to add behavior algorithm')
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg
+    }
+    g_logger.info("BehaviourView.openAdd() res:%s" % str(res))
+    return f_responseJson(res)
+
+
+def api_openEditContext(request):
+    ret = False
+    msg = "未知错误"
+    data = {}
+    
+    if request.method == 'POST':
+        params = f_parsePostParams(request)
+        g_logger.info("BehaviourView.openEditContext() params:%s" % str(params))
+        
+        node_code = params.get('node_code', '').strip()
+        code = params.get('code', '').strip()
+        
+        if not node_code:
+            msg = "node_code is required"
+        elif not code:
+            msg = "code is required"
+        else:
+            result = send_command_to_node_sync(node_code, 'get_behavior_algorithm_edit_context', {
+                'code': code
+            }, timeout=120)
+            
+            if result.get('code') == 1000:
+                ret = True
+                msg = "success"
+                data = result.get('data', {})
+            else:
+                msg = result.get('msg', 'failed to get edit context')
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg,
+        "data": data
+    }
+    g_logger.info("BehaviourView.openEditContext() res:%s" % str(res))
     return f_responseJson(res)

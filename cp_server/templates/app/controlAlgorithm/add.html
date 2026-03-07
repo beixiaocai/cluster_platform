@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if "add" == handle %}添加布控算法{% else %}编辑布控算法{% endif %}</title>
+    
+    <link href="/static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .video-section {
+            flex: 1.4;
+            min-width: 400px;
+        }
+        
+        .form-section {
+            flex: 0.8;
+            min-width: 300px;
+        }
+        
+        .div_canvas_box {
+            background: #e5e5e5;
+            display: block;
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        .div_canvas_box > div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .div_canvas_box > canvas {
+            margin: 0;
+            border: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6;
+        }
+        
+        .div_left_bottom_menu {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            border-radius: 6px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .btn {
+            border-radius: 4px;
+            font-size: 14px;
+            padding: 6px 12px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .btn-dark {
+            background-color: #374151;
+            color: white;
+        }
+        
+        .btn-dark:hover {
+            background-color: #1f2937;
+        }
+        
+        .btn-default {
+            background-color: #f3f4f6;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+        
+        .btn-default:hover {
+            background-color: #e5e7eb;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .form-horizontal {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .control-label {
+            font-weight: 500;
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .required {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .ln_solid {
+            border-top: 1px solid #e5e7eb;
+            margin: 20px 0;
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            .video-section, .form-section {
+                flex: 1;
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-wrapper">
+            <div class="video-section">
+                <div class="div_canvas_box">
+                    <div id="video_player" style="background-color: black; aspect-ratio: 16 / 9;">
+                    </div>
+                    <canvas id="canvas">
+                        Your browser is too old which doesn't support h5 canvas
+                    </canvas>
+                </div>
+
+                <div class="div_left_bottom_menu">
+                    <button type="button" onclick="f_clickPlayStart()" class="btn btn-dark"><i class="fa fa-play"></i> 播放</button>
+                    <button type="button" onclick="f_clickPlayStop()" class="btn btn-default"><i class="fa fa-stop"></i> 停止</button>
+                    <button type="button" onclick="f_clearVideoCanvas()" class="btn btn-default"><i class="fa fa-paint-brush"></i> 清空区域</button>
+                    <div class="btn-group">
+                        <button type="button" id="btn_draw_type1" class="btn btn-default">矩形</button>
+                        <button type="button" id="btn_draw_type2" class="btn btn-default">多边形</button>
+                        <button type="button" id="btn_draw_type4" class="btn btn-default">方向线</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label">布控编号</label>
+                        <span style="height: 34px; line-height: 34px; padding: 6px 0;">{{ controlAlgorithm.control_code }}</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">布控算法编号</label>
+                        <span style="height: 34px; line-height: 34px; padding: 6px 0;">{{ controlAlgorithm.code }}</span>
+                    </div>
+
+                    <div class="ln_solid"></div>
+
+                    <div class="form-group">
+                        <label class="control-label">业务算法 <span class="required">*</span></label>
+                        <select id="select_flow" class="form-control" required="required">
+                            <option value="0">请选择业务算法</option>
+                            {% for flow in flows %}
+                                <option {% if flow.code == controlAlgorithm.flow_code %} selected {% endif %} value="{{ flow.code }}">{{ flow.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">大模型复核</label>
+                        <select id="select_llm" class="form-control">
+                            <option value="">请选择大模型</option>
+                            {% for llm in llms %}
+                                <option {% if llm.code == controlAlgorithm.llm_code %} selected {% endif %} value="{{ llm.code }}">{{ llm.model_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">大模型提示词</label>
+                        <textarea rows="1" id="input_llm_prompt" class="form-control" style="height: 40px; min-height: 40px;">{{ controlAlgorithm.llm_prompt }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">发生关键词</label>
+                        <input type="text" id="input_llm_happen_words" class="form-control" value="{{ controlAlgorithm.llm_happen_words }}">
+                    </div>
+
+                    <div class="ln_solid"></div>
+
+                    <div class="form-actions">
+                        <button type="button" onclick="if(window.parent && window.parent.closeAlgorithmModal){window.parent.closeAlgorithmModal();}else{window.history.go(-1);}" class="btn btn-default">取消</button>
+                        <button type="button" onclick="f_openHandle()" class="btn btn-dark">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/lib/jquery/jquery.min.js"></script>
+    <script src="/static/lib/easyPlayer/js/easyplayer-pro.js?02"></script>
+    <script src="/static/vendors/canvas_select/canvas-select.min.js"></script>
+
+    <script>
+        let flowDict = {};
+        let flowCode;
+        let mNodeCode = '{{ node_code }}';
+        let controlAlgorithmCode = '{{ controlAlgorithm.code }}';
+        let controlCode = '{{ controlAlgorithm.control_code }}';
+        let handle = '{{ handle }}';
+        let mPolygon = '{{ controlAlgorithm.polygon }}';
+        let mPolygonType = parseInt('{{ controlAlgorithm.polygon_type }}');
+        if(isNaN(mPolygonType)){
+            mPolygonType = 1;
+        }
+        let mVideoUrl = null;
+        
+        let option = [];
+        
+        let eleDivCanvasBox = document.querySelector('.div_canvas_box');
+        let eleVideoPlayer = document.querySelector('#video_player');
+        let eleCanvas = document.getElementById("canvas");
+        let eleInputVideoUrl = document.getElementById('input_video_url');
+        let eleSelectFlow = document.getElementById('select_flow');
+        
+        let eleBtnDrawType1 = document.getElementById("btn_draw_type1");
+        let eleBtnDrawType2 = document.getElementById("btn_draw_type2");
+        let eleBtnDrawType4 = document.getElementById("btn_draw_type4");
+        
+        eleCanvas.width = eleVideoPlayer.clientWidth;
+        eleCanvas.height = eleVideoPlayer.clientHeight;
+        
+        let instance = new CanvasSelect("#canvas", eleCanvas.toDataURL());
+        
+        function f_changeCreateType(createType) {
+            instance.createType = createType;
+            if(createType === 1){
+                mPolygonType = 1;
+            }else if(createType === 2){
+                mPolygonType = 3;
+            }else if(createType === 4 || createType === 6){
+                mPolygonType = 2;
+            }else{
+                mPolygonType = 0;
+            }
+            
+            if(mPolygonType === 1){
+                eleBtnDrawType1.className = "btn btn-dark";
+                eleBtnDrawType2.className = "btn btn-default";
+                eleBtnDrawType4.className = "btn btn-default";
+            }else if(mPolygonType === 3){
+                eleBtnDrawType1.className = "btn btn-default";
+                eleBtnDrawType2.className = "btn btn-dark";
+                eleBtnDrawType4.className = "btn btn-default";
+            }else if(mPolygonType === 2){
+                eleBtnDrawType1.className = "btn btn-default";
+                eleBtnDrawType2.className = "btn btn-default";
+                eleBtnDrawType4.className = "btn btn-dark";
+            }
+        }
+        
+        eleBtnDrawType1.onclick = function() { f_changeCreateType(1); };
+        eleBtnDrawType2.onclick = function() { f_changeCreateType(2); };
+        eleBtnDrawType4.onclick = function() { f_changeCreateType(4); };
+        
+        instance.on("add", (info) => {
+            option.push(info);
+        });
+        
+        instance.on("delete", (info) => {
+        });
+        
+        instance.on("select", (shape) => {
+        });
+        
+        function f_clearVideoCanvas() {
+            option = [];
+            instance.setData(option);
+        }
+        
+        function f_adjustVideoCanvas() {
+            let w = eleVideoPlayer.offsetWidth;
+            let h = eleVideoPlayer.offsetHeight;
+            eleCanvas.style.width = String(w) + "px";
+            eleCanvas.style.height = String(h) + "px";
+            eleCanvas.width = w;
+            eleCanvas.height = h;
+            instance.setData(option);
+        }
+        
+        function f_resetPolygon() {
+            if (mPolygon !== "") {
+                f_adjustVideoCanvas();
+                
+                let canvas_box_width = eleDivCanvasBox.clientWidth;
+                let canvas_box_height = eleDivCanvasBox.clientHeight;
+                let polygon_array = mPolygon.split('#');
+                let polygon_item_length = polygon_array.length;
+                
+                if (mPolygonType === 1) {
+                    option = [];
+                    for (let i = 0; i < polygon_item_length; i++) {
+                        let item = polygon_array[i].split(",");
+                        let topLx = parseInt(item[0] * canvas_box_width);
+                        let topLy = parseInt(item[1] * canvas_box_height);
+                        let bomRx = parseInt(item[4] * canvas_box_width);
+                        let bomRy = parseInt(item[5] * canvas_box_height);
+                        let topL = [topLx, topLy];
+                        let bomR = [bomRx, bomRy];
+                        option.push({
+                            type: 1,
+                            coor: [topL, bomR]
+                        });
+                    }
+                    instance.setData(option);
+                } else if (mPolygonType === 2) {
+                    if (polygon_item_length === 1) {
+                        option = [];
+                        for (let i = 0; i < polygon_item_length; i++) {
+                            let item = polygon_array[i].split(",");
+                            let objL = { "coor": [], "type": 4 };
+                            let objLa = { "coor": [], "type": 6 };
+                            for (let j = 0; j < item.length; j++) {
+                                if (j % 2 === 0) {
+                                    if (j > 3) {
+                                        let x = item[j] * canvas_box_width;
+                                        let y = item[j + 1] * canvas_box_height;
+                                        objLa.coor.unshift([x, y]);
+                                    } else {
+                                        let x = item[j] * canvas_box_width;
+                                        let y = item[j + 1] * canvas_box_height;
+                                        objL.coor.push([x, y]);
+                                    }
+                                }
+                            }
+                            option.push(objL);
+                            option.push(objLa);
+                        }
+                        instance.setData(option);
+                    }
+                } else if (mPolygonType === 3) {
+                    option = [];
+                    for (let i = 0; i < polygon_item_length; i++) {
+                        let item = polygon_array[i].split(",");
+                        let line_count = item.length / 2;
+                        let obj = {
+                            type: 2,
+                            coor: []
+                        };
+                        for (let j = 0; j < line_count; j++) {
+                            let x = parseInt(item[j * 2] * canvas_box_width);
+                            let y = parseInt(item[j * 2 + 1] * canvas_box_height);
+                            obj.coor.push([x, y]);
+                        }
+                        option.push(obj);
+                    }
+                    instance.setData(option);
+                }
+            }
+        }
+        
+        function f_calcuTwoLineIntersect(p1, q1, p2, q2) {
+            const a1 = q1[1] - p1[1];
+            const b1 = p1[0] - q1[0];
+            const c1 = a1 * p1[0] + b1 * p1[1];
+            const a2 = q2[1] - p2[1];
+            const b2 = p2[0] - q2[0];
+            const c2 = a2 * p2[0] + b2 * p2[1];
+            const det = a1 * b2 - a2 * b1;
+            if (det === 0) return false;
+            const x = (b2 * c1 - b1 * c2) / det;
+            const y = (a1 * c2 - a2 * c1) / det;
+            return (
+                (p1[0] <= x && x <= q1[0] && p2[0] <= x && x <= q2[0]) ||
+                (p1[0] >= x && x >= q1[0] && p2[0] >= x && x >= q2[0]) ||
+                (p1[1] <= y && y <= q1[1] && p2[1] <= y && y <= q2[1]) ||
+                (p1[1] >= y && y >= q1[1] && p2[1] >= y && y >= q2[1])
+            );
+        }
+        
+        let ePlayer = null;
+        
+        function f_createEPlayer() {
+            ePlayer = new EasyPlayerPro({
+                container: eleVideoPlayer,
+                videoBuffer: 0.1,
+                videoBufferDelay: Number(3),
+                decoder: '/static/lib/easyPlayer/js/decoder-pro.js',
+                isResize: true,
+                text: "预览",
+                loadingText: "加载中",
+                useMSE: true,
+                useWCS: true,
+                hasAudio: true,
+                showBandwidth: false,
+                showPerformance: false,
+                operateBtns: {
+                    fullscreen: false,
+                    screenshot: false,
+                    play: true,
+                    audio: false,
+                    ptz: false,
+                    quality: false,
+                    performance: false,
+                },
+                background: "/static/images/player_poster.jpg",
+                timeout: 10,
+            });
+        }
+        
+        function f_playStart(video_url) {
+            if(!video_url) {
+                return false;
+            }
+            if(video_url.startsWith("ws://") || video_url.startsWith("http://")) {
+                if(ePlayer) {
+                    ePlayer.destroy().then(() => {
+                        f_createEPlayer();
+                        ePlayer.play(video_url);
+                    });
+                } else {
+                    f_createEPlayer();
+                    ePlayer.play(video_url);
+                }
+            }
+        }
+        
+        function f_playStop() {
+            if(ePlayer) {
+                ePlayer.destroy();
+                ePlayer = null;
+            }
+        }
+        
+        function f_clickPlayStart() {
+            if(mVideoUrl) {
+                f_playStart(mVideoUrl);
+            }
+        }
+        
+        function f_clickPlayStop() {
+            f_playStop();
+        }
+        
+        function myToast(text, icon) {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;font-size:14px;color:white;z-index:99999;';
+            toast.style.backgroundColor = icon === 'error' ? '#ef4444' : '#10b981';
+            toast.innerHTML = '<span>' + text + '</span>';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+        
+        function f_openHandle() {
+            flowCode = eleSelectFlow.value.trim();
+            if(flowCode === "0") {
+                myToast("请选择算法", "error");
+                return;
+            }
+            
+            let llm_code = document.getElementById('select_llm').value.trim();
+            let llm_prompt = document.getElementById('input_llm_prompt').value.trim();
+            let llm_happen_words = document.getElementById('input_llm_happen_words').value.trim();
+            
+            let canvas_box_width = eleDivCanvasBox.clientWidth;
+            let canvas_box_height = eleDivCanvasBox.clientHeight;
+            
+            let polygon_array = [];
+            if(mPolygonType === 1) {
+                if(option.length > 0) {
+                    for(let i = 0; i < option.length; i++) {
+                        let info = option[i];
+                        let topL = info.coor[0];
+                        let botR = info.coor[1];
+                        let topR = [botR[0], topL[1]];
+                        let botL = [topL[0], botR[1]];
+                        let item = [];
+                        item.push((topL[0]/canvas_box_width).toFixed(4));
+                        item.push((topL[1]/canvas_box_height).toFixed(4));
+                        item.push((topR[0]/canvas_box_width).toFixed(4));
+                        item.push((topR[1]/canvas_box_height).toFixed(4));
+                        item.push((botR[0]/canvas_box_width).toFixed(4));
+                        item.push((botR[1]/canvas_box_height).toFixed(4));
+                        item.push((botL[0]/canvas_box_width).toFixed(4));
+                        item.push((botL[1]/canvas_box_height).toFixed(4));
+                        polygon_array.push(item.join(","));
+                    }
+                } else {
+                    let item = ["0","0","0","1","1","1","1","0"];
+                    polygon_array.push(item.join(","));
+                }
+            } else {
+                let item = ["0","0","0","1","1","1","1","0"];
+                polygon_array.push(item.join(","));
+            }
+            
+            let polygon = polygon_array.join("#");
+            
+            let data = {
+                "node_code": mNodeCode,
+                "code": controlAlgorithmCode,
+                "controlCode": controlCode,
+                "flowCode": flowCode,
+                "polygon": polygon,
+                "polygon_type": mPolygonType,
+                "llm_code": llm_code,
+                "llm_prompt": llm_prompt,
+                "llm_happen_words": llm_happen_words
+            };
+            
+            let handleUrl = handle === "add" ? "/control/openAddAlgorithm" : "/control/openEditAlgorithm";
+            
+            $.ajax({
+                url: handleUrl,
+                type: "post",
+                data: data,
+                dataType: "json",
+                timeout: 30000,
+                success: function(res) {
+                    if(res.code === 1000) {
+                        myToast("操作成功", "success");
+                        setTimeout(function() {
+                            if(window.parent && window.parent.closeAlgorithmModal) {
+                                window.parent.closeAlgorithmModal();
+                            } else {
+                                window.history.go(-1);
+                            }
+                        }, 1000);
+                    } else {
+                        myToast(res.msg || "操作失败", "error");
+                    }
+                },
+                error: function() {
+                    myToast("网络异常", "error");
+                }
+            });
+        }
+        
+        window.onresize = function() {
+            f_adjustVideoCanvas();
+        };
+        
+        $(function() {
+            if(mPolygonType === 1){
+                f_changeCreateType(1);
+            }else if(mPolygonType === 2){
+                f_changeCreateType(4);
+            }else if(mPolygonType === 3){
+                f_changeCreateType(2);
+            }
+            
+            if(mNodeCode && controlCode) {
+                $.ajax({
+                    url: '/control/getControlInfo',
+                    type: 'get',
+                    data: { node_code: mNodeCode, code: controlCode },
+                    dataType: 'json',
+                    timeout: 30000,
+                    success: function(res) {
+                        if(res.code === 1000 && res.data) {
+                            mVideoUrl = res.data.wsMp4Url;
+                            if(mVideoUrl) {
+                                // 后端已异步启动推流，延迟播放等待推流就绪
+                                setTimeout(function() {
+                                    f_playStart(mVideoUrl);
+                                    f_adjustVideoCanvas();
+                                }, 1500);
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 编辑模式下，延迟加载绘制区域
+            if(handle === "edit") {
+                setTimeout(function() {
+                    f_resetPolygon();
+                }, 1200);
+            }
+        });
+    </script>
+</body>
+</html>

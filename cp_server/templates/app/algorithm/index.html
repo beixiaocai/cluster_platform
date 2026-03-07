@@ -118,6 +118,11 @@
         border-color: #d4d4d4;
         text-decoration: none;
     }
+    .xc_action-link.delete:hover {
+        color: #dc2626;
+        background-color: #fef2f2;
+        border-color: #fecaca;
+    }
     .xc_empty-state {
         text-align: center;
         padding: 60px 20px;
@@ -178,6 +183,131 @@
         font-size: 14px;
         color: #7f8c8d;
     }
+    .xc_modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    .xc_modal-overlay.active {
+        display: flex;
+        animation: xc_fadeIn 0.2s ease;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 20px 0;
+    }
+    @keyframes xc_fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .xc_modal-container {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 750px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: xc_slideIn 0.3s ease;
+        margin: auto;
+        max-height: calc(100vh - 40px);
+    }
+    @keyframes xc_slideIn {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .xc_modal-header {
+        position: relative;
+        padding: 14px 18px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fafafa;
+        border-radius: 8px 8px 0 0;
+        flex-shrink: 0;
+    }
+    .xc_modal-title {
+        font-size: 16px; font-weight: 500; color: #374151;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .xc_modal-title i { color: #3b82f6; }
+    .xc_modal-close {
+        position: absolute; top: 12px; right: 16px;
+        width: 30px; height: 30px; border: 1px solid #d1d5db;
+        background: white; color: #6b7280; font-size: 20px;
+        line-height: 1; cursor: pointer; padding: 0;
+        border-radius: 4px; transition: all 0.2s;
+    }
+    .xc_modal-close:hover { background: #f3f4f6; color: #374151; border-color: #9ca3af; }
+    .xc_modal-body {
+        flex: 1; padding: 18px 20px; overflow-y: auto;
+    }
+    .xc_form-row {
+        display: flex; gap: 14px; margin-bottom: 12px;
+    }
+    .xc_form-row .xc_form-group { flex: 1; margin-bottom: 0; }
+    .xc_form-group { margin-bottom: 12px; }
+    .xc_form-label {
+        display: block; font-size: 13px; color: #374151;
+        margin-bottom: 6px; font-weight: 500;
+    }
+    .xc_form-label .required { color: #ef4444; margin-left: 2px; }
+    .xc_form-label .xc_info-icon { color: #9ca3af; cursor: help; margin-left: 4px; }
+    .xc_form-input, .xc_form-select, .xc_form-textarea {
+        width: 100%; padding: 7px 10px; font-size: 13px;
+        border: 1px solid #d1d5db; border-radius: 4px;
+        background: white; color: #374151; transition: all 0.2s;
+    }
+    .xc_form-input { height: 34px; }
+    .xc_form-select { height: 34px; }
+    .xc_form-textarea {
+        resize: vertical; font-family: 'Courier New', monospace;
+        font-size: 12px; min-height: 60px; line-height: 1.5;
+    }
+    .xc_form-input:focus, .xc_form-select:focus, .xc_form-textarea:focus {
+        outline: none; border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+    .xc_form-input:disabled, .xc_form-select:disabled, .xc_form-textarea:disabled {
+        background: #f3f4f6; color: #9ca3af; cursor: not-allowed;
+    }
+    .xc_form-hint {
+        font-size: 12px; color: #9ca3af; margin-top: 4px; display: block;
+    }
+    .xc_modal-footer {
+        padding: 14px 18px; border-top: 1px solid #e5e7eb;
+        text-align: right; background: #fafafa;
+        border-radius: 0 0 8px 8px; flex-shrink: 0;
+    }
+    .xc_modal-btn {
+        padding: 7px 18px; font-size: 13px; border-radius: 4px;
+        border: 1px solid #d1d5db; cursor: pointer; margin-left: 10px;
+        transition: all 0.2s; font-weight: 400; background: white; color: #374151;
+    }
+    .xc_modal-btn:hover { background: #f9fafb; border-color: #9ca3af; }
+    .xc_modal-btn-primary {
+        background: #3b82f6; color: white; border-color: #3b82f6;
+    }
+    .xc_modal-btn-primary:hover { background: #2563eb; border-color: #2563eb; }
+    .xc_modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .xc_file-input {
+        padding: 0 10px; font-size: 13px; cursor: pointer;
+        display: flex; align-items: center; height: 34px; line-height: 34px;
+    }
+    .xc_file-input::file-selector-button {
+        padding: 5px 12px; margin-right: 10px; font-size: 12px;
+        color: #374151; background: #f3f4f6; border: 1px solid #d1d5db;
+        border-radius: 4px; cursor: pointer; transition: all 0.2s; line-height: 1.2;
+    }
+    .xc_file-input::file-selector-button:hover {
+        background: #e8f4f1; border-color: #10b981;
+    }
+    .xc_btn-add {
+        padding: 8px 16px; border-radius: 6px; border: 1px solid #3b82f6;
+        background: #3b82f6; color: white; font-size: 14px; cursor: pointer;
+        display: flex; align-items: center; gap: 6px; transition: all 0.2s;
+    }
+    .xc_btn-add:hover { background: #2563eb; border-color: #2563eb; }
 </style>
 
 {% endblock stylesheets %}
@@ -201,6 +331,10 @@
                 <i class="fa fa-search"></i> 搜索
             </button>
 
+            <button class="xc_btn-add" onclick="openAddModal()">
+                <i class="fa fa-plus"></i> 添加
+            </button>
+
             <div>
                 <span id="top_loading" style="display: none;">
                     <span class="xc_loading-spinner"></span>
@@ -217,7 +351,7 @@
                         <th>编号</th>
                         <th>名称</th>
                         <th>类型</th>
-                        <th>框架/推理/设备</th>
+                        <th>算法参数</th>
                         <th>更新时间</th>
                         <th>操作</th>
                     </tr>
@@ -246,6 +380,113 @@
 
     </div>
   </div>
+
+<!-- 添加/编辑弹窗 -->
+<div class="xc_modal-overlay" id="algorithmModal">
+    <div class="xc_modal-container">
+        <div class="xc_modal-header">
+            <div class="xc_modal-title" id="modalTitle">
+                <i class="fa fa-plus-circle"></i>
+                添加基础算法
+            </div>
+            <button class="xc_modal-close" onclick="closeAlgorithmModal()">×</button>
+        </div>
+        <div class="xc_modal-body">
+            <form id="algorithmForm">
+                <input type="hidden" id="form_handle" value="add">
+                <input type="hidden" id="form_code" value="">
+
+                <div class="xc_form-group" id="code_group" style="display:none;">
+                    <label class="xc_form-label">算法编号</label>
+                    <input type="text" id="input_code_display" class="xc_form-input" disabled>
+                </div>
+                
+                <div class="xc_form-group">
+                    <label class="xc_form-label">算法名称<span class="required">*</span></label>
+                    <input type="text" id="input_name" class="xc_form-input" placeholder="请输入算法名称">
+                </div>
+                
+                <div class="xc_form-row">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">算法类型<span class="required">*</span></label>
+                        <select id="input_algorithm_type" class="xc_form-select">
+                            <option value="0">请选择</option>
+                        </select>
+                    </div>
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">算法框架<span class="required">*</span></label>
+                        <select id="input_framework" class="xc_form-select">
+                            <option value="0">请先选择算法类型</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="xc_form-row">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">推理引擎<span class="required">*</span></label>
+                        <select id="input_inference" class="xc_form-select">
+                            <option value="0">请先选择算法类型</option>
+                        </select>
+                    </div>
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">推理设备<span class="required">*</span>
+                            <i class="fa fa-info-circle xc_info-icon" title="推理引擎设备，比如CPU,GPU,GPU:0,GPU:1"></i>
+                        </label>
+                        <input type="text" id="input_inference_device" class="xc_form-input" placeholder="CPU">
+                    </div>
+                </div>
+                
+                <div class="xc_form-group">
+                    <label class="xc_form-label">模型推理参数<span class="required">*</span>
+                        <i class="fa fa-info-circle xc_info-icon" title="分析器基于模型计算时的自定义参数"></i>
+                    </label>
+                    <input type="text" id="input_extend_params" class="xc_form-input" placeholder="width=640,height=640,nms_threshold=0.5,score_threshold=0.5,fp=16">
+                </div>
+                
+                <div class="xc_form-group" id="model_convert_group">
+                    <label class="xc_form-label">模型转换参数<span class="required">*</span>
+                        <i class="fa fa-info-circle xc_info-icon" title="trtexec在将onnx转换为engine的命令行扩展参数"></i>
+                    </label>
+                    <input type="text" id="input_model_convert_params" class="xc_form-input" placeholder="--fp16">
+                </div>
+                
+                <div class="xc_form-group" id="model_class_group">
+                    <label class="xc_form-label">模型目标<span class="required">*</span></label>
+                    <textarea id="input_model_class_names" class="xc_form-textarea" rows="3" placeholder="请填写模型支持的目标名称，如果多个名称请用英文逗号隔开"></textarea>
+                </div>
+                
+                <div class="xc_form-row" id="model_info_row" style="display:none;">
+                    <div class="xc_form-group" style="max-width: 100px;">
+                        <label class="xc_form-label">模型目标数量</label>
+                        <input type="text" id="input_model_class_len" class="xc_form-input" disabled>
+                    </div>
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">模型文件路径</label>
+                        <input type="text" id="input_model_path" class="xc_form-input" disabled>
+                    </div>
+                    <div class="xc_form-group" style="max-width: 100px;">
+                        <label class="xc_form-label">模型状态</label>
+                        <div id="model_status_display" style="padding: 5px 0; font-size: 12px;"></div>
+                    </div>
+                </div>
+
+                <div class="xc_form-group" id="model_file_group">
+                    <label class="xc_form-label">模型文件<span class="required">*</span></label>
+                    <input type="file" id="input_model_file" class="xc_form-input xc_file-input" accept=".onnx,.engine,.tar,.om,.rknn">
+                    <span class="xc_form-hint">支持的文件格式：.onnx, .engine, .tar, .om, .rknn，最大1000M</span>
+                </div>
+            </form>
+        </div>
+        <div class="xc_modal-footer">
+            <button class="xc_modal-btn" onclick="closeAlgorithmModal()">取消</button>
+            <button class="xc_modal-btn xc_modal-btn-primary" id="submitBtn" onclick="submitAlgorithmForm()">
+                <span id="submit_text">提交</span>
+            </button>
+            <span id="submit_loading" style="display:none;margin-left:12px;color:#3b82f6;font-size:12px;"><i class="fa fa-spinner fa-spin"></i> 提交中...</span>
+            <span id="submit_timer" style="display:none;margin-left:8px;color:#10b981;font-size:12px;font-weight:500;"></span>
+        </div>
+    </div>
+</div>
 
 {% endblock content %}
 
@@ -342,12 +583,11 @@
             html += "<td>" + (item.code || '-') + "</td>";
             html += "<td>" + (item.name || '-') + "</td>";
             html += "<td>" + (item.algorithm_type_name || item.algorithm_type || '-') + "</td>";
-            html += "<td>" + (item.algorithm_nickname || '-') + "</td>";
-            html += "<td>" + (item.last_update_time || '-') + "</td>";
+            html += "<td title='" + (item.algorithm_nickname || '') + "'>" + (item.algorithm_nickname || (item.framework ? item.framework+'/'+item.inference+'/'+item.inference_device : '-')) + "</td>";
+            html += "<td>" + formatTime(item.last_update_time) + "</td>";
             html += "<td>";
-            html += "<a href='javascript:openInfo(\"" + item.code + "\")' class='xc_action-link'>详情</a>";
             html += "<a href='javascript:openEdit(\"" + item.code + "\")' class='xc_action-link'>编辑</a>";
-            html += "<a href='javascript:openDel(\"" + item.code + "\")' class='xc_action-link'>删除</a>";
+            html += "<a href='javascript:openDel(\"" + item.code + "\")' class='xc_action-link delete'>删除</a>";
             html += "</td>";
             html += "</tr>";
         }
@@ -383,11 +623,11 @@
     }
 
     function openInfo(code) {
-        myToast("详情功能开发中...","info");
+        // reserved
     }
 
     function openEdit(code) {
-        myToast("编辑功能开发中...","info");
+        openEditModal(code);
     }
 
     function openDel(code) {
@@ -433,6 +673,361 @@
             doSearch();
         }
     });
+
+    // ---- 添加/编辑弹框逻辑 ----
+    let currentModalMode = 'add';
+    let currentAlgorithmCode = '';
+    let algorithmTypes = [];
+    let isSubmitting = false;
+    let submitTimer = null;
+    let submitTimerSeconds = 0;
+
+    function startSubmitTimer() {
+        submitTimerSeconds = 0;
+        if(submitTimer) { clearInterval(submitTimer); submitTimer = null; }
+        submitTimer = setInterval(function() {
+            submitTimerSeconds++;
+            $("#submit_timer").text("耗时" + submitTimerSeconds + "秒");
+        }, 1000);
+    }
+    function stopSubmitTimer() {
+        if(submitTimer) { clearInterval(submitTimer); submitTimer = null; }
+    }
+
+    // 打开添加弹窗
+    function openAddModal() {
+        if(!mNodeCode) { myToast("请先选择节点！","error"); return; }
+        currentModalMode = 'add';
+        currentAlgorithmCode = '';
+
+        // 加载添加上下文
+        eleTopLoading.show();
+        $.ajax({
+            url: '/algorithm/openAddContext',
+            type: 'post',
+            data: { node_code: mNodeCode },
+            dataType: 'json',
+            timeout: 30000,
+            error: function() { eleTopLoading.hide(); myToast("网络异常！","error"); },
+            success: function(res) {
+                eleTopLoading.hide();
+                if(res.code === 1000) {
+                    let d = res.data;
+                    algorithmTypes = d.algorithm_types || [];
+                    
+                    $("#modalTitle").html('<i class="fa fa-plus-circle"></i> 添加基础算法');
+                    $("#form_handle").val('add');
+                    $("#form_code").val(d.default_code || '');
+                    $("#code_group").hide();
+                    $("#model_file_group").show();
+                    $("#model_convert_group").show();
+                    $("#model_class_group").show();
+                    $("#model_info_row").hide();
+
+                    // 启用所有字段
+                    $("#input_algorithm_type").prop('disabled', false);
+                    $("#input_framework").prop('disabled', false);
+                    $("#input_inference").prop('disabled', false);
+                    $("#input_model_convert_params").prop('disabled', false);
+                    $("#input_model_class_names").prop('disabled', false);
+
+                    // 清空表单
+                    $("#input_name").val('');
+                    $("#input_inference_device").val(d.default_inference_device || 'CPU');
+                    $("#input_extend_params").val(d.default_extend_params || '');
+                    $("#input_model_convert_params").val(d.default_model_convert_params || '--fp16');
+                    $("#input_model_class_names").val('');
+                    $("#input_model_file").val('');
+
+                    // 填充算法类型
+                    let html = '<option value="0">请选择</option>';
+                    for(let i = 0; i < algorithmTypes.length; i++) {
+                        html += '<option value="' + algorithmTypes[i].code + '">' + algorithmTypes[i].name + '</option>';
+                    }
+                    $("#input_algorithm_type").html(html);
+                    $("#input_framework").html('<option value="0">请先选择算法类型</option>');
+                    $("#input_inference").html('<option value="0">请先选择算法类型</option>');
+
+                    $("#algorithmModal").addClass('active');
+                } else {
+                    myToast(res.msg, "error");
+                }
+            }
+        });
+    }
+
+    // 打开编辑弹窗
+    function openEditModal(code) {
+        if(!mNodeCode) { myToast("请先选择节点！","error"); return; }
+        currentModalMode = 'edit';
+        currentAlgorithmCode = code;
+
+        $("#modalTitle").html('<i class="fa fa-edit"></i> 编辑基础算法');
+        $("#form_handle").val('edit');
+        $("#form_code").val(code);
+        $("#code_group").show();
+        $("#model_file_group").hide();
+        $("#model_convert_group").show();
+        $("#model_class_group").show();
+        $("#model_info_row").show();
+
+        // 禁用不可编辑的字段
+        $("#input_algorithm_type").prop('disabled', true);
+        $("#input_framework").prop('disabled', true);
+        $("#input_inference").prop('disabled', true);
+        $("#input_model_convert_params").prop('disabled', true);
+        $("#input_model_class_names").prop('disabled', true);
+
+        $("#algorithmModal").addClass('active');
+
+        eleTopLoading.show();
+        $.ajax({
+            url: '/algorithm/openEditContext',
+            type: 'post',
+            data: { node_code: mNodeCode, code: code },
+            dataType: 'json',
+            timeout: 30000,
+            error: function() { eleTopLoading.hide(); myToast("网络异常！","error"); closeAlgorithmModal(); },
+            success: function(res) {
+                eleTopLoading.hide();
+                if(res.code === 1000) {
+                    let d = res.data;
+                    $("#input_code_display").val(d.code);
+                    $("#input_name").val(d.name);
+                    $("#input_algorithm_type").html('<option value="' + d.algorithm_type + '">' + (d.algorithm_type_name || d.algorithm_type) + '</option>');
+                    $("#input_framework").html('<option>' + d.framework + '</option>');
+                    $("#input_inference").html('<option>' + d.inference + '</option>');
+                    $("#input_inference_device").val(d.inference_device);
+                    $("#input_extend_params").val(d.extend_params);
+                    $("#input_model_convert_params").val(d.model_convert_params || '');
+                    $("#input_model_class_names").val(d.model_class_names || '');
+                    $("#input_model_class_len").val(d.model_class_names_len || '0');
+                    $("#input_model_path").val(d.absolute_model_dir || '');
+                    if(d.absolute_model_dir_exist) {
+                        $("#model_status_display").html('<span style="color:#10b981;font-weight:500;">✔ 正常</span>');
+                    } else {
+                        $("#model_status_display").html('<span style="color:#ef4444;font-weight:500;">✖ 异常</span>');
+                    }
+                } else {
+                    myToast(res.msg, "error");
+                    closeAlgorithmModal();
+                }
+            }
+        });
+    }
+
+    function closeAlgorithmModal() {
+        $("#algorithmModal").removeClass('active');
+        isSubmitting = false;
+    }
+
+    // 算法类型改变时加载框架和推理引擎
+    $(document).on('change', '#input_algorithm_type', function() {
+        let algorithm_type_code = $(this).val();
+        if(algorithm_type_code && algorithm_type_code !== '0') {
+            $.ajax({
+                url: '/algorithm/openAlgorithmTypeAttrs',
+                type: 'get',
+                data: { node_code: mNodeCode, algorithm_type_code: algorithm_type_code },
+                dataType: 'json',
+                timeout: 30000,
+                error: function() { myToast("网络异常！","error"); },
+                success: function(res) {
+                    if(res.code === 1000) {
+                        let info = res.info;
+                        let html = '<option value="0">请选择</option>';
+                        let frameworks = info.frameworks || [];
+                        for(let i = 0; i < frameworks.length; i++) {
+                            html += '<option value="' + frameworks[i] + '">' + frameworks[i] + '</option>';
+                        }
+                        $("#input_framework").html(html);
+                        html = '<option value="0">请选择</option>';
+                        let inferences = info.inferences || [];
+                        for(let i = 0; i < inferences.length; i++) {
+                            html += '<option value="' + inferences[i] + '">' + inferences[i] + '</option>';
+                        }
+                        $("#input_inference").html(html);
+                    } else {
+                        $("#input_framework").html('<option value="0">请选择</option>');
+                        $("#input_inference").html('<option value="0">请选择</option>');
+                    }
+                }
+            });
+        } else {
+            $("#input_framework").html('<option value="0">请先选择算法类型</option>');
+            $("#input_inference").html('<option value="0">请先选择算法类型</option>');
+        }
+    });
+
+    // 提交表单
+    function submitAlgorithmForm() {
+        if(isSubmitting) { myToast("正在提交中，请勿重复操作！","error"); return false; }
+
+        let name = $("#input_name").val().trim();
+        let algorithm_type = $("#input_algorithm_type").val();
+        let framework = $("#input_framework").val();
+        let inference = $("#input_inference").val();
+        let inference_device = $("#input_inference_device").val().trim();
+        let extend_params = $("#input_extend_params").val().trim();
+
+        if(!name) { myToast("请输入算法名称","error"); $("#input_name").focus(); return false; }
+        if(!inference_device) { myToast("请输入推理设备","error"); $("#input_inference_device").focus(); return false; }
+        if(!extend_params) { myToast("请输入模型推理参数","error"); $("#input_extend_params").focus(); return false; }
+
+        if(currentModalMode === 'add') {
+            if(!algorithm_type || algorithm_type === '0') { myToast("请选择算法类型","error"); return false; }
+            if(!framework || framework === '0') { myToast("请选择算法框架","error"); return false; }
+            if(!inference || inference === '0') { myToast("请选择推理引擎","error"); return false; }
+
+            let model_convert_params = $("#input_model_convert_params").val().trim();
+            let model_class_names = $("#input_model_class_names").val().trim();
+            let modelFile = $("#input_model_file")[0].files[0];
+
+            if(!model_convert_params) { myToast("请输入模型转换参数","error"); return false; }
+            if(!model_class_names) { myToast("请输入模型目标","error"); return false; }
+            if(!modelFile) { myToast("请上传模型文件","error"); return false; }
+
+            let fileSizeM = parseInt(modelFile.size / 1024 / 1024);
+            if(fileSizeM > 1000) { myToast("模型文件不能超过1000M：" + fileSizeM + "M","error"); return false; }
+
+            let fileName = modelFile.name;
+            if(inference === 'TensorRT' && !fileName.endsWith('.onnx') && !fileName.endsWith('.engine')) {
+                myToast("TensorRT仅支持onnx或engine格式","error"); return false;
+            } else if(inference === 'OpenVINO' && !fileName.endsWith('.tar')) {
+                myToast("OpenVINO仅支持tar格式","error"); return false;
+            } else if(inference === 'ONNXRuntime' && !fileName.endsWith('.onnx')) {
+                myToast("ONNXRuntime仅支持onnx格式","error"); return false;
+            } else if(inference === 'Ascend' && !fileName.endsWith('.om')) {
+                myToast("Ascend仅支持om格式","error"); return false;
+            } else if(inference === 'RKNPU' && !fileName.endsWith('.rknn')) {
+                myToast("RKNPU仅支持rknn格式","error"); return false;
+            }
+
+            // 使用FormData上传文件，cp_server后端负责转base64
+            isSubmitting = true;
+            $("#submitBtn").prop('disabled', true);
+            $("#submit_text").text('提交中...');
+            $("#submit_loading").show();
+            $("#submit_timer").show();
+            startSubmitTimer();
+
+            let formData = new FormData();
+            formData.append('node_code', mNodeCode);
+            formData.append('handle', 'add');
+            formData.append('code', $("#form_code").val());
+            formData.append('name', name);
+            formData.append('algorithm_type', algorithm_type);
+            formData.append('framework', framework);
+            formData.append('inference', inference);
+            formData.append('inference_device', inference_device);
+            formData.append('extend_params', extend_params);
+            formData.append('model_convert_params', model_convert_params);
+            formData.append('model_class_names', model_class_names);
+            formData.append('model', modelFile);
+            formData.append('remark', '');
+            doSubmitAdd(formData);
+        } else {
+            // 编辑模式
+            doSubmitEdit({
+                node_code: mNodeCode,
+                handle: 'edit',
+                code: currentAlgorithmCode,
+                name: name,
+                algorithm_type: algorithm_type,
+                framework: $("#input_framework").find('option:selected').text(),
+                inference: $("#input_inference").find('option:selected').text(),
+                inference_device: inference_device,
+                extend_params: extend_params,
+                remark: ''
+            });
+        }
+    }
+
+    function doSubmitAdd(formData) {
+        $("#submit_text").text('提交中...');
+        eleTopLoading.show();
+        $.ajax({
+            url: '/algorithm/openAdd',
+            type: 'post',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            timeout: 0,
+            error: function() {
+                isSubmitting = false;
+                eleTopLoading.hide();
+                $("#submitBtn").prop('disabled', false);
+                $("#submit_text").text('提交');
+                $("#submit_loading").hide();
+                $("#submit_timer").hide();
+                stopSubmitTimer();
+                myToast("网络异常！","error");
+            },
+            success: function(res) {
+                isSubmitting = false;
+                eleTopLoading.hide();
+                $("#submitBtn").prop('disabled', false);
+                $("#submit_text").text('提交');
+                $("#submit_loading").hide();
+                stopSubmitTimer();
+                setTimeout(function() { $("#submit_timer").hide(); }, 2000);
+                if(res.code === 1000) {
+                    myToast(res.msg || '添加成功', "success");
+                    closeAlgorithmModal();
+                    setTimeout(function() { getData(); }, 500);
+                } else {
+                    myToast(res.msg, "error");
+                }
+            }
+        });
+    }
+
+    function doSubmitEdit(postData) {
+        isSubmitting = true;
+        eleTopLoading.show();
+        $("#submitBtn").prop('disabled', true);
+        $("#submit_text").text('提交中...');
+        $.ajax({
+            url: '/algorithm/openEdit',
+            type: 'post',
+            data: postData,
+            dataType: 'json',
+            timeout: 30000,
+            error: function() {
+                isSubmitting = false;
+                eleTopLoading.hide();
+                $("#submitBtn").prop('disabled', false);
+                $("#submit_text").text('提交');
+                myToast("网络异常！","error");
+            },
+            success: function(res) {
+                isSubmitting = false;
+                eleTopLoading.hide();
+                $("#submitBtn").prop('disabled', false);
+                $("#submit_text").text('提交');
+                if(res.code === 1000) {
+                    myToast(res.msg || '编辑成功', "success");
+                    closeAlgorithmModal();
+                    setTimeout(function() { getData(); }, 500);
+                } else {
+                    myToast(res.msg, "error");
+                }
+            }
+        });
+    }
+
+    function formatTime(t) {
+        if (!t) return '-';
+        var d = new Date(t);
+        if (isNaN(d.getTime())) return t;
+        var Y = d.getFullYear();
+        var M = String(d.getMonth()+1).padStart(2,'0');
+        var D = String(d.getDate()).padStart(2,'0');
+        var h = String(d.getHours()).padStart(2,'0');
+        var m = String(d.getMinutes()).padStart(2,'0');
+        return Y+'/'+M+"/"+D+' '+h+':'+m;
+    }
 
     function myToast(text, icon, hideAfter) {
         hideAfter = hideAfter || 2000;

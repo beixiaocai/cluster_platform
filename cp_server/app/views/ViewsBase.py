@@ -10,7 +10,8 @@ from Crypto.Cipher import PKCS1_v1_5
 from Crypto.PublicKey import RSA
 import random
 from django.http import HttpResponse
-from framework.settings import BASE_DIR, PROJECT_UA, PROJECT_BUILT, PROJECT_VERSION, PROJECT_FLAG, PROJECT_ADMIN_START_TIMESTAMP, TIMEOUT
+from django.shortcuts import render
+from framework.settings import BASE_DIR, PROJECT_UA, PROJECT_BUILT, PROJECT_VERSION, PROJECT_FLAG, PROJECT_ADMIN_START_TIMESTAMP
 from app.utils.ZLMediaKit import ZLMediaKit
 from app.utils.Settings import Settings
 from app.utils.Config import Config
@@ -19,6 +20,7 @@ from app.utils.OSSystem import OSSystem
 from app.utils.Database import Database
 
 from app.models import *
+from app.consumers.ClusterConsumer import send_command_to_node_sync
 
 g_filepath_config_json = os.path.join(BASE_DIR, "config.json")
 g_filepath_settings_json = os.path.join(BASE_DIR, "settings.json")
@@ -46,7 +48,6 @@ g_database = Database(logger=g_logger)
 
 g_session_key_user = "user"
 g_session_key_captcha = "captcha"
-CP_SERVER_SAFE = g_config.wsToken
 
 def get_node_manager():
     from app.utils.NodeManager import g_node_manager
@@ -109,7 +110,7 @@ def f_checkRequestSafe(request):
     else:
         headers = request.headers
         Safe = headers.get("Safe")
-        if Safe and Safe == CP_SERVER_SAFE:
+        if Safe and Safe == g_config.safe:
             ret = True
             msg = "success"
         else:

@@ -1,0 +1,503 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} 录像播放器 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+    <link rel="stylesheet" href="/static/lib/jquery/daterangepicker/daterangepicker.min.css"/>
+      <!-- Ion.RangeSlider -->
+  <link href="/static/vendors/normalize-css/normalize.css" rel="stylesheet">
+  <link href="/static/vendors/ion.rangeSlider/css/ion.rangeSlider.css?0908" rel="stylesheet">
+
+{% endblock stylesheets %}
+
+{% block content %}
+<style>
+    video{
+        width: 100%;
+        height: 100%;
+        max-height: 400px;
+        background-color: rgba(0,0,00,1.0);
+        border-radius: 5px;
+    }
+
+    video:focus {
+        outline: -webkit-focus-ring-color auto 0;
+    }
+
+  .timeline-container {
+      margin-top: 6px;
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      align-items: stretch;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+  .timeline-container > .item-valid {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      background: #0e62a7;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    
+  .timeline-container > .item-valid:hover {
+      background: #1a7fd4;
+    }
+    
+  .timeline-container > .item-invalid {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      background: #999;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    
+  .timeline-container > .item-valid:last-child,
+  .timeline-container > .item-invalid:last-child {
+      border-right: none;
+    }
+
+  .timeline-number {
+      display: none;
+    }
+    
+  .timeline-legend {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 20px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    
+  .timeline-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+  .timeline-legend-color {
+      width: 16px;
+      height: 12px;
+      border-radius: 2px;
+    }
+    
+  .timeline-legend-color.valid {
+      background: #0e62a7;
+    }
+    
+  .timeline-legend-color.invalid {
+      background: #999;
+    }
+    
+  .timeline-scale {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 4px;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    
+  .timeline-scale span {
+      text-align: center;
+    }
+    
+  .irs--round .irs-bar {
+      background: linear-gradient(to right, #3b82f6 0%, #2563eb 100%);
+      height: 6px;
+  }
+  
+  .irs--round .irs-line {
+      background: #e5e7eb;
+      border-radius: 3px;
+      height: 6px;
+  }
+  
+  .irs--round .irs-handle {
+      width: 18px;
+      height: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      border: 3px solid #3b82f6;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  }
+  
+  .irs--round .irs-handle:hover {
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+  }
+  
+  .irs--round .irs-from,
+  .irs--round .irs-to,
+  .irs--round .irs-single {
+      background: #3b82f6;
+      color: white;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+  }
+  
+  .irs--round .irs-grid-pol {
+      background: #d1d5db;
+  }
+  
+  .irs--round .irs-grid-text {
+      color: #6b7280;
+      font-size: 11px;
+  }
+  
+  .irs--round .irs-min,
+  .irs--round .irs-max {
+      background: #f3f4f6;
+      color: #6b7280;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+  }
+  </style>
+
+
+  <div class="right_col" role="main">
+    <div class="">
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+                 <h2>录像播放器
+                    <span id="top_loading" ><img class="top_loading_img" src="/static/images/load.gif" alt="loading">加载中</span>
+                    <span id="top_msg">{{top_msg}}</span>
+                 </h2>
+
+                    <div style="float: right; margin-top: 6px; margin-right: 10px;">
+                         <input type="text" style="width: 120px;height: 30px;"  id="record_date" class="form-control">
+                    </div>
+
+                  <div class="clearfix"></div>
+            </div>
+
+            <div class="x_content">
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                   <video id="video_player" poster="/static/images/player_poster.jpg" muted controls>
+                       Your browser is too old which doesn't support HTML5 video.
+                    </video>
+              </div>
+
+                 <div class="col-md-12 col-sm-12 col-xs-12">
+                     <div id="timeline_div">
+                     </div>
+
+                   </div>
+                
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="timeline-container" id="timeline_container">
+                  </div>
+                <div class="timeline-scale" id="timeline_scale">
+                    <span>00:00</span>
+                    <span>04:00</span>
+                    <span>08:00</span>
+                    <span>12:00</span>
+                    <span>16:00</span>
+                    <span>20:00</span>
+                    <span>24:00</span>
+                  </div>
+                <div class="timeline-legend">
+                    <div class="timeline-legend-item">
+                      <div class="timeline-legend-color valid"></div>
+                      <span>已录像</span>
+                    </div>
+                    <div class="timeline-legend-item">
+                      <div class="timeline-legend-color invalid"></div>
+                      <span>无录像</span>
+                    </div>
+                  </div>
+              </div>
+
+                <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top: 30px;">
+                     <div class="form-horizontal form-label-left" >
+                        <div class="form-group">
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                             <input type="text" class="form-control" id="record_video_address" placeholder="当前录像播放地址">
+                          </div>
+                            <button type="button" onclick="f_downloadRecordVideo()" class="btn btn-dark">下载</button>
+                        </div>
+                     </div>
+
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+   <!-- daterangepicker -->
+<script src="/static/vendors/moment/min/moment.min.js"></script>
+<script src="/static/lib/jquery/daterangepicker/jquery.daterangepicker.js"></script>
+  <!-- Ion.RangeSlider -->
+  <script src="/static/vendors/ion.rangeSlider/js/ion.rangeSlider.min.js?0908"></script>
+<script>
+
+    let record_code = '{{ record_code }}';
+    let record_day = parseInt('{{ record_day }}') || 7;
+    let current_node_code = '{{ node_code }}';
+    let current_date = new Date();
+    let current_day = current_date.getDate();
+
+    let eleInputRecordDate = $('#record_date');
+    let eleInputTimelineDiv = $("#timeline_div");
+    let eleVideoPlayerJsObj = document.getElementById("video_player")
+    let eleVideoPlayerJqueryObj = $("#video_player")
+    let eleTimelineContainer = $("#timeline_container");
+    let eleInputRecordVideoAddress = $("#record_video_address");
+    
+    let currentTimestamp = 0;
+    let isAutoContinue = true;
+    let recordTimelineData = [];
+    
+    eleVideoPlayerJsObj.addEventListener('ended', function() {
+        if (isAutoContinue && currentTimestamp > 0) {
+            console.log('视频播放结束，准备播放下一个片段...');
+            let nextTimestamp = currentTimestamp + 60;
+            
+            let currentDateObj = new Date(currentTimestamp * 1000);
+            let maxTimestamp = new Date(
+                currentDateObj.getFullYear(),
+                currentDateObj.getMonth(),
+                currentDateObj.getDate(),
+                23, 59, 59
+            ).valueOf() / 1000;
+            
+            if (nextTimestamp <= maxTimestamp) {
+                console.log('播放下一个片段:', new Date(nextTimestamp * 1000));
+                f_openRecordFilename(nextTimestamp);
+            } else {
+                console.log('已达当天最后一个片段，停止播放');
+            }
+        }
+    });
+
+    eleInputRecordDate.val(current_date.toLocaleDateString())
+
+    function f_downloadRecordVideo() {
+        let url = eleInputRecordVideoAddress.val().trim();
+        if(url.startsWith("/storage/openAccess")){
+            window.open(url);
+        }else if(url.startsWith("http")){
+            window.open(url);
+        }else{
+            myToast2025("录像播放地址不正确！","error");
+        }
+    }
+    
+    function f_openRecordFilename(timestamp){
+        if (!current_node_code || !record_code) {
+            myToast2025("录像参数不正确！","error");
+            return;
+        }
+        
+        eleInputRecordVideoAddress.val("");
+        
+        currentTimestamp = timestamp;
+
+        $.ajax({
+           url: "/streamRecord/getRecordFilename",
+           type: "get",
+           async: true,
+           data: {
+               node_code: current_node_code,
+               code: record_code,
+               timestamp: timestamp
+           },
+           timeout: 0,
+           error: function () {
+                myToast2025("网络异常，请确定网络正常！","error");
+           },
+           success: function (res) {
+               if(1000 === res.code){
+                   try {
+                       eleVideoPlayerJsObj.pause();
+                   }catch (e) {
+                       console.log("eleVideoPlayerJsObj.pause():",e)
+                   }
+
+                   try {
+                       eleVideoPlayerJqueryObj.removeAttr("src");
+                       eleVideoPlayerJqueryObj.load();
+                   }catch (e) {
+                       console.log("eleVideoPlayerJqueryObj.removeAttr():",e)
+                   }
+
+                   let info = res.info;
+                   let filename = info.filename;
+
+                   let url = filename;
+                   if (url.startsWith("/")) {
+                       // 相对路径，直接使用
+                   } else if (!url.startsWith("http")) {
+                       url = "http://" + filename;
+                   }
+
+                   eleInputRecordVideoAddress.val(url);
+
+                   eleVideoPlayerJsObj.src = url;
+                   eleVideoPlayerJsObj.play();
+
+               }else{
+                   try {
+                       eleVideoPlayerJsObj.pause();
+                   }catch (e) {
+                       console.log("eleVideoPlayerJsObj.pause():",e)
+                   }
+
+                   try {
+                       eleVideoPlayerJqueryObj.removeAttr("src");
+                       eleVideoPlayerJqueryObj.load();
+                   }catch (e) {
+                       console.log("eleVideoPlayerJqueryObj.removeAttr():",e)
+                   }
+                   myToast2025(res.msg,"error");
+               }
+           }
+        });
+        
+    }
+    
+    function f_openRecordTimeline(date) {
+        if (!current_node_code || !record_code) {
+            return;
+        }
+        
+       try {
+            eleVideoPlayerJsObj.pause();
+            eleVideoPlayerJqueryObj.removeAttr("src");
+            eleVideoPlayerJqueryObj.load();
+       }catch (e) {
+           console.log("f_openRecordTimeline error:",e)
+       }
+       
+       currentTimestamp = 0;
+
+        let timestamp = parseInt(date.valueOf() / 1000);
+        $.ajax({
+           url: "/streamRecord/getRecordTimeline",
+           type: "get",
+           async: true,
+           data: {
+               node_code: current_node_code,
+               code: record_code,
+               timestamp: timestamp
+           },
+           timeout: 0,
+           error: function () {
+                myToast2025("网络异常，请确定网络正常！","error");
+           },
+           success: function (res) {
+
+               if(1000 === res.code){
+                    let data = res.data;
+                    recordTimelineData = data;
+                    
+                    let html = "";
+                    for (let i = 0; i < data.length; i++) {
+                        let record = data[i].record;
+                        let ts = data[i].timestamp;
+                        if(record === 1){
+                            html += "<div class='item-valid' data-timestamp='" + ts + "' onclick='f_openRecordFilename(" + ts + ")' title='点击播放'></div>";
+                        }else{
+                            html += "<div class='item-invalid'></div>";
+                        }
+                    }
+
+                    eleTimelineContainer.html(html);
+
+                    let date_year = date.getFullYear()
+                    let date_month = date.getMonth()
+                    let date_day = date.getDate()
+                    let date_hour = date.getHours()
+                    let date_minute = date.getMinutes()
+
+                    eleInputTimelineDiv.html("<input id=\"timeline\" type=\"text\" name=\"\" />")
+                    let eleInputTimeline = $("#timeline");
+
+                    eleInputTimeline.ionRangeSlider({
+                        skin: "round",
+                        min: (new Date(date_year, date_month, date_day, 0, 0, 0)).valueOf(),
+                        max: (new Date(date_year, date_month, date_day, 23, 0, 0)).valueOf(),
+                        from: (new Date(date_year, date_month, date_day, date_hour, date_minute)).valueOf(),
+                        step: 1,
+                        grid: true,
+                        grid_num: 4,
+                        prettify: tsToDate,
+                        onStart: function (data) {
+                        },
+                        onChange: function (data) {
+                        },
+                        onFinish: function (data) {
+                             let ts = parseInt(data.from / 1000);
+                             f_openRecordFilename(ts);
+                        },
+                        onUpdate: function (data) {
+                        }
+                    });
+
+               }else{
+                    myToast2025(res.msg,"error");
+               }
+           }
+        });
+
+        
+    }
+    
+    function tsToDate (timestamp) {
+        let d = new Date(timestamp);
+        return d.toLocaleDateString("zh-CN", {
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+        });
+    }
+    
+    eleInputRecordDate.dateRangePicker({
+        language:'cn',
+        autoClose: true,
+        singleDate : true,
+        showShortcuts: false,
+        singleMonth: true,
+        beforeShowDay: function(time)
+        {
+            let cost_ms = current_date - time;
+            let cost_day = cost_ms / (1000 * 60 * 60 * 24);
+            let valid = false;
+            if (cost_day >=0 && cost_day <= record_day){
+                valid = true;
+            }
+            let tip = valid ? '' : '未录像';
+            return [valid,'',tip];
+        }
+    }).bind('datepicker-change',function(event,obj)
+        {
+            f_openRecordTimeline(obj.date1);
+        });
+
+    if (current_node_code && record_code) {
+        f_openRecordTimeline(current_date);
+    }
+
+</script>
+
+{% endblock javascripts %}

@@ -26,11 +26,8 @@ class SimpleMiddleware(MiddlewareMixin):
             # 未登录状态，仍需要放开的路由
             if path.startswith("login") or path.startswith("captcha") \
                     or path.startswith("open/") \
-                    or path.startswith("version/") \
                     or path.startswith("node/open") \
-                    or path.startswith("largeModel/open") \
                     or path.startswith("alarm/open") \
-                    or path.startswith("media/open") \
                     or path.startswith("stream/open") \
                     or path.startswith("control/open") \
                     or path.startswith("storage/") \

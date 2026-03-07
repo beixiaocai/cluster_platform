@@ -1,7 +1,6 @@
 from app.views.ViewsBase import *
 from django.shortcuts import render
 from app.utils.Utils import buildPageLabels
-from app.consumers.ClusterConsumer import send_command_to_node_sync
 
 def index(request):
     context = {

@@ -1,10 +1,6 @@
 from app.views.ViewsBase import *
 from app.models import *
 from django.shortcuts import render, redirect
-from app.consumers.ClusterConsumer import send_command_to_node_sync
-import requests
-import os
-import random
 
 
 def index(request):
@@ -43,7 +39,7 @@ def api_getNodeAudios(request):
             result = send_command_to_node_sync(node_code, 'get_audios', {
                 'p': page,
                 'ps': page_size
-            }, timeout=30)
+            }, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -64,90 +60,48 @@ def api_getNodeAudios(request):
     return f_responseJson(res)
 
 
-def __get_node_info(node_code):
-    try:
-        node = NodeModel.objects.filter(code=node_code, state=1).first()
-        if node:
-            return {
-                'code': node.code,
-                'name': node.name,
-                'host': node.host,
-                'port': node.port,
-                'safe_key': node.safe_key
-            }
-    except Exception as e:
-        g_logger.error(f"__get_node_info error: {e}")
-    return None
-
-
 def api_openAdd(request):
     ret = False
     msg = "未知错误"
     
     if request.method == 'POST':
-        g_logger.info("AudioView.openAdd() processing file upload")
+        params = f_parsePostParams(request)
+        g_logger.info("AudioView.openAdd() params:%s" % str({k: v for k, v in params.items() if k != 'file_content'}))
         
-        node_code = request.POST.get('node_code', '').strip()
-        code = request.POST.get('code', '').strip()
-        name = request.POST.get('name', '').strip()
-        remark = request.POST.get('remark', '').strip()
+        node_code = params.get('node_code', '').strip()
+        code = params.get('code', '').strip()
+        name = params.get('name', '').strip()
+        remark = params.get('remark', '').strip()
+        file_content = params.get('file_content', '').strip()
+        file_name = params.get('file_name', '').strip()
         
         if not node_code:
             msg = "node_code is required"
         elif not name:
             msg = "名称不能为空"
-        elif not code:
-            msg = "编号不能为空"
         else:
-            file = request.FILES.get('file')
-            if not file:
+            if not file_content:
+                uploaded_file = request.FILES.get('file')
+                if uploaded_file:
+                    file_content = base64.b64encode(uploaded_file.read()).decode('utf-8')
+                    file_name = uploaded_file.name
+            
+            if not file_content:
                 msg = "请上传音频文件"
             else:
-                try:
-                    file_size = file.size
-                    file_size_m = int(file_size / 1024 / 1024)
-                    
-                    if file_size_m > 20:
-                        msg = f"音频文件不能超过20M: {file_size_m}M"
-                    else:
-                        node_info = __get_node_info(node_code)
-                        if not node_info:
-                            msg = "节点不存在或已离线"
-                        else:
-                            file_name_suffix = file.name.split(".")[-1]
-                            temp_file_name = f"audio{random.randint(10000, 99999)}.{file_name_suffix}"
-                            temp_file_path = os.path.join(g_config.storageTempDir, temp_file_name)
-                            
-                            with open(temp_file_path, 'wb') as f:
-                                for chunk in file.chunks():
-                                    f.write(chunk)
-                            
-                            download_url = f"http://{g_config.externalHost}:{g_config.adminPort}/storage/download?filename={temp_file_name}"
-                            
-                            node_url = f"http://{node_info['host']}:{node_info['port']}/audio/openAddFromCluster"
-                            headers = {"Safe": node_info['safe_key']}
-                            
-                            form_data = {
-                                'code': code,
-                                'name': name,
-                                'remark': remark,
-                                'download_url': download_url
-                            }
-                            
-                            response = requests.post(node_url, data=form_data, headers=headers, timeout=60)
-                            
-                            if response.status_code == 200:
-                                result = response.json()
-                                if result.get('code') == 1000:
-                                    ret = True
-                                    msg = "添加成功"
-                                else:
-                                    msg = result.get('msg', '添加失败')
-                            else:
-                                msg = f"节点返回错误: HTTP {response.status_code}"
-                except Exception as e:
-                    msg = f"处理失败: {str(e)}"
-                    g_logger.error(f"AudioView.openAdd error: {e}")
+                result = send_command_to_node_sync(node_code, 'add_audio', {
+                    'code': code,
+                    'name': name,
+                    'remark': remark,
+                    'file_content': file_content,
+                    'file_name': file_name
+                }, timeout=120)
+                
+                if result.get('code') == 1000:
+                    ret = True
+                    msg = result.get('msg', '添加成功')
+                else:
+                    msg = result.get('msg', '添加失败')
     else:
         msg = "request method not supported"
     
@@ -172,7 +126,7 @@ def api_openEdit(request):
         if not node_code:
             msg = "node_code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'edit_audio', params, timeout=30)
+            result = send_command_to_node_sync(node_code, 'edit_audio', params, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -206,7 +160,7 @@ def api_openDel(request):
         elif not code:
             msg = "code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'del_audio', {'code': code}, timeout=30)
+            result = send_command_to_node_sync(node_code, 'del_audio', {'code': code}, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -241,7 +195,7 @@ def api_openInfo(request):
         elif not code:
             msg = "code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'get_audio_info', {'code': code}, timeout=30)
+            result = send_command_to_node_sync(node_code, 'get_audio_info', {'code': code}, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True

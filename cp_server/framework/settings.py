@@ -15,16 +15,15 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_UA = "cp_server"
-PROJECT_BUILT = "cp_server built on 2026/03/06"
-PROJECT_VERSION = "0.002"
+PROJECT_BUILT = "cp_server built on 2026/03/07"
+PROJECT_VERSION = "1.002"
 PROJECT_FLAG = "cluster_platform"
 PROJECT_SUPPORT_REBEKAH_MIN_VERSION = 5.002
 PROJECT_ADMIN_START_TIMESTAMP = int(time.time())
-TIMEOUT = 30
 
 SECRET_KEY = 'django-insecure-o(am*2x=@ynuv5w*&$*yc-(1cjsku-b2@$x*t9!swd+n0-cp_server'
 
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
@@ -114,3 +113,8 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# 允许大请求体（与rebekah_admin保持一致）
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1610612736  # 1.5GB

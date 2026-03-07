@@ -1,0 +1,1475 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} 计划任务 {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+<style>
+    .xc_container {
+        color: #333;
+        line-height: 1.6;
+        margin: 0 auto;
+        padding: 10px 20px;
+    }
+
+    .xc_toolbar {
+        background: white;
+        border-radius: 6px;
+        padding: 10px 14px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .xc_page-title {
+        display: flex;
+        align-items: center;
+        font-size: 22px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .xc_page-title i {
+        margin-right: 10px;
+        font-size: 20px;
+        color: #3b82f6;
+    }
+
+    .xc_loading-spinner {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border: 2px solid #e5e7eb;
+        border-top: 2px solid #3b82f6;
+        border-radius: 50%;
+        animation: xc_spin 1s linear infinite;
+        margin-right: 5px;
+    }
+
+    @keyframes xc_spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .xc_loading-text {
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .xc_btn-modern {
+        height: 36px;
+        padding: 0 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        text-decoration: none;
+        vertical-align: middle;
+        line-height: 1;
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+
+    .xc_btn-modern:hover {
+        background: #f9fafb;
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+
+    .xc_btn-primary {
+        background: #169F85;
+        color: white;
+        border-color: #169F85;
+    }
+
+    .xc_btn-primary:hover {
+        background: #14b89a;
+        border-color: #14b89a;
+        color: white;
+        box-shadow: 0 2px 6px rgba(22, 159, 133, 0.25);
+    }
+
+    .xc_btn-secondary {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+    }
+
+    .xc_btn-secondary:hover {
+        background: #f9fafb;
+        color: #374151;
+        border-color: #9ca3af;
+    }
+
+    .xc_btn-danger {
+        background: #ef4444;
+        color: white;
+        border: 1px solid #dc2626;
+    }
+
+    .xc_btn-danger:hover {
+        background: #dc2626;
+        border-color: #b91c1c;
+    }
+
+    .xc_search-input {
+        padding: 0 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        width: 180px;
+        height: 36px;
+        background: white;
+        color: #374151;
+        transition: all 0.2s;
+        box-sizing: border-box;
+        vertical-align: middle;
+        flex-shrink: 0;
+    }
+
+    .xc_search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .xc_search-input::placeholder {
+        color: #9ca3af;
+    }
+
+    .xc_filter-select {
+        padding: 0 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        width: 120px;
+        height: 36px;
+        background: white;
+        color: #374151;
+        transition: all 0.2s;
+        box-sizing: border-box;
+        vertical-align: middle;
+        flex-shrink: 0;
+    }
+
+    .xc_filter-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+
+    .xc_modern-card {
+        background: white;
+        border-radius: 6px;
+        padding: 10px 14px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        margin-bottom: 12px;
+    }
+
+    .xc_table-container {
+        overflow-x: auto;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .xc_table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        background: white;
+    }
+
+    .xc_table-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .xc_table-header th {
+        padding: 14px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+        white-space: nowrap;
+        border-right: 1px solid #e2e8f0;
+    }
+
+    .xc_table-header th:last-child {
+        border-right: none;
+    }
+
+    .xc_table-body tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: all 0.2s ease;
+    }
+
+    .xc_table-body tr:last-child {
+        border-bottom: none;
+    }
+
+    .xc_table-body tr:hover {
+        background: #f9fafb;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    .xc_table-body td {
+        padding: 14px 16px;
+        color: #374151;
+        vertical-align: middle;
+        border-right: 1px solid #f3f4f6;
+    }
+
+    .xc_table-body td:last-child {
+        border-right: none;
+    }
+
+    .xc_action-group {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    .xc_btn-action {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 4px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .xc_btn-action:hover {
+        background: #f9fafb;
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+
+    .xc_btn-action.delete:hover {
+        background: #fef2f2;
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+
+    .xc_btn-action.success:hover {
+        background: #f0fdf4;
+        border-color: #22c55e;
+        color: #22c55e;
+    }
+
+    .xc_btn-action.warning:hover {
+        background: #fffbeb;
+        border-color: #f59e0b;
+        color: #f59e0b;
+    }
+
+    .xc_state-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .xc_state-badge.enabled {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .xc_state-badge.disabled {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .xc_state-badge i {
+        font-size: 10px;
+    }
+
+    .xc_task-type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .xc_task-type-badge.cron {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .xc_task-type-badge.interval {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .xc_pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 0;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .xc_page-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #6b7280;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .xc_page-btn:hover:not(.active) {
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+
+    .xc_page-btn.active {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    .xc_page-info {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0 8px;
+    }
+
+    .xc_empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #9ca3af;
+    }
+
+    .xc_empty-state i {
+        font-size: 64px;
+        color: #d1d5db;
+        margin-bottom: 16px;
+    }
+
+    .xc_empty-state p {
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .xc_modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    .xc_modal-overlay.active {
+        display: block;
+        animation: xc_fadeIn 0.2s ease;
+    }
+
+    @keyframes xc_fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .xc_modal-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 700px;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: xc_slideIn 0.3s ease;
+    }
+
+    @keyframes xc_slideIn {
+        from {
+            transform: translate(-50%, -48%);
+            opacity: 0;
+        }
+        to {
+            transform: translate(-50%, -50%);
+            opacity: 1;
+        }
+    }
+
+    .xc_modal-header {
+        position: relative;
+        padding: 14px 18px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fafafa;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .xc_modal-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .xc_modal-close {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        width: 30px;
+        height: 30px;
+        border: none;
+        background: white;
+        color: #6b7280;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
+        border-radius: 4px;
+        border: 1px solid #d1d5db;
+        transition: all 0.2s;
+    }
+
+    .xc_modal-close:hover {
+        background: #f3f4f6;
+        color: #374151;
+        border-color: #9ca3af;
+    }
+
+    .xc_modal-body {
+        flex: 1;
+        padding: 18px 20px;
+        overflow-y: auto;
+    }
+
+    .xc_form-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 14px;
+    }
+
+    .xc_form-row .xc_form-group {
+        flex: 1;
+        margin-bottom: 0;
+    }
+
+    .xc_form-group {
+        margin-bottom: 14px;
+    }
+
+    .xc_form-label {
+        display: block;
+        font-size: 13px;
+        color: #374151;
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+
+    .xc_form-label .required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+
+    .xc_form-input {
+        width: 100%;
+        padding: 6px 12px;
+        font-size: 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background: white;
+        color: #374151;
+        transition: all 0.2s;
+        height: 30px;
+    }
+
+    .xc_form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .xc_form-textarea {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background: white;
+        color: #374151;
+        transition: all 0.2s;
+        min-height: 60px;
+        resize: vertical;
+        font-family: monospace;
+    }
+
+    .xc_form-textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .xc_form-select {
+        width: 100%;
+        padding: 6px 12px;
+        font-size: 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        background: white;
+        color: #374151;
+        transition: all 0.2s;
+        height: 30px;
+    }
+
+    .xc_form-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+    }
+
+    .xc_cron-inputs {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .xc_cron-inputs .xc_cron-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .xc_cron-inputs .xc_cron-item label {
+        font-size: 12px;
+        color: #6b7280;
+        white-space: nowrap;
+    }
+
+    .xc_cron-inputs .xc_cron-item input {
+        width: 60px;
+        padding: 4px 8px;
+        font-size: 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .xc_modal-footer {
+        padding: 14px 18px;
+        border-top: 1px solid #e5e7eb;
+        text-align: right;
+        background: #fafafa;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .xc_modal-btn {
+        padding: 7px 18px;
+        font-size: 13px;
+        border-radius: 4px;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
+        margin-left: 10px;
+        transition: all 0.2s;
+        font-weight: 400;
+        background: white;
+        color: #374151;
+    }
+
+    .xc_modal-btn:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    .xc_modal-btn-primary {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    .xc_modal-btn-primary:hover {
+        background: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .xc_result-box {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 12px;
+        font-size: 13px;
+        color: #374151;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        font-family: monospace;
+    }
+
+    .right_col {
+        background: #f5f7fa !important;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="right_col" role="main">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="x_panel">
+                <div class="xc_container">
+                    <div class="xc_toolbar">
+                        <div class="xc_page-title">
+                            <i class="fa fa-clock-o"></i>
+                            计划任务
+                        </div>
+
+                        <input type="text" id="search_text_input" class="xc_search-input" placeholder="任务名称搜索">
+                        
+                        <select id="search_state" class="xc_filter-select">
+                            <option value="-1">全部状态</option>
+                            <option value="1">已启用</option>
+                            <option value="0">已禁用</option>
+                        </select>
+
+                        <button class="xc_btn-modern xc_btn-secondary" onclick="doSearch()">
+                            <i class="fa fa-search"></i> 搜索
+                        </button>
+
+                        <button class="xc_btn-modern" onclick="openAddModal()">
+                            <i class="fa fa-plus"></i> 添加
+                        </button>
+
+                        <div>
+                            <span id="top_loading" style="display: none;">
+                                <span class="xc_loading-spinner"></span>
+                                <span class="xc_loading-text">加载中...</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="xc_modern-card">
+                        <div class="xc_table-container" id="task_data_container">
+                            <table class="xc_table">
+                                <thead class="xc_table-header">
+                                    <tr>
+                                        <th style="width: 60px;">ID</th>
+                                        <th style="width: 150px;">任务名称</th>
+                                        <th style="width: 90px;">任务类型</th>
+                                        <th style="width: 140px;">执行时间</th>
+                                        <th style="width: 90px;">状态</th>
+                                        <th style="width: 200px;">请求地址</th>
+                                        <th style="width: 140px;">上次执行</th>
+                                        <th style="width: 140px;">下次执行</th>
+                                        <th style="width: 200px;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="xc_table-body" id="task_data_body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="xc_pagination" id="task_pagination">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加/编辑任务弹窗 -->
+<div class="xc_modal-overlay" id="taskModal">
+    <div class="xc_modal-container">
+        <div class="xc_modal-header">
+            <div class="xc_modal-title" id="modalTitle">添加任务</div>
+            <button class="xc_modal-close" onclick="closeTaskModal()">×</button>
+        </div>
+        <div class="xc_modal-body">
+            <form id="taskForm">
+                <input type="hidden" id="task_code">
+                
+                <div class="xc_form-row">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">任务名称<span class="required">*</span></label>
+                        <input type="text" id="input_name" class="xc_form-input" placeholder="请输入任务名称">
+                    </div>
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">任务类型<span class="required">*</span></label>
+                        <select id="input_task_type" class="xc_form-select" onchange="onTaskTypeChange()">
+                            <option value="cron">Cron表达式</option>
+                            <option value="interval">间隔执行</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="cron_section">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">Cron表达式</label>
+                        <div class="xc_cron-inputs">
+                            <div class="xc_cron-item">
+                                <label>秒</label>
+                                <input type="text" id="input_cron_second" value="0" placeholder="0">
+                            </div>
+                            <div class="xc_cron-item">
+                                <label>分</label>
+                                <input type="text" id="input_cron_minute" value="*" placeholder="*">
+                            </div>
+                            <div class="xc_cron-item">
+                                <label>时</label>
+                                <input type="text" id="input_cron_hour" value="*" placeholder="*">
+                            </div>
+                            <div class="xc_cron-item">
+                                <label>日</label>
+                                <input type="text" id="input_cron_day" value="*" placeholder="*">
+                            </div>
+                            <div class="xc_cron-item">
+                                <label>月</label>
+                                <input type="text" id="input_cron_month" value="*" placeholder="*">
+                            </div>
+                            <div class="xc_cron-item">
+                                <label>周</label>
+                                <input type="text" id="input_cron_day_of_week" value="*" placeholder="*">
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                            示例: 每天8点执行 - 分: 0, 时: 8, 其他填 *
+                        </div>
+                    </div>
+                </div>
+
+                <div id="interval_section" style="display: none;">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">执行间隔(秒)<span class="required">*</span></label>
+                        <input type="number" id="input_interval_seconds" class="xc_form-input" value="60" placeholder="60">
+                    </div>
+                </div>
+
+                <div class="xc_form-row">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">开始时间</label>
+                        <input type="datetime-local" id="input_start_time" class="xc_form-input">
+                    </div>
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">结束时间</label>
+                        <input type="datetime-local" id="input_end_time" class="xc_form-input">
+                    </div>
+                </div>
+
+                <div class="xc_form-row">
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">请求方法<span class="required">*</span></label>
+                        <select id="input_http_method" class="xc_form-select">
+                            <option value="GET">GET</option>
+                            <option value="POST">POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                    </div>
+                    <div class="xc_form-group">
+                        <label class="xc_form-label">状态</label>
+                        <select id="input_state" class="xc_form-select">
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="xc_form-group">
+                    <label class="xc_form-label">请求地址<span class="required">*</span></label>
+                    <input type="text" id="input_http_url" class="xc_form-input" placeholder="http://example.com/api">
+                </div>
+
+                <div class="xc_form-group">
+                    <label class="xc_form-label">请求头(JSON)</label>
+                    <textarea id="input_http_headers" class="xc_form-textarea" rows="2" placeholder='{"Content-Type": "application/json"}'></textarea>
+                </div>
+
+                <div class="xc_form-group">
+                    <label class="xc_form-label">请求参数(JSON)</label>
+                    <textarea id="input_http_params" class="xc_form-textarea" rows="2" placeholder='{"key": "value"}'></textarea>
+                </div>
+
+                <div class="xc_form-group">
+                    <label class="xc_form-label">请求体(JSON)</label>
+                    <textarea id="input_http_body" class="xc_form-textarea" rows="2" placeholder='{"data": "value"}'></textarea>
+                </div>
+
+                <div class="xc_form-group">
+                    <label class="xc_form-label">备注</label>
+                    <textarea id="input_remark" class="xc_form-textarea" rows="2" placeholder="任务备注"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="xc_modal-footer">
+            <button class="xc_modal-btn" onclick="closeTaskModal()">取消</button>
+            <button class="xc_modal-btn xc_modal-btn-primary" onclick="submitTaskForm()">
+                <span id="submit_loading" style="display: none;">
+                    <span class="xc_loading-spinner"></span>
+                </span>
+                <span id="submit_text">提交</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 执行结果弹窗 -->
+<div class="xc_modal-overlay" id="resultModal">
+    <div class="xc_modal-container" style="max-width: 600px;">
+        <div class="xc_modal-header">
+            <div class="xc_modal-title">执行结果</div>
+            <button class="xc_modal-close" onclick="closeResultModal()">×</button>
+        </div>
+        <div class="xc_modal-body">
+            <div class="xc_result-box" id="result_content"></div>
+        </div>
+        <div class="xc_modal-footer">
+            <button class="xc_modal-btn" onclick="closeResultModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 日志弹窗 -->
+<div class="xc_modal-overlay" id="logsModal">
+    <div class="xc_modal-container" style="max-width: 800px;">
+        <div class="xc_modal-header">
+            <div class="xc_modal-title">执行日志</div>
+            <button class="xc_modal-close" onclick="closeLogsModal()">×</button>
+        </div>
+        <div class="xc_modal-body">
+            <div class="xc_table-container">
+                <table class="xc_table">
+                    <thead class="xc_table-header">
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th style="width: 150px;">执行时间</th>
+                            <th style="width: 80px;">状态</th>
+                            <th>结果</th>
+                        </tr>
+                    </thead>
+                    <tbody class="xc_table-body" id="logs_data_body">
+                    </tbody>
+                </table>
+            </div>
+            <div class="xc_pagination" id="logs_pagination"></div>
+        </div>
+        <div class="xc_modal-footer">
+            <button class="xc_modal-btn" onclick="closeLogsModal()">关闭</button>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+<script>
+    function myToast2025(text, icon, hideAfter) {
+        hideAfter = hideAfter || 2000;
+        const existingAlerts = document.querySelectorAll('.xc-toast-alert');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        const toastElement = document.createElement('div');
+        toastElement.className = 'xc-toast-alert ' + icon;
+        toastElement.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);display:flex;align-items:center;gap:8px;';
+        
+        let iconHtml = '';
+        if (icon === 'success') {
+            toastElement.style.backgroundColor = '#00b42a';
+            iconHtml = '<span style="font-size:16px;">✓</span>';
+        } else if (icon === 'error') {
+            toastElement.style.backgroundColor = '#f53f3f';
+            iconHtml = '<span style="font-size:16px;">✗</span>';
+        } else {
+            toastElement.style.backgroundColor = '#165DFF';
+            iconHtml = '<span style="font-size:16px;">ℹ</span>';
+        }
+        
+        toastElement.innerHTML = iconHtml + '<span>' + text + '</span>';
+        document.body.appendChild(toastElement);
+        
+        if (hideAfter > 0) {
+            setTimeout(function() {
+                toastElement.remove();
+            }, hideAfter);
+        }
+    }
+
+    let eleTopLoading = $("#top_loading");
+    let curPage = 1;
+    let curPageSize = 12;
+    let eleData = $("#task_data_body");
+    let elePagination = $("#task_pagination");
+    let eleSearchTextInput = $("#search_text_input");
+    let eleSearchState = $("#search_state");
+    let mNodeCode = "";
+    let currentHandle = 'add';
+    let curIsPost = false;
+
+    function initGlobalNode() {
+        var currentNode = window.GlobalNodeManager ? window.GlobalNodeManager.getCurrentNode() : null;
+        if (currentNode && currentNode.code) {
+            mNodeCode = currentNode.code;
+            f_openIndex(curPage, curPageSize);
+        } else {
+            eleData.html("<tr><td colspan='9'><div class='xc_empty-state'><i class='fa fa-server'></i><p>请在右上角选择节点</p></div></td></tr>");
+        }
+    }
+
+    window.addEventListener('globalNodeChanged', function(e) {
+        mNodeCode = e.detail.code;
+        curPage = 1;
+        f_openIndex(curPage, curPageSize);
+    });
+
+    $(document).ready(function() {
+        setTimeout(initGlobalNode, 500);
+    });
+
+    function doSearch() {
+        curPage = 1;
+        f_openIndex(curPage, curPageSize);
+    }
+
+    eleSearchTextInput.on("keydown", function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13 || e.which === 13) {
+            e.preventDefault();
+            doSearch();
+        }
+    });
+
+    eleSearchState.on("change", function() {
+        doSearch();
+    });
+
+    function f_openIndex(page, page_size) {
+        if (!mNodeCode) {
+            eleData.html("<tr><td colspan='9'><div class='xc_empty-state'><i class='fa fa-server'></i><p>请在右上角选择节点</p></div></td></tr>");
+            return;
+        }
+
+        curPage = page;
+        curPageSize = page_size;
+        let searchText = eleSearchTextInput.val().trim();
+        let searchState = eleSearchState.val();
+
+        eleTopLoading.show();
+
+        $.ajax({
+            url: '/scheduleTask/openIndex',
+            type: 'get',
+            async: true,
+            data: {
+                "node_code": mNodeCode,
+                "p": page,
+                "ps": page_size,
+                "search_text": searchText,
+                "search_state": searchState
+            },
+            dataType: 'json',
+            timeout: 0,
+            error: function() {
+                eleTopLoading.hide();
+                myToast2025("网络异常，请确定网络正常！", "error");
+            },
+            success: function(res) {
+                eleTopLoading.hide();
+                if(res.code === 1000) {
+                    let data = res.data || [];
+
+                    if(data.length === 0) {
+                        eleData.html("<tr><td colspan='9'><div class='xc_empty-state'><i class='fa fa-clock-o'></i><p>暂无计划任务</p></div></td></tr>");
+                        f_show_pageData(res.pageData);
+                    } else {
+                        let html = "";
+                        for(let i = 0; i < data.length; i++) {
+                            let d = data[i];
+
+                            let stateBadge = d.state === 1
+                                ? '<span class="xc_state-badge enabled"><i class="fa fa-circle"></i> 已启用</span>'
+                                : '<span class="xc_state-badge disabled"><i class="fa fa-circle"></i> 已禁用</span>';
+
+                            let typeBadge = d.task_type === 'cron'
+                                ? '<span class="xc_task-type-badge cron"><i class="fa fa-clock-o"></i> Cron</span>'
+                                : '<span class="xc_task-type-badge interval"><i class="fa fa-repeat"></i> 间隔</span>';
+
+                            let cronDisplay = d.task_type === 'cron'
+                                ? (d.cron_expression || '-')
+                                : (d.interval_seconds + '秒');
+
+                            html += "<tr>";
+                            html += "<td>" + d.id + "</td>";
+                            html += "<td>" + d.name + "</td>";
+                            html += "<td>" + typeBadge + "</td>";
+                            html += "<td>" + cronDisplay + "</td>";
+                            html += "<td>" + stateBadge + "</td>";
+                            html += "<td style='max-width:180px;overflow:hidden;text-overflow:ellipsis;' title='" + d.http_url + "'>" + d.http_url + "</td>";
+                            html += "<td>" + (d.last_run_time || '-') + "</td>";
+                            html += "<td>" + (d.next_run_time || '-') + "</td>";
+                            html += "<td>";
+                            html += "<div class='xc_action-group'>";
+                            html += "<button onclick=\"toggleState('" + d.code + "')\" class='xc_btn-action " + (d.state === 1 ? 'warning' : 'success') + "\" title='" + (d.state === 1 ? '禁用' : '启用') + "'>";
+                            html += "<i class='fa fa-" + (d.state === 1 ? 'pause' : 'play') + "'></i></button>";
+                            html += "<button onclick=\"runNow('" + d.code + "')\" class='xc_btn-action' title='立即执行'>";
+                            html += "<i class='fa fa-play-circle'></i></button>";
+                            html += "<button onclick=\"openEditModal('" + d.code + "')\" class='xc_btn-action' title='编辑'>";
+                            html += "<i class='fa fa-edit'></i></button>";
+                            html += "<button onclick=\"openLogsModal('" + d.code + "')\" class='xc_btn-action' title='日志'>";
+                            html += "<i class='fa fa-file-text-o'></i></button>";
+                            html += "<button onclick=\"f_del('" + d.code + "')\" class='xc_btn-action delete' title='删除'>";
+                            html += "<i class='fa fa-trash'></i></button>";
+                            html += "</div></td>";
+                            html += "</tr>";
+                        }
+                        eleData.html(html);
+                        f_show_pageData(res.pageData);
+                    }
+                } else {
+                    myToast2025(res.msg, "error");
+                }
+            }
+        });
+    }
+
+    function f_show_pageData(pageData) {
+        if (!pageData) {
+            elePagination.html('');
+            return;
+        }
+        let page_size = pageData["page_size"] || curPageSize;
+        let html = "";
+        html += "<span class='xc_page-info'>共 " + (pageData["page_num"] || 1) + " 页 / " + (pageData["count"] || 0) + " 条</span>";
+        let pageLabels = pageData["pageLabels"] || [];
+
+        for (let i = 0; i < pageLabels.length; i++) {
+            let cur = pageLabels[i]["cur"];
+            if(cur === 1){
+                html += "<div class='xc_page-btn active'>" + pageLabels[i]["name"] + "</div>";
+            } else {
+                html += "<div class='xc_page-btn' onclick='f_openIndex(" + pageLabels[i]["page"] + ", " + page_size + ")'>" + pageLabels[i]["name"] + "</div>";
+            }
+        }
+        elePagination.html(html);
+    }
+
+    function onTaskTypeChange() {
+        let taskType = $('#input_task_type').val();
+        if (taskType === 'cron') {
+            $('#cron_section').show();
+            $('#interval_section').hide();
+        } else {
+            $('#cron_section').hide();
+            $('#interval_section').show();
+        }
+    }
+
+    function openAddModal() {
+        if (!mNodeCode) {
+            myToast2025('请先选择节点', 'error');
+            return;
+        }
+
+        currentHandle = 'add';
+
+        $('#modalTitle').text('添加任务');
+        $('#taskForm')[0].reset();
+        $('#task_code').val('');
+        $('#input_task_type').val('cron');
+        onTaskTypeChange();
+
+        eleTopLoading.show();
+        $.ajax({
+            url: '/scheduleTask/openAddContext',
+            type: 'get',
+            data: {'node_code': mNodeCode},
+            dataType: 'json',
+            success: function(res) {
+                eleTopLoading.hide();
+                if(res.code === 1000 && res.context) {
+                    if (res.context.code) {
+                        $('#task_code').val(res.context.code);
+                    }
+                }
+                $('#taskModal').addClass('active');
+            },
+            error: function() {
+                eleTopLoading.hide();
+                myToast2025('加载失败，请稍后重试', 'error');
+            }
+        });
+    }
+
+    function openEditModal(code) {
+        if (!mNodeCode) {
+            myToast2025('请先选择节点', 'error');
+            return;
+        }
+
+        currentHandle = 'edit';
+
+        $('#modalTitle').text('编辑任务');
+        $('#taskForm')[0].reset();
+
+        eleTopLoading.show();
+        $.ajax({
+            url: '/scheduleTask/openEditContext',
+            type: 'get',
+            data: {'code': code, 'node_code': mNodeCode},
+            dataType: 'json',
+            success: function(res) {
+                eleTopLoading.hide();
+                if(res.code === 1000 && res.context) {
+                    let d = res.context;
+                    $('#task_code').val(d.code);
+                    $('#input_name').val(d.name);
+                    $('#input_task_type').val(d.task_type || 'cron');
+                    onTaskTypeChange();
+
+                    $('#input_cron_second').val(d.cron_second || '0');
+                    $('#input_cron_minute').val(d.cron_minute || '*');
+                    $('#input_cron_hour').val(d.cron_hour || '*');
+                    $('#input_cron_day').val(d.cron_day || '*');
+                    $('#input_cron_month').val(d.cron_month || '*');
+                    $('#input_cron_day_of_week').val(d.cron_day_of_week || '*');
+
+                    $('#input_interval_seconds').val(d.interval_seconds || 60);
+
+                    if (d.start_time) {
+                        $('#input_start_time').val(d.start_time.replace(' ', 'T').substring(0, 16));
+                    }
+                    if (d.end_time) {
+                        $('#input_end_time').val(d.end_time.replace(' ', 'T').substring(0, 16));
+                    }
+
+                    $('#input_http_method').val(d.http_method || 'GET');
+                    $('#input_http_url').val(d.http_url || '');
+                    $('#input_http_headers').val(d.http_headers || '');
+                    $('#input_http_params').val(d.http_params || '');
+                    $('#input_http_body').val(d.http_body || '');
+                    $('#input_remark').val(d.remark || '');
+                    $('#input_state').val(d.state !== undefined ? d.state : 1);
+
+                    $('#taskModal').addClass('active');
+                } else {
+                    myToast2025(res.msg || '任务不存在', 'error');
+                }
+            },
+            error: function() {
+                eleTopLoading.hide();
+                myToast2025('加载失败，请稍后重试', 'error');
+            }
+        });
+    }
+
+    function closeTaskModal() {
+        $('#taskModal').removeClass('active');
+    }
+
+    function submitTaskForm() {
+        if (!mNodeCode) {
+            myToast2025('请先选择节点', 'error');
+            return;
+        }
+
+        let code = $('#task_code').val().trim();
+        let name = $('#input_name').val().trim();
+        let task_type = $('#input_task_type').val();
+
+        if (!name) {
+            myToast2025('请输入任务名称', 'error');
+            return false;
+        }
+
+        let http_url = $('#input_http_url').val().trim();
+        if (!http_url) {
+            myToast2025('请输入请求地址', 'error');
+            return false;
+        }
+
+        let handleUrl = currentHandle === 'add' ? '/scheduleTask/openAdd' : '/scheduleTask/openEdit';
+
+        if(curIsPost) {
+            myToast2025('正在提交中，请勿重复提交！', 'error', 500);
+            return false;
+        }
+        curIsPost = true;
+
+        $('#submit_loading').show();
+        $('#submit_text').text('提交中...');
+
+        let params = {
+            node_code: mNodeCode,
+            code: code,
+            name: name,
+            task_type: task_type,
+            cron_second: $('#input_cron_second').val(),
+            cron_minute: $('#input_cron_minute').val(),
+            cron_hour: $('#input_cron_hour').val(),
+            cron_day: $('#input_cron_day').val(),
+            cron_month: $('#input_cron_month').val(),
+            cron_day_of_week: $('#input_cron_day_of_week').val(),
+            interval_seconds: $('#input_interval_seconds').val(),
+            start_time: $('#input_start_time').val().replace('T', ' '),
+            end_time: $('#input_end_time').val().replace('T', ' '),
+            http_method: $('#input_http_method').val(),
+            http_url: http_url,
+            http_headers: $('#input_http_headers').val(),
+            http_params: $('#input_http_params').val(),
+            http_body: $('#input_http_body').val(),
+            remark: $('#input_remark').val(),
+            state: $('#input_state').val()
+        };
+
+        $.ajax({
+            url: handleUrl,
+            type: 'post',
+            async: true,
+            data: params,
+            dataType: 'json',
+            timeout: 0,
+            error: function() {
+                curIsPost = false;
+                $('#submit_loading').hide();
+                $('#submit_text').text('提交');
+                myToast2025('网络异常，请确定网络正常！', 'error');
+            },
+            success: function(res) {
+                curIsPost = false;
+                $('#submit_loading').hide();
+                $('#submit_text').text('提交');
+
+                if(1000 === res.code) {
+                    myToast2025(res.msg, 'success', 1000);
+                    setTimeout(function() {
+                        closeTaskModal();
+                        f_openIndex(curPage, curPageSize);
+                    }, 1000);
+                } else {
+                    myToast2025(res.msg, 'error');
+                }
+            }
+        });
+    }
+
+    function toggleState(code) {
+        if (!mNodeCode) return;
+
+        $.ajax({
+            url: '/scheduleTask/openToggleState',
+            type: 'post',
+            data: {'node_code': mNodeCode, 'code': code},
+            dataType: 'json',
+            success: function(res) {
+                if(res.code === 1000) {
+                    myToast2025(res.msg, 'success');
+                    f_openIndex(curPage, curPageSize);
+                } else {
+                    myToast2025(res.msg, 'error');
+                }
+            }
+        });
+    }
+
+    function runNow(code) {
+        if (!mNodeCode) return;
+
+        myToast2025('正在执行...', 'info', 0);
+
+        $.ajax({
+            url: '/scheduleTask/openRunNow',
+            type: 'post',
+            data: {'node_code': mNodeCode, 'code': code},
+            dataType: 'json',
+            timeout: 60000,
+            success: function(res) {
+                $('.xc-toast-alert').remove();
+                if(res.code === 1000) {
+                    $('#result_content').text(res.result || '执行成功');
+                    $('#resultModal').addClass('active');
+                    f_openIndex(curPage, curPageSize);
+                } else {
+                    myToast2025(res.msg, 'error');
+                }
+            },
+            error: function() {
+                $('.xc-toast-alert').remove();
+                myToast2025('执行超时或网络异常', 'error');
+            }
+        });
+    }
+
+    function closeResultModal() {
+        $('#resultModal').removeClass('active');
+    }
+
+    function f_del(code) {
+        if (!mNodeCode) return;
+
+        if(!confirm('确定要删除这个任务吗？')) {
+            return;
+        }
+
+        eleTopLoading.show();
+        $.ajax({
+            url: '/scheduleTask/openDel',
+            type: "post",
+            data: {"code": code, "node_code": mNodeCode},
+            dataType: "json",
+            success: function (res) {
+                eleTopLoading.hide();
+                if(1000 === res.code){
+                    myToast2025(res.msg, "success", 1000);
+                    f_openIndex(curPage, curPageSize);
+                }else{
+                    myToast2025(res.msg,"error");
+                }
+            },
+            error: function() {
+                eleTopLoading.hide();
+                myToast2025("网络异常", "error");
+            }
+        });
+    }
+
+    let currentLogTaskCode = '';
+    let currentLogPage = 1;
+
+    function openLogsModal(code) {
+        if (!mNodeCode) return;
+
+        currentLogTaskCode = code;
+        currentLogPage = 1;
+        loadLogs();
+        $('#logsModal').addClass('active');
+    }
+
+    function closeLogsModal() {
+        $('#logsModal').removeClass('active');
+    }
+
+    function loadLogs() {
+        $.ajax({
+            url: '/scheduleTask/openLogs',
+            type: 'get',
+            data: {
+                'node_code': mNodeCode,
+                'task_code': currentLogTaskCode,
+                'p': currentLogPage,
+                'ps': 10
+            },
+            dataType: 'json',
+            success: function(res) {
+                if(res.code === 1000) {
+                    let data = res.data || [];
+                    let html = '';
+                    if (data.length === 0) {
+                        html = "<tr><td colspan='4' style='text-align:center;color:#9ca3af;'>暂无日志</td></tr>";
+                    } else {
+                        for(let i = 0; i < data.length; i++) {
+                            let log = data[i];
+                            let stateBadge = log.state === 1
+                                ? '<span class="xc_state-badge enabled">成功</span>'
+                                : '<span class="xc_state-badge disabled">失败</span>';
+                            html += '<tr>';
+                            html += '<td>' + log.id + '</td>';
+                            html += '<td>' + log.run_time + '</td>';
+                            html += '<td>' + stateBadge + '</td>';
+                            html += '<td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;" title="' + (log.result || '') + '">' + (log.result || '-') + '</td>';
+                            html += '</tr>';
+                        }
+                    }
+                    $('#logs_data_body').html(html);
+                    showLogsPagination(res.pageData);
+                }
+            }
+        });
+    }
+
+    function showLogsPagination(pageData) {
+        if (!pageData || pageData.page_num <= 1) {
+            $('#logs_pagination').html('');
+            return;
+        }
+
+        let html = "<span class='xc_page-info'>共 " + pageData.page_num + " 页</span>";
+        let pageLabels = pageData.pageLabels || [];
+
+        for (let i = 0; i < pageLabels.length; i++) {
+            if(pageLabels[i].cur === 1){
+                html += "<div class='xc_page-btn active'>" + pageLabels[i].name + "</div>";
+            } else {
+                html += "<div class='xc_page-btn' onclick='goToLogPage(" + pageLabels[i].page + ")'>" + pageLabels[i].name + "</div>";
+            }
+        }
+        $('#logs_pagination').html(html);
+    }
+
+    function goToLogPage(page) {
+        currentLogPage = page;
+        loadLogs();
+    }
+
+    $('#taskModal').click(function(e) {
+        if (e.target === this) {
+            closeTaskModal();
+        }
+    });
+
+    $('#resultModal').click(function(e) {
+        if (e.target === this) {
+            closeResultModal();
+        }
+    });
+
+    $('#logsModal').click(function(e) {
+        if (e.target === this) {
+            closeLogsModal();
+        }
+    });
+
+    $(document).keydown(function(e) {
+        if (e.keyCode === 27) {
+            closeTaskModal();
+            closeResultModal();
+            closeLogsModal();
+        }
+    });
+</script>
+{% endblock javascripts %}

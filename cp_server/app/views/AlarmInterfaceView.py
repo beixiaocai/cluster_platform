@@ -1,7 +1,6 @@
 from app.views.ViewsBase import *
 from app.models import *
 from django.shortcuts import render, redirect
-from app.consumers.ClusterConsumer import send_command_to_node_sync
 
 
 def index(request):
@@ -40,7 +39,7 @@ def api_getNodeAlarmInterfaces(request):
             result = send_command_to_node_sync(node_code, 'get_alarm_interfaces', {
                 'p': page,
                 'ps': page_size
-            }, timeout=30)
+            }, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -74,7 +73,7 @@ def api_openAdd(request):
         if not node_code:
             msg = "node_code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'add_alarm_interface', params, timeout=30)
+            result = send_command_to_node_sync(node_code, 'add_alarm_interface', params, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -105,7 +104,7 @@ def api_openEdit(request):
         if not node_code:
             msg = "node_code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'edit_alarm_interface', params, timeout=30)
+            result = send_command_to_node_sync(node_code, 'edit_alarm_interface', params, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -139,7 +138,7 @@ def api_openDel(request):
         elif not code:
             msg = "code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'del_alarm_interface', {'code': code}, timeout=30)
+            result = send_command_to_node_sync(node_code, 'del_alarm_interface', {'code': code}, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -174,7 +173,7 @@ def api_openInfo(request):
         elif not code:
             msg = "code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'get_alarm_interface_info', {'code': code}, timeout=30)
+            result = send_command_to_node_sync(node_code, 'get_alarm_interface_info', {'code': code}, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
@@ -193,28 +192,57 @@ def api_openInfo(request):
     return f_responseJson(res)
 
 
+def test(request):
+    """渲染报警存储测试页面（在iframe中加载）"""
+    return render(request, 'app/alarmInterface/test.html', {})
+
+
 def api_openTest(request):
+    """报警存储测试：接收文件上传，转base64后通过WebSocket转发到节点执行测试"""
     ret = False
     msg = "未知错误"
     info = {}
     
-    if request.method == 'GET':
-        params = f_parseGetParams(request)
-        g_logger.info("AlarmInterfaceView.openTest() params:%s" % str(params))
+    if request.method == 'POST':
+        params = f_parsePostParams(request)
+        g_logger.info("AlarmInterfaceView.openTest() params keys:%s" % str(list(params.keys())))
         
         node_code = params.get('node_code', '').strip()
         code = params.get('code', '').strip()
+        enable_base64 = params.get('enable_base64', '0')
         
         if not node_code:
             msg = "node_code is required"
         elif not code:
             msg = "code is required"
         else:
-            result = send_command_to_node_sync(node_code, 'test_alarm_interface', {'code': code}, timeout=30)
+            # 构建转发参数
+            forward_params = {
+                'code': code,
+                'enable_base64': enable_base64
+            }
+            
+            # 从 request.FILES 获取上传的图片，转为 base64
+            image_file = request.FILES.get('image')
+            if image_file:
+                image_bytes = image_file.read()
+                forward_params['image_base64'] = base64.b64encode(image_bytes).decode('utf-8')
+                forward_params['image_filename'] = image_file.name
+                g_logger.info("AlarmInterfaceView.openTest() image: %s, size: %d bytes" % (image_file.name, len(image_bytes)))
+            
+            # 从 request.FILES 获取上传的视频，转为 base64
+            video_file = request.FILES.get('video')
+            if video_file:
+                video_bytes = video_file.read()
+                forward_params['video_base64'] = base64.b64encode(video_bytes).decode('utf-8')
+                forward_params['video_filename'] = video_file.name
+                g_logger.info("AlarmInterfaceView.openTest() video: %s, size: %d bytes" % (video_file.name, len(video_bytes)))
+            
+            result = send_command_to_node_sync(node_code, 'test_alarm_interface', forward_params, timeout=120)
             
             if result.get('code') == 1000:
                 ret = True
-                msg = "success"
+                msg = result.get('msg', 'success')
                 info = result.get('info', {})
             else:
                 msg = result.get('msg', 'failed to test alarm interface')
@@ -226,4 +254,5 @@ def api_openTest(request):
         "msg": msg,
         "info": info
     }
+    g_logger.info("AlarmInterfaceView.openTest() res code:%s msg:%s" % (res['code'], res['msg']))
     return f_responseJson(res)

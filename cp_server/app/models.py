@@ -8,7 +8,7 @@ class NodeModel(models.Model):
     
     system_name = models.CharField(max_length=100, blank=True, null=True, verbose_name='系统名称')
     machine_node = models.CharField(max_length=100, blank=True, null=True, verbose_name='机器节点名')
-    machine_mac = models.CharField(max_length=50, blank=True, null=True, verbose_name='MAC地址')
+    finger = models.CharField(max_length=100, blank=True, null=True, verbose_name='机器指纹')
     host = models.CharField(max_length=100, blank=True, null=True, verbose_name='内网主机地址')
     admin_port = models.IntegerField(default=9001, verbose_name='管理端口')
     
@@ -18,7 +18,7 @@ class NodeModel(models.Model):
     is_auth = models.IntegerField(default=0, verbose_name='是否授权')
     is_multi_process = models.IntegerField(default=0, verbose_name='是否多进程')
     max_count = models.IntegerField(default=0, verbose_name='最大布控数')
-    auth_desc = models.CharField(max_length=200, blank=True, null=True, verbose_name='授权描述')
+    auth_msg = models.CharField(max_length=200, blank=True, null=True, verbose_name='授权消息')
     
     ws_connected = models.BooleanField(default=False, verbose_name='WebSocket连接状态')
     ws_channel = models.CharField(max_length=200, blank=True, null=True, verbose_name='WebSocket通道')
@@ -28,10 +28,8 @@ class NodeModel(models.Model):
     client_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name='客户端IP')
     register_info = models.TextField(blank=True, null=True, verbose_name='注册信息')
     
-    start_timestamp = models.IntegerField(default=0, verbose_name='启动时间戳')
-    
-    expand1 = models.CharField(max_length=200, blank=True, null=True, verbose_name='扩展字段1')
-    expand2 = models.CharField(max_length=200, blank=True, null=True, verbose_name='扩展字段2')
+    project_start_timestamp = models.IntegerField(default=0, verbose_name='软件启动时间戳')
+    os_boot_timestamp = models.IntegerField(default=0, verbose_name='系统启动时间戳')
     
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     last_update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')

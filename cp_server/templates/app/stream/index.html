@@ -3,110 +3,179 @@
 {% block stylesheets %}
   {{ block.super }}
 <style>
-    :root {
-        --xc-primary: #10b981;
-        --xc-primary-light: #34d399;
-        --xc-primary-dark: #059669;
-        --xc-warning: #f59e0b;
-        --xc-danger: #ef4444;
-        --xc-gray-100: #f9fafb;
-        --xc-gray-200: #f3f4f6;
-        --xc-gray-300: #e5e7eb;
-        --xc-gray-400: #9ca3af;
-        --xc-gray-500: #6b7280;
-        --xc-gray-600: #4b5563;
-        --xc-gray-700: #374151;
-        --xc-white: #FFFFFF;
-        --xc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-        --xc-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        --xc-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        --xc-radius-sm: 4px;
-        --xc-radius: 6px;
-        --xc-radius-lg: 8px;
-        --xc-radius-xl: 12px;
-        --xc-transition: all 0.2s ease;
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
     .xc_container {
         color: #333;
         line-height: 1.6;
         margin: 0 auto;
         padding: 10px 20px;
     }
+    
+    .xc_empty-state {
+        text-align: center !important;
+        padding: 80px 20px !important;
+        color: #9ca3af !important;
+        display: block !important;
+    }
+    
+    .xc_empty-state i {
+        font-size: 64px !important;
+        color: #d1d5db !important;
+        margin-bottom: 16px !important;
+        display: block !important;
+    }
+    
+    .xc_empty-state p {
+        font-size: 14px !important;
+        margin: 0 !important;
+        display: block !important;
+    }
 
     .xc_toolbar {
         display: flex;
-        gap: 12px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-
-    .xc_page-title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #1D2129;
-        display: flex;
-        align-items: center;
         gap: 8px;
+        margin-bottom: 20px;
+        align-items: center;
+        background: #FFFFFF;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        flex-wrap: wrap;
     }
-
-    .xc_page-title i {
-        color: var(--xc-primary);
-    }
-
-    .xc_btn-modern {
-        padding: 8px 16px;
-        border-radius: 6px;
-        border: 1px solid #d1d5db;
-        background: white;
-        color: #374151;
-        font-size: 14px;
-        cursor: pointer;
+    
+    .xc_page-title {
         display: flex;
         align-items: center;
         gap: 6px;
-        transition: all 0.2s;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1D2129;
+        white-space: nowrap;
     }
-
-    .xc_btn-modern:hover {
-        background: #f9fafb;
-        border-color: #9ca3af;
+    
+    .xc_page-title i {
+        color: #165DFF;
+        font-size: 18px;
     }
-
-    .xc_btn-modern i {
-        font-size: 14px;
+    
+    .xc_loading-spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid #E5E6EB;
+        border-top-color: #165DFF;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
     }
-
-    .xc_search-input {
-        padding: 8px 12px;
-        border: 1px solid #d1d5db;
+    
+    .xc_loading-text {
+        font-size: 12px;
+        color: #86909C;
+        font-weight: 400;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .xc_status-filter {
+        padding: 0 28px 0 10px;
+        border: 1px solid #E5E6EB;
         border-radius: 6px;
-        font-size: 14px;
-        width: 200px;
+        font-size: 13px;
+        color: #4E5969;
+        background: #FFFFFF;
+        cursor: pointer;
         transition: all 0.2s;
-    }
-
-    .xc_search-input:focus {
         outline: none;
-        border-color: var(--xc-primary);
+        min-width: 100px;
+        height: 32px !important;
+        line-height: 32px;
+        box-sizing: border-box;
+        vertical-align: middle;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%234E5969" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3cpolyline points="6 9 12 15 18 9"%3e%3c/polyline%3e%3c/svg%3e');
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 12px;
+      margin-bottom: 5px;
+    }
+    
+    .xc_status-filter:hover {
+        border-color: #165DFF;
+    }
+    
+    .xc_status-filter:focus {
+        border-color: #165DFF;
         box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
     }
-
-    .xc_status-filter {
-        padding: 8px 12px;
-        border: 1px solid #d1d5db;
+    
+    .xc_search-input {
+        padding: 0 10px;
+        border: 1px solid #E5E6EB;
         border-radius: 6px;
-        font-size: 14px;
-        background: white;
+        font-size: 13px;
+        width: 180px;
+        min-width: 120px;
+        transition: all 0.2s;
+        outline: none;
+        height: 32px !important;
+        line-height: 32px;
+        box-sizing: border-box;
+        vertical-align: middle;
+        margin-bottom: 5px;
+    }
+    
+    .xc_search-input:focus {
+        border-color: #165DFF;
+        box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+    }
+    
+    .xc_search-input::placeholder {
+        color: #C9CDD4;
+    }
+    
+    .xc_btn-modern {
+        padding: 0 10px;
+        background: #F2F3F5;
+        color: #4E5969;
+        border: 1px solid #E5E6EB;
+        border-radius: 6px;
+        font-size: 13px;
         cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        height: 32px;
+        line-height: 1;
+        box-sizing: border-box;
+        vertical-align: middle;
+    }
+    
+    .xc_btn-modern:hover {
+        background: #E5E6EB;
+        border-color: #C9CDD4;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .xc_btn-modern:active {
+        transform: translateY(0);
+    }
+    
+    .xc_btn-modern.danger {
+        color: #F53F3F;
+    }
+    
+    .xc_btn-modern.danger:hover {
+        background: #FFECE8;
+        border-color: #FFCCC7;
+        color: #D03050;
     }
 
     .xc_camera_groups {
@@ -116,81 +185,135 @@
     }
 
     .xc_group {
-        background-color: var(--xc-white);
-        border-radius: var(--xc-radius-xl);
+        background-color: #FFFFFF;
+        border-radius: 12px;
         overflow: hidden;
-        box-shadow: var(--xc-shadow-sm);
-        transition: var(--xc-transition);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .xc_group:hover {
-        box-shadow: var(--xc-shadow);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     }
 
     .xc_group_header {
-        padding: 12px 24px;
+        padding: 10px 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
-        border-bottom: 1px solid #d1fae5;
-        cursor: pointer;
+        position: relative;
+        background: linear-gradient(to right, #f8f9fa 0%, #ffffff 100%);
+        border-bottom: 1px solid #e5e7eb;
+        border-radius: 8px 8px 0 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
-
+    
     .xc_group_title {
-        color: #065f46;
         display: flex;
-        font-size: 16px;
-        font-weight: 600;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .xc_device_id {
-        background: #f0fdf4;
-        color: #047857;
-        padding: 4px 12px;
-        border-radius: 6px;
         font-size: 14px;
-        border: 1px solid #d1fae5;
+        font-weight: 500;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        color: #374151;
     }
-
+    
+    .xc_device_id {
+        color: #1d2129;
+        font-weight: 500;
+        transition: all 0.2s;
+        position: relative;
+        padding: 0 4px;
+    }
+    
+    .xc_device_id::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 0;
+        background: linear-gradient(135deg, #165DFF, #4080ff);
+        border-radius: 2px;
+        transition: height 0.2s;
+    }
+    
+    .xc_device_id:hover {
+        color: #165DFF;
+        padding-left: 10px;
+    }
+    
+    .xc_device_id:hover::before {
+        height: 16px;
+    }
+    
     .xc_group_count {
-        background: #d1fae5;
-        color: #047857;
-        padding: 2px 8px;
-        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 24px;
+        padding: 0 8px;
+        background: #f2f3f5;
+        color: #4e5969;
+        border: 1px solid #e5e6eb;
+        border-radius: 12px;
         font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .xc_group_count:hover {
+        background: #e5e6eb;
+        border-color: #c9cdd4;
+        color: #1d2129;
     }
 
     .xc_group_actions {
         display: flex;
+        gap: 12px;
         align-items: center;
+        cursor: pointer;
     }
 
     .xc_group_toggle {
         width: 32px;
         height: 32px;
-        border-radius: 50%;
+        border-radius: 8px;
+        background: #f2f3f5;
+        border: 1px solid #e5e6eb;
+        color: #4E5969;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: var(--xc-transition);
-        color: var(--xc-gray-500);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .xc_group_toggle:hover {
+        background: #e5e6eb;
+        border-color: #165DFF;
+        color: #165DFF;
     }
 
     .xc_group_toggle.expanded {
         transform: rotate(180deg);
+        background: #165DFF;
+        border-color: #165DFF;
+        color: white;
     }
 
     .xc_camera_list {
+        padding: 0;
         max-height: 0;
         overflow: hidden;
-        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
     }
 
     .xc_camera_list.expanded {
-        max-height: 2000px;
+        padding: 4px;
+        max-height: 800px;
         overflow: auto;
     }
 
@@ -201,20 +324,31 @@
     }
 
     .xc_camera_table th {
-        padding: 10px 16px;
+        padding: 6px 12px;
         text-align: left;
         font-weight: 500;
-        color: var(--xc-gray-500);
-        font-size: 13px;
-        background: #fafbfc;
-        border-bottom: 1px solid var(--xc-gray-200);
+        color: #4E5969;
+        font-size: 14px;
+        border-bottom: 1px solid #E5E6EB;
+        position: relative;
+    }
+
+    .xc_camera_table th::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 16px;
+        right: 16px;
+        height: 1px;
+        background-color: #E5E6EB;
     }
 
     .xc_camera_table td {
-        padding: 10px 16px;
+        padding: 3px 4px;
         font-size: 14px;
-        color: var(--xc-gray-600);
-        border-bottom: 1px solid var(--xc-gray-100);
+        color: #272E3B;
+        border-bottom: 1px solid #F2F3F5;
+        transition: background-color 0.2s;
     }
 
     .xc_camera_table tr:last-child td {
@@ -225,31 +359,62 @@
         background-color: rgba(22, 93, 255, 0.03);
     }
 
+    .xc_status {
+        padding: 4px 6px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .xc_status_running {
+        background-color: rgba(0, 180, 42, 0.1);
+        color: #2b542c;
+    }
+
+    .xc_status_stopped {
+        background-color: rgba(245, 63, 63, 0.1);
+        color: #F53F3F;
+    }
+
     .xc_stream-status {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 4px 10px;
-        border-radius: 12px;
+        padding: 2px 0;
         font-size: 12px;
         font-weight: 500;
+        white-space: nowrap;
     }
-
+    
     .xc_stream-status-active {
-        background: rgba(0, 180, 42, 0.1);
-        color: #00b42a;
+        color: #059669;
     }
-
+    
     .xc_stream-status-inactive {
-        background: rgba(245, 63, 63, 0.1);
-        color: #f53f3f;
+        color: #dc2626;
     }
-
+    
     .xc_stream-status-icon {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
-        background: currentColor;
+        background-color: currentColor;
+        box-shadow: 0 0 8px currentColor;
+        animation: xc_stream-pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes xc_stream-pulse {
+        0%, 100% {
+            opacity: 1;
+            box-shadow: 0 0 8px currentColor;
+        }
+        50% {
+            opacity: 0.7;
+            box-shadow: 0 0 4px currentColor;
+        }
     }
 
     .xc_action_buttons {
@@ -259,16 +424,16 @@
 
     .xc_action_btn {
         width: 28px;
-        height: 28px;
+        height: 30px;
         border-radius: 4px;
-        background-color: var(--xc-gray-100);
+        background-color: #F2F3F5;
         border: none;
-        color: var(--xc-gray-500);
+        color: #4E5969;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: var(--xc-transition);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .xc_action_btn:hover {
@@ -277,41 +442,54 @@
     }
 
     .xc_action_btn.view:hover {
-        background-color: var(--xc-primary);
+        background-color: #165DFF;
+        color: white;
+        cursor: pointer;
+    }
+
+    .xc_action_btn.start:hover {
+        background-color: #2b542c;
+        color: white;
+    }
+
+    .xc_action_btn.stop:hover {
+        background-color: #FF7D00;
+        color: white;
+    }
+
+    .xc_action_btn.delete:hover {
+        background-color: #F53F3F;
         color: white;
     }
 
     .xc-icon {
-        width: 16px;
-        height: 16px;
+        width: 20px;
+        height: 20px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
     }
 
-    .sun-a-label {
-        color: #6b7280;
-        text-decoration: none;
-        font-weight: 500;
-        margin-left: 12px;
-        cursor: pointer;
-        font-size: 13px;
-        padding: 5px 12px;
-        border-radius: 6px;
-        transition: all 0.2s;
-        background-color: #fafafa;
-        border: 1px solid #e5e5e5;
+    .xc-icon-sm {
+        width: 16px;
+        height: 16px;
     }
 
-    .sun-a-label:hover {
-        color: #374151;
-        background-color: #f5f5f5;
-        border-color: #d4d4d4;
+    .sun-a-label {
+        margin-left: 2px;
+        font-size: 13px;
+        color: #23527c !important;
         text-decoration: none;
+        cursor: pointer;
+    }
+    
+    .sun-a-label:hover {
+        color: #4395ff !important;
+        text-decoration: underline;
     }
 
     .sun-a-label:first-of-type {
-        margin-left: 12px;
+        margin-left: 6px;
     }
 
     .top_loading_img {
@@ -319,97 +497,77 @@
         height: 16px;
     }
 
-    .xc_empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: var(--xc-gray-400);
-    }
-
-    .xc_empty-state i {
-        font-size: 48px;
-        margin-bottom: 16px;
-        display: block;
-    }
-
-    .xc_empty-state p {
-        font-size: 16px;
-    }
-
-    .xc_loading-spinner {
-        width: 16px;
-        height: 16px;
-        border: 2px solid #e5e7eb;
-        border-top-color: var(--xc-primary);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
+    .xc_more-button {
+        position: relative;
         display: inline-block;
-        margin-right: 8px;
     }
 
-    @keyframes spin {
-        to { transform: rotate(360deg); }
+    .xc_bullet-dialog {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 4px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10001;
+        display: none;
+        min-width: 160px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        animation: menuFadeIn 0.2s ease-out;
     }
 
-    .xc_loading-text {
-        color: var(--xc-gray-500);
-        font-size: 14px;
+    @keyframes menuFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-5px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
     }
 
-    .xc_pagination {
+    .xc_bullet-dialog-content {
         display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-
-    .xc_pagination>.xc_page-btn {
-        min-width: 36px;
-        height: 36px;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        background-color: white;
-        color: #555;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .xc_pagination>.xc_page-btn:hover:not(.xc_active) {
-        border-color: #34495e;
-        color: #34495e;
-    }
-
-    .xc_pagination>.xc_page-btn.xc_active {
-        background-color: #34495e;
-        color: white;
-    }
-
-    .xc_pagination>.xc_page-info {
-        font-size: 14px;
-        color: #7f8c8d;
-    }
-
-    .xc_select {
-        width: 180px;
-        border-radius: 6px;
-        font-size: 14px;
-        color: #333;
-        cursor: pointer;
-        padding: 8px 12px;
-        border: 1px solid #d1d5db;
+        flex-direction: column;
         background: white;
     }
 
-    .xc_select:focus {
-        outline: none;
-        border-color: var(--xc-primary);
-        box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+    .xc_bullet-dialog-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        background: white;
+        border: none;
+        text-align: left;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
     }
 
+    .xc_bullet-dialog-btn:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+
+    .xc_bullet-dialog-btn i {
+        width: 16px;
+        text-align: center;
+        font-size: 13px;
+    }
+
+    .xc_bullet-dialog-btn-danger {
+        color: #dc2626 !important;
+    }
+
+    .xc_bullet-dialog-btn-danger:hover {
+        background: #fef2f2 !important;
+        color: #b91c1c !important;
+    }
 </style>
 
 {% endblock stylesheets %}
@@ -427,14 +585,44 @@
                 视频管理
             </div>
 
+            <select id="search_status_select" class="xc_status-filter">
+                <option value="-1">全部状态</option>
+                <option value="1">转发中</option>
+                <option value="0">未转发</option>
+            </select>
+
             <input type="text" id="search_input" class="xc_search-input" placeholder="输入视频流名称或编号">
 
             <button class="xc_btn-modern" onclick="doSearch()">
                 <i class="fa fa-search"></i> 搜索
             </button>
 
+            <button class="xc_btn-modern" onclick="streamModal.openAdd()">
+                <i class="fa fa-plus"></i> 添加
+            </button>
+
+            <div style="position: relative; display: inline-block;">
+                <button class="xc_btn-modern" onclick="toggleMoreDialog()">
+                    <i class="fa fa-ellipsis-v"></i> 更多
+                </button>
+                
+                <div class="xc_bullet-dialog" id="moreDialog">
+                    <div class="xc_bullet-dialog-content">
+                        <button class="xc_bullet-dialog-btn" onclick="f_openHandleAllStreamProxy('add'); toggleMoreDialog()">
+                            <i class="fa fa-play"></i> 全部开启转发
+                        </button>
+                        <button class="xc_bullet-dialog-btn" onclick="f_openHandleAllStreamProxy('del'); toggleMoreDialog()">
+                            <i class="fa fa-pause"></i> 全部停止转发
+                        </button>
+                        <button class="xc_bullet-dialog-btn xc_bullet-dialog-btn-danger" onclick="f_delAll(); toggleMoreDialog()">
+                            <i class="fa fa-trash"></i> 全部删除
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div>
-                <span id="top_loading" style="display: none;">
+                <span id="top_loading" style="display: none; margin-left: 10px;">
                     <span class="xc_loading-spinner"></span>
                     <span class="xc_loading-text">加载中...</span>
                 </span>
@@ -451,14 +639,11 @@
               </div>
         </div>
       </div>
-
-    <div class="row">
-        <div class="xc_pagination" id="pageData">
-        </div>
-    </div>
-
     </div>
   </div>
+
+    {% include 'app/stream/modal_form.html' %}
+
 {% endblock content %}
 
 {% block javascripts %}
@@ -467,9 +652,11 @@
     let eleTopLoading = $("#top_loading");
     let eleData = $("#data");
     let eleSearchInput = $("#search_input");
+    let eleSearchStatusSelect = $("#search_status_select");
     let mNodeCode = "";
     let mStreams = [];
-    let mPusherKeys = {};
+    let mPullStreamTypes = [];
+    let mAudioTypes = [];
 
     function initGlobalNode() {
         var currentNode = window.GlobalNodeManager ? window.GlobalNodeManager.getCurrentNode() : null;
@@ -494,37 +681,6 @@
         f_renderStreams();
     }
 
-    function f_getNodeStreams() {
-        if(!mNodeCode){
-            myToast2025("请选择节点！","error");
-            return;
-        }
-        
-        eleTopLoading.show();
-        $.ajax({
-            url: '/stream/getNodeStreams',
-            type: "get",
-            async: true,
-            data: {"node_code": mNodeCode},
-            dataType: "json",
-            timeout: 30000,
-            error: function () {
-                eleTopLoading.hide();
-                myToast2025("网络异常，请确定网络正常！","error");
-            },
-            success: function (res) {
-                eleTopLoading.hide();
-                if(res.code === 1000){
-                    mStreams = res.data || [];
-                    f_renderStreams();
-                }else{
-                    eleData.html("<div class='xc_empty-state'><i class='fa fa-exclamation-triangle'></i><p>"+res.msg+"</p></div>");
-                    myToast2025(res.msg,"error");
-                }
-            }
-        });
-    }
-
     function toggleGroup(actionsElement) {
         const headerElement = actionsElement.parentNode;
         const listElement = headerElement.nextElementSibling;
@@ -534,15 +690,162 @@
         toggleIcon.classList.toggle('expanded');
     }
 
+    function toggleMoreDialog() {
+        const bulletDialog = document.getElementById('moreDialog');
+        if (bulletDialog.style.display === 'block') {
+            bulletDialog.style.display = 'none';
+        } else {
+            bulletDialog.style.display = 'block';
+        }
+    }
+
+    document.addEventListener('click', function(event) {
+        const moreButton = event.target.closest('button[onclick="toggleMoreDialog()"]');
+        const bulletDialog = document.getElementById('moreDialog');
+        
+        if (!moreButton && !bulletDialog.contains(event.target)) {
+            bulletDialog.style.display = 'none';
+        }
+    });
+
+    function f_openCheckDevice() {
+        const ip = $('#stream_onvif_ip').val().trim();
+        const username = $('#stream_onvif_username').val().trim();
+        const password = $('#stream_onvif_password').val().trim();
+
+        if (!mNodeCode) {
+            myToast2025("请先选择节点", "error");
+            return;
+        }
+
+        if (!ip) {
+            myToast2025("ONVIF IP不能为空", "error");
+            return;
+        }
+
+        if (!/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(ip)) {
+            myToast2025("ONVIF IP格式不正确", "error");
+            return;
+        }
+
+        if (!username) {
+            myToast2025("ONVIF用户名不能为空", "error");
+            return;
+        }
+
+        if (!password) {
+            myToast2025("ONVIF密码不能为空", "error");
+            return;
+        }
+
+        eleTopLoading.show();
+        $.ajax({
+            url: "/stream/openCheckDevice",
+            type: "post",
+            data: {
+                "node_code": mNodeCode,
+                "ip": ip,
+                "username": username,
+                "password": password,
+                "encrypted": "0"
+            },
+            dataType: "json",
+            success: (res) => {
+                eleTopLoading.hide();
+                if (res.code === 1000) {
+                    const info = res.info;
+                    const streamUri = info.streamUri;
+                    const deviceInfo = info.deviceInfo;
+
+                    $('#stream_pull_url').val(streamUri || '');
+                    $('#stream_pull_ip').val(ip);
+                    $('#stream_camera_name').val(deviceInfo.HardwareId || '');
+                    $('#stream_camera_manufacturer').val(deviceInfo.Manufacturer || '');
+
+                    const remark = 'FirmwareVersion=' + (deviceInfo.FirmwareVersion || '') + ',Model=' + (deviceInfo.Model || '') + ',SerialNumber=' + (deviceInfo.SerialNumber || '');
+                    $('#stream_remark').val(remark);
+
+                    myToast2025("探测成功", "success");
+                } else {
+                    myToast2025(res.msg || '探测失败', "error");
+                }
+            },
+            error: () => {
+                eleTopLoading.hide();
+                myToast2025("网络异常，请确定网络正常！", "error");
+            }
+        });
+    }
+
+    function f_getNodeStreams() {
+        if(!mNodeCode){
+            myToast2025("请选择节点！","error");
+            return;
+        }
+        
+        eleTopLoading.show();
+        
+        $.ajax({
+            url: '/stream/openAddContext',
+            type: 'get',
+            data: { node_code: mNodeCode },
+            dataType: 'json',
+            success: (res) => {
+                if (res.code === 1000) {
+                    if (res.pull_stream_types) {
+                        mPullStreamTypes = res.pull_stream_types;
+                    }
+                    if (res.audio_types) {
+                        mAudioTypes = res.audio_types;
+                    }
+                }
+                
+                $.ajax({
+                    url: '/stream/getNodeStreams',
+                    type: "get",
+                    async: true,
+                    data: {"node_code": mNodeCode},
+                    dataType: "json",
+                    timeout: 30000,
+                    error: function () {
+                        eleTopLoading.hide();
+                        myToast2025("网络异常，请确定网络正常！","error");
+                    },
+                    success: function (res) {
+                        eleTopLoading.hide();
+                        if(res.code === 1000){
+                            mStreams = res.data || [];
+                            f_renderStreams();
+                        }else{
+                            eleData.html("<div class='xc_empty-state'><i class='fa fa-exclamation-triangle'></i><p>"+res.msg+"</p></div>");
+                            myToast2025(res.msg,"error");
+                        }
+                    }
+                });
+            },
+            error: function() {
+                eleTopLoading.hide();
+                myToast2025("获取配置信息失败！","error");
+            }
+        });
+    }
+
     function f_renderStreams() {
         let searchText = eleSearchInput.val().trim().toLowerCase();
+        let searchStatus = parseInt(eleSearchStatusSelect.val());
         let filteredStreams = mStreams;
         
         if(searchText){
-            filteredStreams = mStreams.filter(function(s){
+            filteredStreams = filteredStreams.filter(function(s){
                 return (s.code && s.code.toLowerCase().indexOf(searchText) >= 0) ||
                        (s.nickname && s.nickname.toLowerCase().indexOf(searchText) >= 0) ||
                        (s.camera_device_id && s.camera_device_id.toLowerCase().indexOf(searchText) >= 0);
+            });
+        }
+
+        if(searchStatus !== -1){
+            filteredStreams = filteredStreams.filter(function(s){
+                return s.forward_state === searchStatus;
             });
         }
 
@@ -554,7 +857,7 @@
         let groupedData = {};
         for(let i = 0; i < filteredStreams.length; i++){
             let s = filteredStreams[i];
-            let deviceId = s.camera_device_id || 'default';
+            let deviceId = s.camera_device_id || s.code || 'default';
             if(!groupedData[deviceId]){
                 groupedData[deviceId] = [];
             }
@@ -584,9 +887,14 @@
             html += "<table class=\"xc_camera_table\">";
             html += "<thead>";
             html += "<tr>";
+            html += "<th>ID</th>";
             html += "<th>编号</th>";
+            html += "<th>接入协议</th>";
             html += "<th>名称</th>";
-            html += "<th>应用</th>";
+            html += "<th>IP</th>";
+            html += "<th>音频</th>";
+            html += "<th>状态</th>";
+            html += "<th>更新时间</th>";
             html += "<th>操作</th>";
             html += "</tr>";
             html += "</thead>";
@@ -594,13 +902,34 @@
 
             for(let i = 0; i < streams.length; i++){
                 let s = streams[i];
+                let pullTypeName = getPullStreamTypeName(s.pull_stream_type);
+                let audioName = getAudioTypeName(s.is_audio);
                 
                 html += "<tr>";
+                html += "<td>" + (s.id || '-') + "</td>";
                 html += "<td style='width:15%;'>" + (s.code || '-') + "</td>";
-                html += "<td>" + (s.nickname || s.name || '-') + "</td>";
-                html += "<td style='width:10%;'>" + (s.app || '-') + "</td>";
-                html += "<td style='width:30%;'>";
-                html += "<a href=\"javascript:f_open_player('" + s.app + "','" + s.name + "')\" class=\"sun-a-label\">播放</a>";
+                html += "<td style='width:8%;'>" + pullTypeName + "</td>";
+                html += "<td style='width:10%;'>" + (s.nickname || s.name || '-') + "</td>";
+                html += "<td style='width:10%;'>" + (s.pull_stream_ip || '-') + "</td>";
+                html += "<td style='width:8%;'>" + audioName + "</td>";
+                html += "<td style='width:15%;'>";
+                
+                if(s.forward_state === 1){
+                    html += "<span class='xc_stream-status xc_stream-status-active'><span class='xc_stream-status-icon'></span>转发中</span>";
+                    html += "<a href=\"javascript:f_open_player('" + s.app + "','" + s.name + "')\" class='sun-a-label'>播放</a>";
+                    html += "<a href=\"javascript:f_openHandleStreamProxy('del','" + s.code + "')\" class='sun-a-label'>停止</a>";
+                }else{
+                    html += "<span class='xc_stream-status xc_stream-status-inactive'><span class='xc_stream-status-icon'></span>未转发</span>";
+                    html += "<a href=\"javascript:f_openHandleStreamProxy('add','" + s.code + "')\" class='sun-a-label'>开启</a>";
+                }
+                
+                html += "</td>";
+                html += "<td style='white-space:nowrap;'>" + formatDateTime(s.last_update_time) + "</td>";
+                html += "<td class=\"xc_action_buttons\">";
+                html += "<button class='xc_action_btn view' onclick=\"streamModal.openEdit('" + s.code + "')\" title=\"编辑\"><i class='fa fa-edit'></i></button>";
+                html += "<button class='xc_action_btn delete' onclick=\"f_del('" + s.code + "')\" title=\"删除\">";
+                html += "<svg class='xc-icon' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><polyline points='3 6 5 6 21 6'/><path d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/></svg>";
+                html += "</button>";
                 html += "</td>";
                 html += "</tr>";
             }
@@ -614,8 +943,147 @@
         eleData.html(html);
     }
 
+    function getPullStreamTypeName(pull_stream_type) {
+        for (let i = 0; i < mPullStreamTypes.length; i++) {
+            if (mPullStreamTypes[i].id === pull_stream_type) {
+                return mPullStreamTypes[i].name;
+            }
+        }
+        return pull_stream_type || '-';
+    }
+
+    function getAudioTypeName(is_audio) {
+        for (let i = 0; i < mAudioTypes.length; i++) {
+            if (mAudioTypes[i].type === is_audio) {
+                return mAudioTypes[i].name;
+            }
+        }
+        return is_audio || '-';
+    }
+
+    function formatDateTime(dateTimeStr) {
+        if (!dateTimeStr) return '-';
+        
+        try {
+            let d = new Date(dateTimeStr);
+            if (isNaN(d.getTime())) return dateTimeStr;
+            
+            let year = d.getFullYear();
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            let day = String(d.getDate()).padStart(2, '0');
+            let hours = String(d.getHours()).padStart(2, '0');
+            let minutes = String(d.getMinutes()).padStart(2, '0');
+            
+            return year + '/' + month + '/' + day + ' ' + hours + ':' + minutes;
+        } catch (e) {
+            return dateTimeStr;
+        }
+    }
+
     function f_open_player(stream_app, stream_name) {
         window.open("/stream/player?app=" + stream_app + "&name=" + stream_name + "&node_code=" + mNodeCode);
+    }
+
+    function f_openHandleStreamProxy(handle, code) {
+        let url;
+        if (handle === "add") {
+            url = "/stream/openAddStreamProxy";
+        } else if (handle === "del") {
+            url = "/stream/openDelStreamProxy";
+        } else {
+            return;
+        }
+
+        eleTopLoading.show();
+        $.ajax({
+            url: url,
+            type: "post",
+            async: true,
+            data: {"node_code": mNodeCode, "code": code},
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast2025("网络异常，请确定网络正常！", "error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if (res.code === 1000) {
+                    myToast2025(res.msg || "操作成功", "success");
+                    setTimeout(function() {
+                        f_getNodeStreams();
+                    }, 1000);
+                } else {
+                    myToast2025(res.msg, "error");
+                }
+            }
+        });
+    }
+
+    function f_openHandleAllStreamProxy(handle) {
+        eleTopLoading.show();
+        $.ajax({
+            url: '/stream/openHandleAllStreamProxy',
+            type: "post",
+            async: true,
+            data: {"node_code": mNodeCode, "handle": handle},
+            dataType: "json",
+            timeout: 60000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast2025("网络异常，请确定网络正常！", "error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if (res.code === 1000) {
+                    myToast2025(res.msg || "操作成功", "success");
+                    setTimeout(function() {
+                        f_getNodeStreams();
+                    }, 1000);
+                } else {
+                    myToast2025(res.msg, "error");
+                }
+            }
+        });
+    }
+
+    function f_del(code) {
+        let ret = confirm("确认删除吗？");
+        if (ret) {
+            f_openDel("one", code);
+        }
+    }
+
+    function f_delAll() {
+        let ret = confirm("确认全部删除吗？");
+        if (ret) {
+            f_openDel("all", "");
+        }
+    }
+
+    function f_openDel(handle, code) {
+        eleTopLoading.show();
+        $.ajax({
+            url: '/stream/openDel',
+            type: "post",
+            async: true,
+            data: {"node_code": mNodeCode, "handle": handle, "code": code},
+            dataType: "json",
+            timeout: 30000,
+            error: function () {
+                eleTopLoading.hide();
+                myToast2025("网络异常，请确定网络正常！", "error");
+            },
+            success: function (res) {
+                eleTopLoading.hide();
+                if (res.code === 1000) {
+                    myToast2025(res.msg || "删除成功", "success");
+                    f_getNodeStreams();
+                } else {
+                    myToast2025(res.msg, "error");
+                }
+            }
+        });
     }
 
     eleSearchInput.on("keydown", function(e){
@@ -623,6 +1091,10 @@
             e.preventDefault();
             doSearch();
         }
+    });
+
+    eleSearchStatusSelect.on('change', function() {
+        doSearch();
     });
 
     function myToast2025(text, icon, hideAfter) {
@@ -651,6 +1123,297 @@
             }, hideAfter);
         }
     }
+
+    const streamModal = {
+        mode: 'add',
+        currentCode: null,
+
+        init: function() {
+            $('#stream_pull_type').on('change', () => {
+                this.onPullTypeChange();
+            });
+        },
+
+        onPullTypeChange: function() {
+            const pullType = parseInt($('#stream_pull_type').val());
+
+            if (pullType === 1) {
+                $('#onvif_section').show();
+            } else {
+                $('#onvif_section').hide();
+
+                if (this.mode === 'add') {
+                    if (pullType === 0) {
+                        myToast2025("请选择接入协议", "error");
+                    } else if (pullType === 21) {
+                        myToast2025("如需接入GB28181，请到摄像头管理平台配置", "error");
+                    }
+                }
+            }
+        },
+
+        openAdd: function() {
+            if (!mNodeCode) {
+                myToast2025("请先选择节点", "error");
+                return;
+            }
+
+            this.mode = 'add';
+            this.currentCode = null;
+
+            $('#stream_modal_title').text('添加摄像头');
+            this.resetForm();
+            this.loadAddContext();
+
+            $('#stream_modal').addClass('active');
+        },
+
+        loadAddContext: function() {
+            $.ajax({
+                url: '/stream/openAddContext',
+                type: 'get',
+                data: { node_code: mNodeCode },
+                dataType: 'json',
+                success: (res) => {
+                    if (res.code === 1000) {
+                        const stream = res.stream;
+
+                        $('#stream_code').val(stream.code || '');
+                        $('#stream_camera_device_id').val(stream.code || '');
+
+                        if (res.pull_stream_types) {
+                            mPullStreamTypes = res.pull_stream_types;
+                            let pullTypeHtml = '<option value="0">请选择</option>';
+                            res.pull_stream_types.forEach(item => {
+                                pullTypeHtml += '<option value="' + item.id + '">' + item.name + '</option>';
+                            });
+                            $('#stream_pull_type').html(pullTypeHtml);
+                        }
+
+                        if (res.audio_types) {
+                            mAudioTypes = res.audio_types;
+                            let audioHtml = '';
+                            res.audio_types.forEach(item => {
+                                audioHtml += '<option value="' + item.type + '">' + item.name + '</option>';
+                            });
+                            $('#stream_is_audio').html(audioHtml);
+
+                            const defaultAudioType = stream.is_audio !== undefined ? stream.is_audio : (res.audio_types.length > 0 ? res.audio_types[0].type : 0);
+                            $('#stream_is_audio').val(defaultAudioType);
+                        }
+
+                        $('#stream_pull_type').val('1');
+                        this.onPullTypeChange();
+
+                        if (stream.pull_stream_username) {
+                            $('#stream_onvif_username').val(stream.pull_stream_username);
+                        }
+                        if (stream.pull_stream_password) {
+                            $('#stream_onvif_password').val(stream.pull_stream_password);
+                        }
+                    } else {
+                        myToast2025(res.msg || '加载失败', 'error');
+                    }
+                },
+                error: () => {
+                    myToast2025('网络异常，请确定网络正常！', 'error');
+                }
+            });
+        },
+
+        openEdit: function(code) {
+            if (!mNodeCode) {
+                myToast2025("请先选择节点", "error");
+                return;
+            }
+
+            this.mode = 'edit';
+            this.currentCode = code;
+
+            $('#stream_modal_title').text('编辑摄像头');
+            this.resetForm();
+            this.loadData(code);
+
+            $('#stream_modal').addClass('active');
+        },
+
+        loadData: function(code) {
+            $.ajax({
+                url: '/stream/openEditContext',
+                type: 'get',
+                data: { node_code: mNodeCode, code: code },
+                dataType: 'json',
+                success: (res) => {
+                    if (res.code === 1000) {
+                        const stream = res.stream;
+
+                        if (res.pull_stream_types) {
+                            mPullStreamTypes = res.pull_stream_types;
+                            let pullTypeHtml = '<option value="0">请选择</option>';
+                            res.pull_stream_types.forEach(item => {
+                                pullTypeHtml += '<option value="' + item.id + '">' + item.name + '</option>';
+                            });
+                            $('#stream_pull_type').html(pullTypeHtml);
+                        }
+
+                        if (res.audio_types) {
+                            mAudioTypes = res.audio_types;
+                            let audioHtml = '';
+                            res.audio_types.forEach(item => {
+                                audioHtml += '<option value="' + item.type + '">' + item.name + '</option>';
+                            });
+                            $('#stream_is_audio').html(audioHtml);
+                        }
+
+                        $('#stream_code').val(stream.code).prop('disabled', true);
+                        $('#stream_camera_device_id').val(stream.camera_device_id || '');
+                        $('#stream_nickname').val(stream.nickname || '');
+                        $('#stream_pull_type').val(stream.pull_stream_type || 1);
+                        $('#stream_pull_url').val(stream.pull_stream_url || '');
+                        $('#stream_is_audio').val(stream.is_audio !== undefined ? stream.is_audio : 0);
+                        $('#stream_pull_ip').val(stream.pull_stream_ip || '');
+                        $('#stream_camera_name').val(stream.camera_name || '');
+                        $('#stream_camera_manufacturer').val(stream.camera_manufacturer || '');
+                        $('#stream_remark').val(stream.remark || '');
+
+                        if (stream.pull_stream_username) {
+                            $('#stream_onvif_username').val(stream.pull_stream_username);
+                        }
+                        if (stream.pull_stream_password) {
+                            $('#stream_onvif_password').val(stream.pull_stream_password);
+                        }
+
+                        this.onPullTypeChange();
+                    } else {
+                        myToast2025(res.msg || '加载失败', 'error');
+                        this.close();
+                    }
+                },
+                error: () => {
+                    myToast2025('网络异常，请确定网络正常！', 'error');
+                    this.close();
+                }
+            });
+        },
+
+        resetForm: function() {
+            $('#stream_form')[0].reset();
+            $('#stream_code').prop('disabled', false);
+            $('#onvif_section').hide();
+        },
+
+        close: function() {
+            $('#stream_modal').removeClass('active');
+            this.resetForm();
+        },
+
+        validate: function() {
+            const code = $('#stream_code').val().trim();
+            if (!code) {
+                myToast2025("请输入编号", "error");
+                return false;
+            }
+
+            const nickname = $('#stream_nickname').val().trim();
+            if (!nickname) {
+                myToast2025("请输入名称", "error");
+                return false;
+            }
+
+            const pullType = parseInt($('#stream_pull_type').val());
+            if (pullType === 0) {
+                myToast2025("请选择接入协议", "error");
+                return false;
+            }
+
+            if (this.mode === 'add') {
+                if (pullType === 21) {
+                    myToast2025("如需接入GB28181，请到摄像头管理平台配置", "error");
+                    return false;
+                }
+            }
+
+            if (pullType === 1 || pullType === 2 || pullType === 3 || pullType === 4) {
+                const pullUrl = $('#stream_pull_url').val().trim();
+                if (!pullUrl) {
+                    myToast2025("请输入直播流地址", "error");
+                    return false;
+                }
+
+                if (pullType === 1) {
+                    if (!pullUrl.startsWith("rtsp://") && !pullUrl.startsWith("rtsps://")) {
+                        myToast2025("直播流地址格式不正确", "error");
+                        return false;
+                    }
+                } else if (pullType === 2) {
+                    if (!pullUrl.startsWith("rtmp://") && !pullUrl.startsWith("rtmps://")) {
+                        myToast2025("直播流地址格式不正确", "error");
+                        return false;
+                    }
+                } else if (pullType === 3 || pullType === 4) {
+                    if (!pullUrl.startsWith("http://") && !pullUrl.startsWith("https://")) {
+                        myToast2025("直播流地址格式不正确", "error");
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        },
+
+        submit: function() {
+            if (!this.validate()) {
+                return;
+            }
+
+            const data = {
+                node_code: mNodeCode,
+                code: $('#stream_code').val().trim(),
+                app: 'live',
+                name: this.mode === 'edit' ? this.currentCode : $('#stream_code').val().trim(),
+                nickname: $('#stream_nickname').val().trim(),
+                pull_stream_type: parseInt($('#stream_pull_type').val()),
+                pull_stream_url: $('#stream_pull_url').val().trim(),
+                pull_stream_ip: $('#stream_pull_ip').val().trim(),
+                pull_stream_port: 0,
+                camera_name: $('#stream_camera_name').val().trim(),
+                camera_manufacturer: $('#stream_camera_manufacturer').val().trim(),
+                camera_device_id: $('#stream_camera_device_id').val().trim(),
+                remark: $('#stream_remark').val().trim(),
+                onvif_username: $('#stream_onvif_username').val().trim(),
+                onvif_password: $('#stream_onvif_password').val().trim(),
+                is_audio: parseInt($('#stream_is_audio').val())
+            };
+
+            const url = this.mode === 'add' ? '/stream/openAdd' : '/stream/openEdit';
+
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: data,
+                dataType: 'json',
+                success: (res) => {
+                    if (res.code === 1000) {
+                        myToast2025(res.msg || '操作成功', 'success');
+                        this.close();
+
+                        setTimeout(() => {
+                            f_getNodeStreams();
+                        }, 500);
+                    } else {
+                        myToast2025(res.msg || '操作失败', 'error');
+                    }
+                },
+                error: () => {
+                    myToast2025('网络异常，请确定网络正常！', 'error');
+                }
+            });
+        }
+    };
+
+    $(document).ready(function() {
+        streamModal.init();
+    });
 </script>
 
 {% endblock javascripts %}

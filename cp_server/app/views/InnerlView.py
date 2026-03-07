@@ -1,6 +1,5 @@
 from app.views.ViewsBase import *
 from app.models import *
-from app.consumers.ClusterConsumer import send_command_to_node_sync
 import threading
 
 """
@@ -41,7 +40,7 @@ def api_on_stream_not_found(request):
                 'dst_secret': g_config.mediaSecret
             }
             
-            result = send_command_to_node_sync(node_code, 'add_stream_pusher', pusher_params, timeout=30)
+            result = send_command_to_node_sync(node_code, 'add_stream_pusher', pusher_params, timeout=120)
             
             g_logger.debug("on_stream_not_found() add_stream_pusher result:%s" % str(result))
             
@@ -63,24 +62,3 @@ def api_on_stream_not_found(request):
     }
     g_logger.debug("on_stream_not_found() ret=%d,msg=%s,key=%s" % (ret, msg, str(key)))
     return f_responseJson(res)
-
-def f_initThread():
-    i = 0
-    while True:
-        isSyncNode = False
-        if i == 0 or i % 60 == 0:
-            isSyncNode = True
-
-        if isSyncNode:
-            pass
-
-        time.sleep(g_config.checkInterval)
-        i += 1
-
-def __INIT__():
-    g_logger.info("InnerView.__INIT__()")
-    t1 = threading.Thread(target=f_initThread)
-    t1.daemon = True
-    t1.start()
-
-__INIT__()

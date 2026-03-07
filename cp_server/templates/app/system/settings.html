@@ -1,6 +1,6 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} 系统配置 {% endblock title %}
+{% block title %} 平台启动配置 {% endblock title %}
 {% block stylesheets %}
   {{ block.super }}
 <style>
@@ -140,7 +140,7 @@
 <div class="right_col" role="main">
     <div class="config-page">
         <div class="config-page-title">
-            系统配置
+            平台启动配置
             <span id="top_loading"><img src="/static/images/load.gif" alt="">保存中</span>
         </div>
         
@@ -185,6 +185,11 @@
                 <div class="config-section-title">安全配置</div>
                 <div class="config-grid">
                     <div class="config-item">
+                        <label class="config-label">API安全密钥 <span class="req">*</span></label>
+                        <input type="text" name="safe" value="{{config.safe}}" class="config-input">
+                        <span class="config-hint">开放接口验证的请求头安全值</span>
+                    </div>
+                    <div class="config-item">
                         <label class="config-label">WebSocket Token <span class="req">*</span></label>
                         <input type="text" name="wsToken" value="{{config.wsToken}}" class="config-input">
                         <span class="config-hint">节点连接认证令牌</span>
@@ -207,8 +212,8 @@
                         <input type="text" name="uploadDir" value="{{config.uploadDir}}" class="config-input">
                     </div>
                     <div class="config-item">
-                        <label class="config-label">存储目录 <span class="req">*</span></label>
-                        <input type="text" name="storageDir" value="{{config.storageDir}}" class="config-input">
+                        <label class="config-label">临时存储目录 <span class="req">*</span></label>
+                        <input type="text" name="storageTempDir" value="{{config.storageTempDir}}" class="config-input">
                     </div>
                 </div>
             </div>

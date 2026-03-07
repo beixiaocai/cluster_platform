@@ -366,9 +366,6 @@ body .container.body .right_col {
         width: 100%;
         margin: 0
     }
-    .nav-md .container.body .col-md-3.left_col {
-        display: none
-    }
     .nav-md .container.body .right_col {
         width: 100%;
         padding-right: 0
@@ -764,10 +761,20 @@ a:active,
     position: absolute;
     top: 0
 }
-.nav.side-menu>li>a,
+.nav.side-menu>li>a {
+    color: #E7E7E7;
+    font-weight: 500;
+    font-size: 15px;
+}
+.nav.side-menu>li>a>i.fa {
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+}
 .nav.child_menu>li>a {
     color: #E7E7E7;
-    font-weight: 500
+    font-weight: 500;
+    font-size: 14px;
 }
 .nav.child_menu li li:hover,
 .nav.child_menu li li.active {
@@ -780,7 +787,8 @@ a:active,
 .nav>li>a {
     position: relative;
     display: block;
-    padding: 13px 15px 12px
+    padding: 13px 15px 12px;
+    font-size: 15px;
 }
 .nav.side-menu>li.current-page,
 .nav.side-menu>li.active {

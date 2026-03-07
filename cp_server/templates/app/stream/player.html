@@ -241,11 +241,23 @@
 <script src="/static/lib/easyPlayer/js/easyplayer-pro.js?v=2"></script>
 <script>
     let mNodeCode = "{{ info.node_code }}";
-    let mStreamPullStreamType = 0;
-    let mStreamIsOnline = 0;
+    let mStreamApp = "{{ info.stream_app }}";
+    let mStreamName = "{{ info.stream_name }}";
+    let mStreamCode = "{{ info.stream_code }}";
+    let mStreamPullStreamType = {{ info.pull_stream_type|default:'0' }};
+    console.log("mStreamPullStreamType:", mStreamPullStreamType, typeof mStreamPullStreamType);
     let eleInputAddress= $("#input_address");
     let eleVideoPlayer = document.querySelector('#video_player');
     let ePlayer = null;
+
+    if(mStreamPullStreamType === 21){
+        //gb28181的设备
+        console.log("GB28181 device detected, PTZ enabled");
+    }else{
+        //非gb28181的设备
+        console.log("Non-GB28181 device, PTZ disabled");
+        $(".ptz-button").addClass("ptz-button-gray");
+    }
 
     function f_createEPlayer() {
         ePlayer = new EasyPlayerPro({
@@ -359,7 +371,12 @@
            url: "/stream/openPtz",
            type: "post",
            async: true,
-           data: {"code":mStreamCode,"ptzType":ptzType,"val":val},
+           data: {
+               "node_code": mNodeCode,
+               "code": mStreamCode,
+               "ptzType": ptzType,
+               "val": val
+           },
            dataType: "json",
            timeout: 0,
            error: function () {
@@ -376,12 +393,6 @@
     }
 
     $(function() {
-        if(mStreamPullStreamType === 21){
-            //gb28181的设备
-        }else{
-            //非gb28181的设备
-            $(".ptz-button").addClass("ptz-button-gray");
-        }
         let wsMp4Url = "{{ info.wsMp4Url }}";
 
         eleInputAddress.val(wsMp4Url);

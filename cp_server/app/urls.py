@@ -14,6 +14,11 @@ from .views import AlarmInterfaceView
 from .views import AlgorithmFlowView
 from .views import AlgorithmView
 from .views import BehaviourView
+from .views import StreamRecordView
+from .views import LLMView
+from .views import AlgorithmTestView
+from .views import FaceView
+from .views import ScheduleTaskView
 
 app_name = 'app'
 
@@ -33,6 +38,12 @@ urlpatterns = [
     path('node/index', NodeView.index),
     path('node/openDel', NodeView.api_openDel),
     path('node/getOnlineNodes', NodeView.api_getOnlineNodes),
+    path('node/getList', NodeView.api_getList),
+    path('node/upgrade', NodeView.api_upgradeVersion),
+    path('node/restartApp', NodeView.api_restartApp),
+    path('node/restartOS', NodeView.api_restartOS),
+    path('node/exportLogs', NodeView.api_exportLogs),
+    path('node/downloadLog', NodeView.api_downloadLog),
 
     path('alarm/index', AlarmView.index),
     path('alarm/openHandle', AlarmView.api_openHandle),
@@ -45,6 +56,17 @@ urlpatterns = [
 
     path('stream/index', StreamView.index),
     path('stream/getNodeStreams', StreamView.api_getNodeStreams),
+    path('stream/getAllStreamData', StreamView.api_getAllStreamData),
+    path('stream/openAddContext', StreamView.api_openAddContext),
+    path('stream/openAdd', StreamView.api_openAdd),
+    path('stream/openEditContext', StreamView.api_openEditContext),
+    path('stream/openEdit', StreamView.api_openEdit),
+    path('stream/openDel', StreamView.api_openDel),
+    path('stream/openAddStreamProxy', StreamView.api_openAddStreamProxy),
+    path('stream/openDelStreamProxy', StreamView.api_openDelStreamProxy),
+    path('stream/openHandleAllStreamProxy', StreamView.api_openHandleAllStreamProxy),
+    path('stream/openCheckDevice', StreamView.api_openCheckDevice),
+    path('stream/openPtz', StreamView.api_openPtz),
     path('stream/openStartPusher', StreamView.api_openStartPusher),
     path('stream/openStopPusher', StreamView.api_openStopPusher),
     path('stream/player', StreamView.player),
@@ -58,23 +80,25 @@ urlpatterns = [
     path('control/openLog', ControlView.api_openLog),
     path('control/openDel', ControlView.api_openDel),
     path('control/openHandle', ControlView.api_openHandle),
+    path('control/getControlInfo', ControlView.api_getControlInfo),
     path('control/openAddAlgorithm', ControlView.api_openAddAlgorithm),
     path('control/openEditAlgorithm', ControlView.api_openEditAlgorithm),
     path('control/openDelAlgorithm', ControlView.api_openDelAlgorithm),
     path('control/openStartControlStream', ControlView.api_openStartControlStream),
     path('control/openStopControlStream', ControlView.api_openStopControlStream),
+    path('control/openCopy', ControlView.api_openCopy),
+    path('control/openSettings', ControlView.api_openSettings),
+    path('control/openInfo', ControlView.api_openInfo),
+
+    path('controlAlgorithm/add', ControlView.control_algorithm_add),
+    path('controlAlgorithm/edit', ControlView.control_algorithm_edit),
+    path('controlAlgorithm/openDel', ControlView.api_openDelAlgorithm),
 
     path('inner/on_stream_not_found', InnerlView.api_on_stream_not_found),
 
-    path('open/getIndex', OpenView.api_getIndex),
+    path('index/getIndex', IndexView.api_getIndex),
     path('open/getNodeList', OpenView.api_getNodeList),
     path('open/getZlmProcessData', OpenView.api_getZlmProcessData),
-    path('open/getAllCoreProcessData', OpenView.api_getAllCoreProcessData),
-    path('open/getAllCoreProcessData2', OpenView.api_getAllCoreProcessData2),
-    path('open/getAllStreamData', OpenView.api_getAllStreamData),
-    path('open/getControl', OpenView.api_getControl),
-    path('open/restartApp', OpenView.api_restartApp),
-    path('open/restartOS', OpenView.api_restartOS),
 
     path('storage/download', StorageView.download),
     path('storage/access', StorageView.access),
@@ -100,6 +124,7 @@ urlpatterns = [
     path('alarmInterface/openEdit', AlarmInterfaceView.api_openEdit),
     path('alarmInterface/openDel', AlarmInterfaceView.api_openDel),
     path('alarmInterface/openInfo', AlarmInterfaceView.api_openInfo),
+    path('alarmInterface/test', AlarmInterfaceView.test),
     path('alarmInterface/openTest', AlarmInterfaceView.api_openTest),
 
     path('algorithmFlow/index', AlgorithmFlowView.index),
@@ -107,16 +132,76 @@ urlpatterns = [
     path('algorithmFlow/getInfo', AlgorithmFlowView.api_getInfo),
     path('algorithmFlow/openEdit', AlgorithmFlowView.api_openEdit),
     path('algorithmFlow/openDel', AlgorithmFlowView.api_openDel),
+    path('algorithmFlow/openAdd', AlgorithmFlowView.api_openAdd),
+    path('algorithmFlow/openEditContext', AlgorithmFlowView.api_openEditContext),
+    path('algorithmFlow/openAddContext', AlgorithmFlowView.api_openAddContext),
 
     path('algorithm/index', AlgorithmView.index),
     path('algorithm/getList', AlgorithmView.api_getList),
     path('algorithm/getInfo', AlgorithmView.api_getInfo),
     path('algorithm/openEdit', AlgorithmView.api_openEdit),
     path('algorithm/openDel', AlgorithmView.api_openDel),
+    path('algorithm/openEditContext', AlgorithmView.api_openEditContext),
+    path('algorithm/openAlgorithmTypeAttrs', AlgorithmView.api_openTypeAttrs),
+    path('algorithm/openAdd', AlgorithmView.api_openAdd),
+    path('algorithm/openAddContext', AlgorithmView.api_openAddContext),
 
     path('behaviour/index', BehaviourView.index),
     path('behaviour/getList', BehaviourView.api_getList),
     path('behaviour/getInfo', BehaviourView.api_getInfo),
     path('behaviour/openEdit', BehaviourView.api_openEdit),
     path('behaviour/openDel', BehaviourView.api_openDel),
+    path('behaviour/openAdd', BehaviourView.api_openAdd),
+    path('behaviour/openEditContext', BehaviourView.api_openEditContext),
+
+    path('streamRecord/index', StreamRecordView.index),
+    path('streamRecord/timeplayer', StreamRecordView.timeplayer),
+    path('streamRecord/getList', StreamRecordView.api_getList),
+    path('streamRecord/getInfo', StreamRecordView.api_getInfo),
+    path('streamRecord/getStreams', StreamRecordView.api_getStreams),
+    path('streamRecord/add', StreamRecordView.api_add),
+    path('streamRecord/edit', StreamRecordView.api_edit),
+    path('streamRecord/del', StreamRecordView.api_del),
+    path('streamRecord/getRecordTimeline', StreamRecordView.api_getRecordTimeline),
+    path('streamRecord/getRecordFilename', StreamRecordView.api_getRecordFilename),
+    
+    path('llm/index', LLMView.index),
+    path('llm/test', LLMView.test),
+    path('llm/getList', LLMView.api_getList),
+    path('llm/getInfo', LLMView.api_getInfo),
+    path('llm/getTypes', LLMView.api_getTypes),
+    path('llm/add', LLMView.api_add),
+    path('llm/edit', LLMView.api_edit),
+    path('llm/del', LLMView.api_del),
+    path('llm/doTest', LLMView.api_test),
+    
+    path('algorithmTest/index', AlgorithmTestView.index),
+    path('algorithmTest/getFlows', AlgorithmTestView.api_getFlows),
+    path('algorithmTest/flowInit', AlgorithmTestView.api_flowInit),
+    path('algorithmTest/flowRelease', AlgorithmTestView.api_flowRelease),
+    path('algorithmTest/flowAnalyze', AlgorithmTestView.api_flowAnalyze),
+    path('algorithmTest/getImage', AlgorithmTestView.api_getImage),
+    
+    path('face/index', FaceView.index),
+    path('face/getNodeFaces', FaceView.api_getNodeFaces),
+    path('face/openAddContext', FaceView.api_openAddContext),
+    path('face/openEditContext', FaceView.api_openEditContext),
+    path('face/openAdd', FaceView.api_openAdd),
+    path('face/openEdit', FaceView.api_openEdit),
+    path('face/openDel', FaceView.api_openDel),
+    path('face/openFlows', FaceView.api_openFlows),
+    path('face/openFaceDbUpdate', FaceView.api_openFaceDbUpdate),
+    path('face/openFaceDbInfo', FaceView.api_openFaceDbInfo),
+    path('face/openFaceDbRecognize', FaceView.api_openFaceDbRecognize),
+    
+    path('scheduleTask/index', ScheduleTaskView.index),
+    path('scheduleTask/openIndex', ScheduleTaskView.api_openIndex),
+    path('scheduleTask/openAddContext', ScheduleTaskView.api_openAddContext),
+    path('scheduleTask/openEditContext', ScheduleTaskView.api_openEditContext),
+    path('scheduleTask/openAdd', ScheduleTaskView.api_openAdd),
+    path('scheduleTask/openEdit', ScheduleTaskView.api_openEdit),
+    path('scheduleTask/openDel', ScheduleTaskView.api_openDel),
+    path('scheduleTask/openToggleState', ScheduleTaskView.api_openToggleState),
+    path('scheduleTask/openRunNow', ScheduleTaskView.api_openRunNow),
+    path('scheduleTask/openLogs', ScheduleTaskView.api_openLogs),
 ]
