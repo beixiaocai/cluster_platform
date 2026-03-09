@@ -516,8 +516,6 @@
                                         <td>
                                             {% if d.online %}
                                                 <span class="sun-state-success">在线</span>
-                                            {% elif d.ws_connected %}
-                                                <span class="sun-state-warning">数据库记录在线</span>
                                             {% else %}
                                                 <span class="sun-state-error">离线</span>
                                             {% endif %}
@@ -558,19 +556,17 @@
                                             </div>
                                             <div class="node-boot-time">
                                                 {% if d.project_start_timestamp %}
-                                                    <span>软件: {{ d.project_start_timestamp|timestamp:"%Y/%m/%d %H:%M" }}</span>
+                                                    <span>软件启动: {{ d.project_start_timestamp|timestamp:"%Y/%m/%d %H:%M" }}</span>
                                                 {% endif %}
                                                 {% if d.os_boot_timestamp %}
-                                                    <span>系统: {{ d.os_boot_timestamp|timestamp:"%Y/%m/%d %H:%M" }}</span>
-                                                {% endif %}
-                                                {% if d.ws_last_heartbeat %}
-                                                    <span>心跳: {{ d.ws_last_heartbeat|date:"Y/m/d H:i" }}</span>
+                                                    <span>系统启动: {{ d.os_boot_timestamp|timestamp:"%Y/%m/%d %H:%M" }}</span>
                                                 {% endif %}
                                             </div>
                                         </td>
                                         <td>
                                             <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
                                                 <a href="javascript:f_openDetail('{{ d.code }}')" class="sun-a-label btn-detail">详情</a>
+                                                <a href="javascript:f_openHeartbeats('{{ d.code }}')" class="sun-a-label" style="background-color: #f3e5f5; border-color: #c5cae9; color: #1b5e20;">心跳记录</a>
                                                 <a href="javascript:f_openExportLogs('{{ d.code }}')" class="sun-a-label" style="background-color: #e3f2fd; border-color: #90caf9; color: #1565c0;">导出日志</a>
                                                 <a href="javascript:f_openUpgrade('{{ d.code }}')" class="sun-a-label" style="background-color: #e8f5e9; border-color: #a5d6a7; color: #2e7d32;">升级</a>
                                                 <a href="javascript:f_restartApp('{{ d.code }}')" class="sun-a-label" style="background-color: #fff3e0; border-color: #ffcc80; color: #e65100;">重启软件</a>
@@ -681,6 +677,35 @@
     </div>
 </div>
 
+<div class="detail-modal" id="heartbeatsModal">
+    <div class="detail-modal-content" style="width: 550px;">
+        <div class="detail-modal-header">
+            <h3>心跳记录 - <span id="heartbeats_node_code" style="color:#165DFF;"></span></h3>
+            <button class="detail-modal-close" onclick="f_closeHeartbeats()">&times;</button>
+        </div>
+        <div class="detail-modal-body">
+            <div style="margin-top: 10px;">
+                <table class="table table-bordered" style="font-size: 13px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th style="width: 160px;">心跳时间</th>
+                            <th style="width: 120px;">客户端IP</th>
+                            <th style="width: 160px;">添加时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="heartbeats_table_body">
+                        <tr>
+                            <td colspan="4" style="text-align:center;padding:20px;color:#6c757d;">加载中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="heartbeats_pagination" style="margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 5px;"></div>
+        </div>
+    </div>
+</div>
+
 <style>
     .xc_switch_container {
         display: inline-flex;
@@ -764,7 +789,9 @@
         is_auth: {{ d.is_auth }},
         auth_msg: '{% if d.auth_msg %}{{ d.auth_msg|escapejs }}{% else %}-{% endif %}',
         ws_connect_time: '{{ d.ws_connect_time|date:"Y-m-d H:i:s"|default:"-" }}',
-        ws_last_heartbeat: '{{ d.ws_last_heartbeat|date:"Y-m-d H:i:s"|default:"-" }}',
+        last_update_time: '{{ d.last_update_time|date:"Y-m-d H:i:s"|default:"-" }}',
+        project_start_timestamp: {{ d.project_start_timestamp|default:0 }},
+        os_boot_timestamp: {{ d.os_boot_timestamp|default:0 }},
         register_info: {% if d.register_info %}{{ d.register_info|safe }}{% else %}{}{% endif %},
     };
     {% endfor %}
@@ -808,10 +835,9 @@
         html += '<div class="detail-item"><div class="detail-label">内网地址</div><div class="detail-value">' + node.client_ip + ':' + node.admin_port + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">版本号</div><div class="detail-value">' + node.version + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">授权状态</div><div class="detail-value">' + (node.is_auth == 1 ? node.auth_msg : '未授权') + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">软件启动时间</div><div class="detail-value">' + formatTimestamp(node.project_start_timestamp) + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">系统启动时间</div><div class="detail-value">' + formatTimestamp(node.os_boot_timestamp) + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">软件启动</div><div class="detail-value">' + formatTimestamp(node.project_start_timestamp) + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">系统启动</div><div class="detail-value">' + formatTimestamp(node.os_boot_timestamp) + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">连接时间</div><div class="detail-value">' + node.ws_connect_time + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">最后心跳</div><div class="detail-value">' + node.ws_last_heartbeat + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">更新时间</div><div class="detail-value">' + node.last_update_time + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">注册信息</div><div class="detail-json">' + JSON.stringify(registerInfo, null, 2) + '</div></div>';
         
@@ -1051,6 +1077,94 @@
                 }
             }
         });
+    }
+
+    let m_heartbeats_node_code = '';
+    let m_heartbeats_page = 1;
+    let m_heartbeats_page_size = 10;
+
+    function f_formatDateTime(isoStr) {
+        if (!isoStr) return '-';
+        let d = new Date(isoStr);
+        let year = d.getFullYear();
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+        let day = String(d.getDate()).padStart(2, '0');
+        let hour = String(d.getHours()).padStart(2, '0');
+        let minute = String(d.getMinutes()).padStart(2, '0');
+        let second = String(d.getSeconds()).padStart(2, '0');
+        return year + '/' + month + '/' + day + ' ' + hour + ':' + minute + ':' + second;
+    }
+
+    function f_openHeartbeats(code) {
+        m_heartbeats_node_code = code;
+        m_heartbeats_page = 1;
+        document.getElementById('heartbeats_node_code').innerText = code;
+        document.getElementById('heartbeatsModal').classList.add('show');
+        f_loadHeartbeats();
+    }
+
+    function f_closeHeartbeats() {
+        document.getElementById('heartbeatsModal').classList.remove('show');
+    }
+
+    function f_loadHeartbeats() {
+        document.getElementById('heartbeats_table_body').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#6c757d;">加载中...</td></tr>';
+        
+        $.ajax({
+            url: '/node/getHeartbeats',
+            type: 'get',
+            data: {
+                node_code: m_heartbeats_node_code,
+                p: m_heartbeats_page,
+                ps: m_heartbeats_page_size
+            },
+            success: function(res) {
+                if (res.code === 1000) {
+                    let html = '';
+                    if (res.data && res.data.length > 0) {
+                        for (let i = 0; i < res.data.length; i++) {
+                            let item = res.data[i];
+                            html += '<tr>';
+                            html += '<td>' + item.id + '</td>';
+                            html += '<td>' + f_formatDateTime(item.heartbeat_time) + '</td>';
+                            html += '<td>' + (item.client_ip || '-') + '</td>';
+                            html += '<td>' + f_formatDateTime(item.create_time) + '</td>';
+                            html += '</tr>';
+                        }
+                    } else {
+                        html = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#6c757d;">暂无心跳记录</td></tr>';
+                    }
+                    document.getElementById('heartbeats_table_body').innerHTML = html;
+                    
+                    let pageData = res.pageData || {};
+                    let paginationHtml = '';
+                    paginationHtml += '<span style="margin-right:10px;color:#666;">共' + pageData.count + '条</span>';
+                    
+                    if (pageData.page_num > 1) {
+                        if (m_heartbeats_page > 1) {
+                            paginationHtml += '<button class="btn btn-default btn-sm" onclick="f_heartbeatsGoPage(1)">首页</button>';
+                            paginationHtml += '<button class="btn btn-default btn-sm" onclick="f_heartbeatsGoPage(' + (m_heartbeats_page - 1) + ')">上一页</button>';
+                        }
+                        paginationHtml += '<span style="margin:0 10px;">第' + m_heartbeats_page + '/' + pageData.page_num + '页</span>';
+                        if (m_heartbeats_page < pageData.page_num) {
+                            paginationHtml += '<button class="btn btn-default btn-sm" onclick="f_heartbeatsGoPage(' + (m_heartbeats_page + 1) + ')">下一页</button>';
+                            paginationHtml += '<button class="btn btn-default btn-sm" onclick="f_heartbeatsGoPage(' + pageData.page_num + ')">末页</button>';
+                        }
+                    }
+                    document.getElementById('heartbeats_pagination').innerHTML = paginationHtml;
+                } else {
+                    document.getElementById('heartbeats_table_body').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#dc3545;">' + res.msg + '</td></tr>';
+                }
+            },
+            error: function() {
+                document.getElementById('heartbeats_table_body').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#dc3545;">网络异常</td></tr>';
+            }
+        });
+    }
+
+    function f_heartbeatsGoPage(page) {
+        m_heartbeats_page = page;
+        f_loadHeartbeats();
     }
 </script>
 

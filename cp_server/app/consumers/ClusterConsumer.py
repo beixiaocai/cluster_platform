@@ -114,7 +114,8 @@ class ClusterConsumer(WebsocketConsumer):
             node_code=node_code,
             channel_name=self.channel_name,
             discover_info=discover_info,
-            client_ip=client_ip
+            client_ip=client_ip,
+            consumer=self
         )
         
         if ret:
@@ -140,7 +141,11 @@ class ClusterConsumer(WebsocketConsumer):
         
         if node_code:
             node_manager = self.get_node_manager()
-            ret = node_manager.update_heartbeat(node_code)
+            client_ip = self.scope.get('client', ['unknown', 0])[0]
+            if client_ip == 'unknown':
+                client_ip = None
+            
+            ret = node_manager.update_heartbeat(node_code, client_ip)
             if ret:
                 self.send(json.dumps({
                     'type': 'heartbeat_response',
@@ -148,7 +153,12 @@ class ClusterConsumer(WebsocketConsumer):
                     'timestamp': int(datetime.now().timestamp())
                 }))
             else:
-                self.send_error("node not found")
+                self.send(json.dumps({
+                    'type': 'heartbeat_response',
+                    'code': 0,
+                    'msg': 'node not found, please re-register',
+                    'need_register': True
+                }))
         else:
             self.send_error("node_code is required")
     

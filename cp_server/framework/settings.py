@@ -15,8 +15,8 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_UA = "cp_server"
-PROJECT_BUILT = "cp_server built on 2026/03/07"
-PROJECT_VERSION = "1.002"
+PROJECT_BUILT = "cp_server built on 2026/03/09"
+PROJECT_VERSION = "1.003"
 PROJECT_FLAG = "cluster_platform"
 PROJECT_SUPPORT_REBEKAH_MIN_VERSION = 5.002
 PROJECT_ADMIN_START_TIMESTAMP = int(time.time())

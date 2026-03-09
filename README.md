@@ -2,14 +2,14 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.002-green.svg)
+![Version](https://img.shields.io/badge/version-1.003-green.svg)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
 ![Django](https://img.shields.io/badge/django-5.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
 **轻量级视频分析集群管理平台**
 
-[功能特性](#功能特性) • [快速开始](#快速开始) • [配置说明](#配置说明)
+[功能特性](#功能特性) • [快速开始](#快速开始) • [配置说明](#配置说明) • [更新日志](#更新日志)
 
 </div>
 
@@ -26,6 +26,7 @@ Cluster Platform 是专为 Rebekah 视频行为分析系统 v5.002+ 设计的集
 - ⚡ **WebSocket 通信**：所有 API 通过 WebSocket 转发，支持公网管理内网节点
 - 📹 **流媒体集成**：内置 ZLMediaKit，支持多协议和按需推流
 - 🔐 **安全认证**：Token 认证 + API 安全密钥
+- 💓 **心跳监控**：实时监控节点状态，支持心跳历史记录查询
 
 ---
 
@@ -225,3 +226,25 @@ python manage.py runserver 0.0.0.0:9824
 
 - GitHub: https://github.com/beixiaocai/cluster_platform
 - Gitee: https://gitee.com/Vanishi/cluster_platform
+
+---
+
+## 更新日志
+
+### v1.003 (2026-03-09)
+
+**新增功能**
+- 新增心跳记录存储功能，每个节点保留最新 100 条心跳记录
+- 新增心跳记录查询 API，支持分页查询
+- 节点列表操作列新增"心跳记录"按钮，可查看心跳历史
+
+**优化改进**
+- 简化连接状态显示，仅保留"在线"和"离线"两种状态
+- 删除节点时主动断开 WebSocket 连接，触发节点重新注册
+- 删除节点时同步清理心跳记录数据
+- 服务启动时自动将所有节点设为离线状态
+- 移除 `ws_last_heartbeat` 字段，心跳数据独立存储
+
+**Bug 修复**
+- 修复节点详情弹框中"更新时间"显示 undefined 的问题
+- 修复删除节点后节点无法重新注册的问题

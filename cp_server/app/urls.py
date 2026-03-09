@@ -44,6 +44,7 @@ urlpatterns = [
     path('node/restartOS', NodeView.api_restartOS),
     path('node/exportLogs', NodeView.api_exportLogs),
     path('node/downloadLog', NodeView.api_downloadLog),
+    path('node/getHeartbeats', NodeView.api_getHeartbeats),
 
     path('alarm/index', AlarmView.index),
     path('alarm/openHandle', AlarmView.api_openHandle),

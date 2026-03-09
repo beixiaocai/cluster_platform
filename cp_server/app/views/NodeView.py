@@ -66,7 +66,6 @@ def index(request):
             'ws_connected': node.ws_connected,
             'ws_channel': node.ws_channel,
             'ws_connect_time': node.ws_connect_time,
-            'ws_last_heartbeat': node.ws_last_heartbeat,
             'client_ip': node.client_ip,
             'register_info': node.register_info,
             'project_start_timestamp': node.project_start_timestamp,
@@ -181,6 +180,11 @@ def api_openDel(request):
         g_logger.info("NodeView.openDel() code:%s" % code)
 
         if code:
+            get_node_manager().unregister_node_by_code(code)
+            
+            from app.models import NodeHeartModel
+            NodeHeartModel.objects.filter(node_code=code).delete()
+            
             node = NodeModel.objects.filter(code=code).first()
             if node:
                 if node.delete():
@@ -189,7 +193,8 @@ def api_openDel(request):
                 else:
                     msg = "failed to delete model"
             else:
-                msg = "the data does not exist"
+                ret = True
+                msg = "success"
         else:
             msg = "code is required"
     else:
@@ -230,7 +235,6 @@ def api_openNodeDetail(request):
                     'max_count': node.max_count,
                     'ws_connected': node.ws_connected,
                     'ws_connect_time': node.ws_connect_time,
-                    'ws_last_heartbeat': node.ws_last_heartbeat,
                 }
                 ret = True
                 msg = "success"
@@ -483,3 +487,77 @@ def api_downloadLog(request):
     except Exception as e:
         g_logger.error(f"NodeView.api_downloadLog() error: {str(e)}")
         return f_responseJson({'code': 0, 'msg': str(e)})
+
+
+def api_getHeartbeats(request):
+    ret = False
+    msg = "未知错误"
+    data = []
+    pageData = {}
+    
+    if request.method == 'GET':
+        try:
+            from app.models import NodeHeartModel
+            
+            node_code = request.GET.get('node_code', '').strip()
+            page = request.GET.get('p', 1)
+            page_size = request.GET.get('ps', 20)
+            
+            try:
+                page = int(page)
+            except:
+                page = 1
+            
+            try:
+                page_size = int(page_size)
+                if page_size < 1:
+                    page_size = 20
+                elif page_size > 100:
+                    page_size = 100
+            except:
+                page_size = 20
+            
+            if not node_code:
+                msg = "node_code is required"
+            else:
+                query = NodeHeartModel.objects.filter(node_code=node_code)
+                count = query.count()
+                
+                skip = (page - 1) * page_size
+                heartbeats = query[skip:skip+page_size]
+                
+                for hb in heartbeats:
+                    data.append({
+                        'id': hb.id,
+                        'node_code': hb.node_code,
+                        'heartbeat_time': hb.heartbeat_time.isoformat() if hb.heartbeat_time else None,
+                        'client_ip': hb.client_ip,
+                        'create_time': hb.create_time.isoformat() if hb.create_time else None,
+                    })
+                
+                page_num = int(count / page_size)
+                if count % page_size > 0:
+                    page_num += 1
+                
+                pageData = {
+                    "page": page,
+                    "page_size": page_size,
+                    "page_num": page_num,
+                    "count": count,
+                }
+                
+                ret = True
+                msg = "success"
+        except Exception as e:
+            msg = str(e)
+            g_logger.error(f"NodeView.api_getHeartbeats() error: {str(e)}")
+    else:
+        msg = "request method not supported"
+    
+    res = {
+        "code": 1000 if ret else 0,
+        "msg": msg,
+        "data": data,
+        "pageData": pageData
+    }
+    return f_responseJson(res)

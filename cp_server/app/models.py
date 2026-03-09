@@ -23,7 +23,6 @@ class NodeModel(models.Model):
     ws_connected = models.BooleanField(default=False, verbose_name='WebSocket连接状态')
     ws_channel = models.CharField(max_length=200, blank=True, null=True, verbose_name='WebSocket通道')
     ws_connect_time = models.DateTimeField(blank=True, null=True, verbose_name='连接时间')
-    ws_last_heartbeat = models.DateTimeField(blank=True, null=True, verbose_name='最后心跳时间')
     
     client_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name='客户端IP')
     register_info = models.TextField(blank=True, null=True, verbose_name='注册信息')
@@ -44,3 +43,26 @@ class NodeModel(models.Model):
         db_table = 'cp_node'
         verbose_name = 'cp_node'
         verbose_name_plural = 'cp_node'
+
+
+class NodeHeartModel(models.Model):
+    node_code = models.CharField(max_length=50, verbose_name='节点编号')
+    heartbeat_time = models.DateTimeField(verbose_name='心跳时间')
+    client_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name='客户端IP')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='添加时间')
+
+    def __repr__(self):
+        return f"{self.node_code} - {self.heartbeat_time}"
+
+    def __str__(self):
+        return f"{self.node_code} - {self.heartbeat_time}"
+
+    class Meta:
+        db_table = 'cp_node_heart'
+        verbose_name = 'cp_node_heart'
+        verbose_name_plural = 'cp_node_heart'
+        ordering = ['-heartbeat_time']
+        indexes = [
+            models.Index(fields=['node_code']),
+            models.Index(fields=['heartbeat_time']),
+        ]

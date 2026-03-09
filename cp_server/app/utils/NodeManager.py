@@ -21,10 +21,14 @@ class NodeManager:
         self._initialized = True
         self._nodes = {}
         self._channels = {}
+        self._consumers = {}
         self._lock = threading.Lock()
         self._heartbeat_timeout = 60
+        self._checker_interval = 30
+        self._checker_thread = None
+        self._checker_running = False
     
-    def register_node(self, node_code, channel_name, discover_info, client_ip=None):
+    def register_node(self, node_code, channel_name, discover_info, client_ip=None, consumer=None):
         with self._lock:
             auth_info = discover_info.get('auth', {})
             
@@ -55,6 +59,8 @@ class NodeManager:
             
             self._nodes[node_code] = node_data
             self._channels[channel_name] = node_code
+            if consumer:
+                self._consumers[channel_name] = consumer
             
             self._save_node_to_db(node_data)
             
@@ -69,17 +75,44 @@ class NodeManager:
                     self._nodes[node_code]['channel_name'] = None
                     self._update_node_disconnect_db(node_code)
                 del self._channels[channel_name]
+                if channel_name in self._consumers:
+                    del self._consumers[channel_name]
                 if node_code in self._nodes:
                     del self._nodes[node_code]
-                return node_code
             return None
     
-    def update_heartbeat(self, node_code):
+    def update_heartbeat(self, node_code, client_ip=None):
         with self._lock:
             if node_code in self._nodes:
-                self._nodes[node_code]['last_heartbeat'] = datetime.now()
+                now = datetime.now()
+                self._nodes[node_code]['last_heartbeat'] = now
+                self._save_heartbeat_to_db(node_code, now, client_ip)
                 return True
             return False
+    
+    def _save_heartbeat_to_db(self, node_code, heartbeat_time, client_ip=None):
+        try:
+            from app.models import NodeHeartModel
+            NodeHeartModel.objects.create(
+                node_code=node_code,
+                heartbeat_time=heartbeat_time,
+                client_ip=client_ip
+            )
+            self._cleanup_old_heartbeats(node_code)
+        except Exception as e:
+            print(f"NodeManager._save_heartbeat_to_db() error: {e}")
+    
+    def _cleanup_old_heartbeats(self, node_code, keep_count=100):
+        try:
+            from app.models import NodeHeartModel
+            old_heartbeats = NodeHeartModel.objects.filter(
+                node_code=node_code
+            ).order_by('-heartbeat_time')[keep_count:]
+            if old_heartbeats:
+                old_ids = [h.id for h in old_heartbeats]
+                NodeHeartModel.objects.filter(id__in=old_ids).delete()
+        except Exception as e:
+            print(f"NodeManager._cleanup_old_heartbeats() error: {e}")
     
     def is_node_online(self, node_code):
         with self._lock:
@@ -126,6 +159,64 @@ class NodeManager:
                         timeout_nodes.append(node_code)
         return timeout_nodes
     
+    def unregister_node_by_code(self, node_code, close_connection=True):
+        with self._lock:
+            if node_code in self._nodes:
+                node = self._nodes[node_code]
+                channel_name = node.get('channel_name')
+                
+                if close_connection and channel_name and channel_name in self._consumers:
+                    try:
+                        consumer = self._consumers[channel_name]
+                        consumer.close()
+                        print(f"NodeManager.unregister_node_by_code() closed websocket for node_code={node_code}")
+                    except Exception as e:
+                        print(f"NodeManager.unregister_node_by_code() close connection error: {e}")
+                
+                if channel_name and channel_name in self._channels:
+                    del self._channels[channel_name]
+                if channel_name and channel_name in self._consumers:
+                    del self._consumers[channel_name]
+                self._update_node_disconnect_db(node_code)
+                del self._nodes[node_code]
+                print(f"NodeManager.unregister_node_by_code() node_code={node_code}")
+                return True
+            return False
+    
+    def start_heartbeat_checker(self):
+        if self._checker_running:
+            return
+        self._checker_running = True
+        self._checker_thread = threading.Thread(target=self._heartbeat_checker_loop, daemon=True)
+        self._checker_thread.start()
+        print("NodeManager.start_heartbeat_checker() heartbeat checker started")
+    
+    def stop_heartbeat_checker(self):
+        self._checker_running = False
+        if self._checker_thread:
+            self._checker_thread.join(timeout=5)
+            self._checker_thread = None
+        print("NodeManager.stop_heartbeat_checker() heartbeat checker stopped")
+    
+    def _heartbeat_checker_loop(self):
+        while self._checker_running:
+            try:
+                timeout_nodes = self.check_heartbeat_timeout()
+                for node_code in timeout_nodes:
+                    print(f"NodeManager._heartbeat_checker_loop() node {node_code} heartbeat timeout")
+                    self.unregister_node_by_code(node_code)
+            except Exception as e:
+                print(f"NodeManager._heartbeat_checker_loop() error: {e}")
+            time.sleep(self._checker_interval)
+    
+    def reset_all_nodes_offline(self):
+        try:
+            from app.models import NodeModel
+            NodeModel.objects.update(ws_connected=False, ws_channel='')
+            print("NodeManager.reset_all_nodes_offline() all nodes set to offline")
+        except Exception as e:
+            print(f"NodeManager.reset_all_nodes_offline() error: {e}")
+    
     def _save_node_to_db(self, node_data):
         try:
             from app.models import NodeModel
@@ -150,7 +241,6 @@ class NodeManager:
                     'ws_connected': True,
                     'ws_channel': node_data.get('channel_name', ''),
                     'ws_connect_time': node_data.get('connect_time'),
-                    'ws_last_heartbeat': node_data.get('last_heartbeat'),
                     'client_ip': node_data.get('client_ip', ''),
                     'register_info': node_data.get('register_info', ''),
                 }
@@ -165,8 +255,7 @@ class NodeManager:
             from app.models import NodeModel
             NodeModel.objects.filter(code=node_code).update(
                 ws_connected=False,
-                ws_channel='',
-                ws_last_heartbeat=datetime.now()
+                ws_channel=''
             )
         except Exception as e:
             print(f"NodeManager._update_node_disconnect_db() error: {e}")
