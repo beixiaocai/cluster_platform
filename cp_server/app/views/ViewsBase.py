@@ -13,7 +13,6 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from framework.settings import BASE_DIR, PROJECT_UA, PROJECT_BUILT, PROJECT_VERSION, PROJECT_FLAG, PROJECT_ADMIN_START_TIMESTAMP
 from app.utils.ZLMediaKit import ZLMediaKit
-from app.utils.Settings import Settings
 from app.utils.Config import Config
 from app.utils.Logger import CreateLogger
 from app.utils.OSSystem import OSSystem
@@ -23,10 +22,38 @@ from app.models import *
 from app.consumers.ClusterConsumer import send_command_to_node_sync
 
 g_filepath_config_json = os.path.join(BASE_DIR, "config.json")
-g_filepath_settings_json = os.path.join(BASE_DIR, "settings.json")
 
+# 从 config.json 读取所有配置（包括 OEM 配置）
 g_config = Config(filepath=g_filepath_config_json)
-g_settings = Settings(filepath=g_filepath_settings_json)
+
+# OEM 配置从 config.json 的 oem 子字典读取
+class OemConfig:
+    """OEM 配置类，从 config.json 的 oem 字段读取"""
+    def __init__(self):
+        try:
+            with open(g_filepath_config_json, 'r', encoding='utf-8') as f:
+                config_data = json.load(f)
+                self.data = config_data.get('oem', {})
+        except Exception as e:
+            g_logger.error("OemConfig.__init__() error: %s" % str(e)) if 'g_logger' in globals() else print("OemConfig error:", e)
+            self.data = {}
+        
+        # 解析具体字段
+        self.name = self.data.get("name", "集群管理平台")
+        self.welcome = self.data.get("welcome", "欢迎")
+        self.logo_url = self.data.get("logo_url", "/static/images/logo.png")
+        self.bottom_name = self.data.get("bottom_name", "集群管理平台")
+        self.is_show_author = bool(self.data.get("is_show_author", True))
+        self.author = self.data.get("author", "宇图瑞视")
+        self.author_link = self.data.get("author_link", "https://www.yuturuishi.com/")
+        self.auth_online_link = self.data.get("auth_online_link", "https://www.yuturuishi.com")
+        self.enable_update = bool(self.data.get("enable_update", True))
+        self.check_version_download_url = self.data.get("check_version_download_url", "https://github.com/beixiaocai/cluster_platform")
+    
+    def getStr(self):
+        return str(self.data)
+
+g_settings = OemConfig()
 
 __log_dir = os.path.join(BASE_DIR, "log")
 if not os.path.exists(__log_dir):
@@ -38,9 +65,8 @@ g_logger = CreateLogger(filepath=os.path.join(__log_dir, "cp_server%s.log" % (da
 g_logger.info("%s v%s,%s" % (PROJECT_UA, PROJECT_VERSION, PROJECT_FLAG))
 g_logger.info(PROJECT_BUILT)
 g_logger.info("g_filepath_config_json=%s" % g_filepath_config_json)
-g_logger.info("g_filepath_settings_json=%s" % g_filepath_settings_json)
 g_logger.info("config.json:%s" % g_config.getStr())
-g_logger.info("settings.json:%s" % g_settings.getStr())
+g_logger.info("oem config data loaded from config.json")
 g_logger.info("logDebug=%d" % g_config.logDebug)
 g_osSystem = OSSystem()
 g_zlm = ZLMediaKit(logger=g_logger, config=g_config)
@@ -130,9 +156,6 @@ def f_responseJson(res):
         else:
             raise TypeError
     return HttpResponse(json.dumps(res, default=json_dumps_default), content_type="application/json")
-
-def f_settingsReadData():
-    return g_settings.data
 
 def f_checkNode(node_code):
     ret = False

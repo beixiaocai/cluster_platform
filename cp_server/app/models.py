@@ -66,3 +66,102 @@ class NodeHeartModel(models.Model):
             models.Index(fields=['node_code']),
             models.Index(fields=['heartbeat_time']),
         ]
+
+
+class PlatformAlarmModel(models.Model):
+    sort = models.IntegerField(verbose_name='sort')
+    code = models.CharField(max_length=50, verbose_name='code')
+    draw_type = models.IntegerField(verbose_name='合成报警视频画框类型')
+    flag = models.CharField(max_length=50, verbose_name='合成报警视频标记')
+    node_code = models.CharField(max_length=100, verbose_name='node_code')
+    control_code = models.CharField(max_length=50, verbose_name='布控编号')
+    desc = models.CharField(max_length=200, verbose_name='描述')
+    video_path = models.TextField(verbose_name='视频存储路径')
+    video_count = models.IntegerField(verbose_name='视频总数量')
+    image_path = models.TextField(verbose_name='主图存储路径')
+    image_count = models.IntegerField(verbose_name='图片总数量')
+    other_image_count = models.IntegerField(verbose_name='其他图片数量')
+    level = models.IntegerField(verbose_name='报警级别')
+    state = models.IntegerField(verbose_name='状态')
+    is_check = models.IntegerField(verbose_name='是否检测')
+    review_remark = models.CharField(max_length=200, verbose_name='审核备注')
+    stream_app = models.CharField(max_length=50, verbose_name='视频流应用')
+    stream_name = models.CharField(max_length=100, verbose_name='视频流名称')
+    stream_code = models.CharField(max_length=50, verbose_name='视频流编号')
+    flow_mode = models.IntegerField(verbose_name='业务算法模式')
+    flow_code = models.CharField(max_length=50, verbose_name='业务算法编号')
+    flow_name = models.CharField(max_length=100, verbose_name='业务算法名称')
+    main_plate_color = models.IntegerField(verbose_name='关键帧车牌颜色', default=0)
+    main_plate_type = models.IntegerField(verbose_name='关键帧车牌类型', default=0)
+    main_plate_no = models.CharField(max_length=100, verbose_name='关键帧车牌号', default='')
+    main_track_max_code = models.CharField(max_length=50, verbose_name='特征最大匹配编号', default='')
+    main_track_max_custom_code = models.CharField(max_length=50, verbose_name='特征最大匹配自定义编号', default='')
+    main_track_max_similary = models.IntegerField(verbose_name='特征最大相似度', default=0)
+    expand1 = models.CharField(max_length=200, verbose_name='expand1', default='')
+    expand2 = models.CharField(max_length=200, verbose_name='expand2', default='')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='create_time')
+    create_timestamp = models.IntegerField(verbose_name='create_timestamp')
+    last_update_time = models.DateTimeField(verbose_name='last_update_time')
+
+    def __repr__(self):
+        return self.desc
+
+    def __str__(self):
+        return self.desc
+
+    def delete(self, using=None, keep_parents=False):
+        ret = super(PlatformAlarmModel, self).delete(using, keep_parents)
+        return ret
+
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        ret = super(PlatformAlarmModel, self).save(force_insert, force_update, using, update_fields)
+        return ret
+
+    class Meta:
+        db_table = 'cp_platform_alarm'
+        verbose_name = 'cp_platform_alarm'
+        verbose_name_plural = 'cp_platform_alarm'
+
+
+class PlatformStreamModel(models.Model):
+    sort = models.IntegerField(verbose_name='排序')
+    stream_code = models.CharField(max_length=50, verbose_name='stream_code')
+    stream_nickname = models.CharField(max_length=100, verbose_name='stream_nickname')
+    node_codes = models.TextField(verbose_name='节点编号列表')
+    state = models.IntegerField(verbose_name='状态')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='create_time')
+    last_update_time = models.DateTimeField(verbose_name='last_update_time')
+
+    def __repr__(self):
+        return self.stream_code
+
+    def __str__(self):
+        return self.stream_code
+
+    class Meta:
+        db_table = 'cp_platform_stream'
+        verbose_name = 'cp_platform_stream'
+        verbose_name_plural = 'cp_platform_stream'
+
+
+class PlatformAlgorithmFlowModel(models.Model):
+    sort = models.IntegerField(verbose_name='排序')
+    flow_code = models.CharField(max_length=50, verbose_name='flow_code')
+    flow_name = models.CharField(max_length=100, verbose_name='flow_name')
+    node_codes = models.TextField(verbose_name='节点编号列表')
+    state = models.IntegerField(verbose_name='状态')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='create_time')
+    last_update_time = models.DateTimeField(verbose_name='last_update_time')
+
+    def __repr__(self):
+        return self.flow_code
+
+    def __str__(self):
+        return self.flow_code
+
+    class Meta:
+        db_table = 'cp_platform_algorithm_flow'
+        verbose_name = 'cp_platform_algorithm_flow'
+        verbose_name_plural = 'cp_platform_algorithm_flow'

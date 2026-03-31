@@ -35,9 +35,20 @@ class Config(object):
             self.isEnableLoginCaptcha = int(config_data.get("isEnableLoginCaptcha", 1))
             self.fontPath = config_data.get("fontPath")
             self.uploadDir = config_data.get("uploadDir")
+            self.storageDir = config_data.get("storageDir")
+            
+            if self.storageDir and not os.path.exists(self.storageDir):
+                os.makedirs(self.storageDir)
+            
             self.storageTempDir = config_data.get("storageTempDir")
             if self.storageTempDir and not os.path.exists(self.storageTempDir):
                 os.makedirs(self.storageTempDir)
+            
+            self.storageAlarmDir = os.path.join(self.storageDir, "alarm") if self.storageDir else None
+            if self.storageAlarmDir and not os.path.exists(self.storageAlarmDir):
+                os.makedirs(self.storageAlarmDir)
+            
+            self.storageDir_www = "/storage/access?filename="
 
 
         else:

@@ -56,7 +56,7 @@ def _transform_stream_urls(node_code, stream_dict):
 
 def index(request):
     context = {
-        "settings": f_settingsReadData()
+        "settings": g_settings.data
     }
     
     nodes = NodeModel.objects.all().order_by('-id')

@@ -12,9 +12,11 @@ except ImportError:
 
 class SimpleMiddleware(MiddlewareMixin):
     def process_request(self, request):
+        from app.views.ViewsBase import g_logger
+        
         path = request.path_info.lstrip('/')
-        # print("process_request:path=%s"%path,request.session.keys(),request.session.get("user"))
-
+        g_logger.info("SimpleMiddleware.process_request() path=%s" % path)
+        
         if request.session.has_key("user"):
             # 已登录
             request.session["user"] = request.session["user"]
@@ -24,18 +26,22 @@ class SimpleMiddleware(MiddlewareMixin):
                 return None
         else:
             # 未登录状态，仍需要放开的路由
+            g_logger.info("SimpleMiddleware.process_request() checking path=%s" % path)
             if path.startswith("login") or path.startswith("captcha") \
                     or path.startswith("open/") \
                     or path.startswith("node/open") \
                     or path.startswith("alarm/open") \
+                    or path.startswith("platform/alarm/open") \
                     or path.startswith("stream/open") \
                     or path.startswith("control/open") \
                     or path.startswith("storage/") \
                     or path.startswith("inner/") \
                     or path.startswith("static/"):
                 # 未登录状态，仍需要放开的路由
+                g_logger.info("SimpleMiddleware.process_request() path allowed=%s" % path)
                 return None
             else:
+                g_logger.info("SimpleMiddleware.process_request() path blocked=%s" % path)
                 return HttpResponseRedirect("/login")
 
     def process_response(self, request, response):

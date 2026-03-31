@@ -4,180 +4,484 @@
 
 {% block stylesheets %}
   {{ block.super }}
+  <style>
+    .right_col { background: transparent; padding: 20px; }
+    
+    /* 页面标题栏 */
+    .dashboard-header {
+      background: white;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #ebeef5;
+    }
+    .dashboard-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dashboard-header h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #303133;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dashboard-header h1 i {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 20px;
+    }
+    .dashboard-header p {
+      margin: 0;
+      color: #909399;
+      font-size: 12px;
+      padding-left: 16px;
+      border-left: 2px solid #e4e7ed;
+    }
+    
+    /* 统计卡片 */
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+      transition: all 0.2s ease;
+      border: 1px solid #ebeef5;
+      min-height: auto;
+      display: block;
+    }
+    .stat-card:hover {
+      border-color: #409EFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .stat-card-title {
+      font-size: 13px;
+      color: #909399;
+      font-weight: 500;
+    }
+    .stat-card-value {
+      font-size: 22px;
+      font-weight: 600;
+      color: #303133;
+      margin-bottom: 6px;
+    }
+    .stat-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .stat-card-icon.cpu {
+      background: #f0f9ff;
+      color: #409EFF;
+    }
+    .stat-card-icon.memory {
+      background: #f0f9ff;
+      color: #67C23A;
+    }
+    .stat-card-icon.disk {
+      background: #f0f9ff;
+      color: #E6A23C;
+    }
+    .stat-card-icon.server {
+      background: #f0f9ff;
+      color: #409EFF;
+    }
+    .stat-card-icon.system {
+      background: #f0f9ff;
+      color: #909399;
+    }
+    .stat-card-icon.version {
+      background: #f0f9ff;
+      color: #909399;
+    }
+    
+    .stat-card-detail {
+      font-size: 12px;
+      color: #909399;
+      margin-top: 10px;
+    }
+    .stat-card-detail span {
+      color: #303133;
+      font-weight: 600;
+    }
+    
+    /* 图表卡片 */
+    .chart-card {
+      background: white;
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+      border: 1px solid #ebeef5;
+    }
+    .chart-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #303133;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-card-title::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: #409EFF;
+      border-radius: 2px;
+    }
+    
+    /* 状态徽章 */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      gap: 4px;
+    }
+    .status-badge.online {
+      background: #f0f9ff;
+      color: #67C23A;
+      border: 1px solid #e1f3d8;
+    }
+    .status-badge.offline {
+      background: #fef0f0;
+      color: #F56C6C;
+      border: 1px solid #fde2e2;
+    }
+    .status-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .status-badge.online::before {
+      animation: pulse 2s infinite;
+    }
+    .status-badge.offline::before {
+      background: #F56C6C;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* 信息表格 */
+    .info-table {
+      width: 100%;
+    }
+    .info-table td {
+      padding: 6px 0;
+      border-bottom: 1px solid #f2f6fc;
+      font-size: 12px;
+    }
+    .info-table tr:last-child td {
+      border-bottom: none;
+    }
+    .info-table td:first-child {
+      color: #909399;
+      width: 35%;
+    }
+    .info-table td:last-child {
+      color: #303133;
+      font-weight: 500;
+    }
+    
+    /* 进度条 */
+    .progress-bar {
+      height: 6px;
+      background: #f2f6fc;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+    .progress-bar-fill.cpu {
+      background: linear-gradient(90deg, #409EFF 0%, #66b1ff 100%);
+    }
+    .progress-bar-fill.memory {
+      background: linear-gradient(90deg, #67C23A 0%, #85ce61 100%);
+    }
+    .progress-bar-fill.disk {
+      background: linear-gradient(90deg, #E6A23C 0%, #ebb563 100%);
+    }
+    
+    .x_panel {
+      border: none !important;
+      background: transparent !important;
+      padding: 0 !important;
+    }
+    .x_title {
+      display: none;
+    }
+    .x_content {
+      padding: 0 !important;
+    }
+    
+    /* 模态框样式 */
+    .modal-header {
+      background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
+      color: white;
+      padding: 16px 20px;
+      border-bottom: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 8px 8px 0 0;
+    }
+    .modal-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-body {
+      padding: 20px;
+    }
+    .modal-footer {
+      padding: 12px 20px;
+      border-top: 1px solid #ebeef5;
+      text-align: right;
+    }
+    .btn-default {
+      background: #f5f7fa;
+      color: #606266;
+      border: 1px solid #dcdfe6;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-default:hover {
+      background: #e9e9eb;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: white;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 2px 8px rgba(64,158,255,0.3);
+    }
+  </style>
 {% endblock stylesheets %}
 
 {% block content %}
   <div class="right_col" role="main">
-
-
-    <div class="row">
-        <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="x_panel">
-            <div class="x_title">
-              <h2>CPU利用率</h2>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-                <div id="cpuCharts" style="height:220px"></div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="x_panel">
-            <div class="x_title">
-              <h2>内存利用率</h2>
-
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-                <div id="memoryCharts" style="height:220px"></div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="x_panel">
-            <div class="x_title">
-              <h2>存储利用率</h2>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-                <div id="diskCharts" style="height:220px"></div>
-            </div>
-          </div>
-        </div>
-        <div class="clearfix"></div>
-        <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="x_panel">
-            <div class="x_title">
-                <h2>流媒体服务器</h2>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-              <table class="table table-hover">
-                <tbody>
-                 <tr>
-                    <th scope="row">进程状态</th>
-                    <th scope="row" id="zlm_process_state">离线</th>
-                  </tr>
-                 <tr>
-                    <th scope="row">在线视频</th>
-                    <th scope="row" id="zlm_total_media_count">0</th>
-                  </tr>
-
-                </tbody>
-              </table>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="x_panel">
-            <div class="x_title">
-                <h2>系统信息</h2>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-              <table class="table table-hover">
-                <tbody>
-
-
-                  <tr>
-                    <th scope="row">机器</th>
-                    <th scope="row" id="os_machine_node">Machine</th>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">系统</th>
-                    <th scope="row" id="os_system_name">System</th>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">运行</th>
-                    <th scope="row" id="os_run_date_str">00:00:00</th>
-                  </tr>
-                    <tr>
-                    <th scope="row">CPU</th>
-                    <th scope="row" id="os_cpu_used_rate">0%</th>
-                  </tr>
-
-                  <tr>
-                    <th scope="row">内存</th>
-                    <th scope="row" id="os_virtual_mem_used_rate">0%</th>
-                  </tr>
-
-                   <tr>
-                    <th scope="row">存储</th>
-                    <th scope="row" id="os_disk_used_rate">0%</th>
-                  </tr>
-                </tbody>
-              </table>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4 col-sm-6 col-xs-12">
-          <div class="x_panel">
-            <div class="x_title">
-                <h2>版本信息</h2>
-              </ul>
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-              <table class="table table-hover">
-                <tbody>
-                  <tr>
-                    <th scope="row">版本</th>
-                    <th scope="row" id="project_version">Version</th>
-                  </tr>
-                </tbody>
-              </table>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="clearfix"></div>
-
-         <!--版本检测弹窗start -->
-          <div id="checkVersionDialog" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                  <h4 class="modal-title" >发现新版本</h4>
-              </div>
-              <div class="modal-body">
-                <div style="padding: 5px 20px;">
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                          <th>版本号</th>
-                        <th>更新时间</th>
-                        <th>更新内容</th>
-                      </tr>
-                    </thead>
-                    <tbody id="checkVersionData">
-
-                    </tbody>
-                  </table>
-                </div>
-
-              </div>
-               <div class="modal-footer">
-                    <button type="button"  class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" onclick="f_downloadNewVersion()" class="btn btn-primary">下载新版本</button>
-                  </div>
-
-            </div>
-          </div>
-        </div>
-      <!--版本检测弹窗end -->
-
+    <div class="dashboard-header">
+      <div class="dashboard-header-left">
+        <h1><i class="fa fa-tachometer"></i>控制面板</h1>
+        <p>欢迎使用集群管理平台 · 实时监控系统运行状态</p>
+      </div>
     </div>
 
+    <div class="row">
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">CPU 利用率</div>
+            <div class="stat-card-icon cpu">
+              <i class="fa fa-microchip"></i>
+            </div>
+          </div>
+          <div class="stat-card-value" id="os_cpu_used_rate">0%</div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill cpu" id="cpu_progress" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">内存利用率</div>
+            <div class="stat-card-icon memory">
+              <i class="fa fa-memory"></i>
+            </div>
+          </div>
+          <div class="stat-card-value" id="os_virtual_mem_used_rate">0%</div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill memory" id="memory_progress" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">存储利用率</div>
+            <div class="stat-card-icon disk">
+              <i class="fa fa-database"></i>
+            </div>
+          </div>
+          <div class="stat-card-value" id="os_disk_used_rate">0%</div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill disk" id="disk_progress" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="clearfix"></div>
+      
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">流媒体服务器</div>
+            <div class="stat-card-icon server">
+              <i class="fa fa-server"></i>
+            </div>
+          </div>
+          <div class="status-badge" id="zlm_process_state">
+            <span>离线</span>
+          </div>
+          <div class="stat-card-detail" style="margin-top:16px;">
+            在线视频: <span id="zlm_total_media_count">0</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">系统信息</div>
+            <div class="stat-card-icon system">
+              <i class="fa fa-desktop"></i>
+            </div>
+          </div>
+          <table class="info-table">
+            <tr>
+              <td>机器</td>
+              <td id="os_machine_node">Machine</td>
+            </tr>
+            <tr>
+              <td>系统</td>
+              <td id="os_system_name">System</td>
+            </tr>
+            <tr>
+              <td>运行</td>
+              <td id="os_run_date_str">00:00:00</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">版本信息</div>
+            <div class="stat-card-icon version">
+              <i class="fa fa-code-branch"></i>
+            </div>
+          </div>
+          <table class="info-table">
+            <tr>
+              <td>版本</td>
+              <td id="project_version">Version</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      
+      <div class="clearfix"></div>
+      
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="chart-card">
+          <div class="chart-card-title">CPU 趋势</div>
+          <div id="cpuCharts" style="height:120px"></div>
+        </div>
+      </div>
+      
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="chart-card">
+          <div class="chart-card-title">内存趋势</div>
+          <div id="memoryCharts" style="height:120px"></div>
+        </div>
+      </div>
+      
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="chart-card">
+          <div class="chart-card-title">存储趋势</div>
+          <div id="diskCharts" style="height:120px"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <!--版本检测弹窗start -->
+    <div id="checkVersionDialog" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h4 class="modal-title"><i class="fa fa-star" style="color:#fbbf24;margin-right:8px;"></i>发现新版本</h4>
+          </div>
+          <div class="modal-body">
+            <div style="padding: 5px 20px;">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>版本号</th>
+                    <th>更新时间</th>
+                    <th>更新内容</th>
+                  </tr>
+                </thead>
+                <tbody id="checkVersionData">
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" onclick="f_downloadNewVersion()" class="btn btn-primary">
+              <i class="fa fa-download" style="margin-right:6px;"></i>下载新版本
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--版本检测弹窗end -->
 
   </div>
 {% endblock content %}
@@ -198,20 +502,23 @@
                     useUTC: false
             }
         });
+        
         function activeLastPointToolip(chart) {
             let points = chart.series[0].points;
             chart.tooltip.refresh(points[points.length -1]);
         }
-        let cpuCharts = Highcharts.chart('cpuCharts', {
+        
+        let chartOptions = {
             exporting:{
-                enabled:false //隐藏右上角菜单
+                enabled:false
             },
             credits:{
-                enabled:false//隐藏右下角logo
+                enabled:false
             },
             chart: {
                 type: 'spline',
                 marginRight: 10,
+                backgroundColor: 'transparent',
                 events: {
                     load: function () {
                         let chart = this;
@@ -224,163 +531,113 @@
             },
             xAxis: {
                     type: 'datetime',
-                    tickPixelInterval: 150
+                    tickPixelInterval: 150,
+                    lineColor: '#e2e8f0',
+                    tickColor: '#e2e8f0',
+                    labels: {
+                        style: {
+                            color: '#64748b'
+                        }
+                    }
             },
              yAxis: [{
                 min:0,
+                max:100,
                 title: {
                     text: null
                 },
-                showFirstLabel: true
+                showFirstLabel: true,
+                gridLineColor: '#f1f5f9',
+                labels: {
+                    style: {
+                        color: '#64748b'
+                    },
+                    format: '{value}%'
+                }
             }],
             tooltip: {
+                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                    borderColor: 'transparent',
+                    borderRadius: 8,
+                    style: {
+                        color: '#fff'
+                    },
                     formatter: function () {
-                            return '<b>' + this.series.name + '</b><br/>' +
+                            return '<b style="color:#fff;font-size:14px;">' + this.series.name + '</b><br/>' +
                                     Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                                    Highcharts.numberFormat(this.y, 2);
-
-
+                                    '<span style="font-size:18px;font-weight:700;">' + Highcharts.numberFormat(this.y, 1) + '%</span>';
                     }
             },
             legend: {
-                    enabled: false //隐藏底部类别名称
+                    enabled: false
+            },
+            plotOptions: {
+                spline: {
+                    lineWidth: 3,
+                    marker: {
+                        enabled: false
+                    }
+                }
             },
             series: [{
-                    name: 'CPU利用率',
+                    name: '利用率',
                     data: (function () {
-                            // 生成随机值
                             var data = [],
                                     time = (new Date()).getTime(),
                                     i;
                             for (i = -9; i <= 0; i += 1) {
                                     data.push({
                                             x: time + i * 1000,
-                                            y: 0 //Math.random()
+                                            y: 0
                                     });
                             }
-
                             return data;
                     }())
             }]
+        };
+        
+        let cpuCharts = Highcharts.chart('cpuCharts', {
+            ...chartOptions,
+            colors: ['#f5576c'],
+            series: [{
+                name: 'CPU利用率',
+                data: (function () {
+                    var data = [], time = (new Date()).getTime(), i;
+                    for (i = -9; i <= 0; i += 1) {
+                        data.push({x: time + i * 1000, y: 0});
+                    }
+                    return data;
+                }())
+            }]
         });
+        
         let memoryCharts = Highcharts.chart('memoryCharts', {
-            exporting:{
-                enabled:false //隐藏右上角菜单
-            },
-            credits:{
-                enabled:false//隐藏右下角logo
-            },
-            chart: {
-                type: 'spline',
-                marginRight: 10,
-                events: {
-                    load: function () {
-                        let chart = this;
-                        activeLastPointToolip(chart);
-                    }
-                }
-            },
-            title: {
-                text: null
-            },
-            xAxis: {
-                    type: 'datetime',
-                    tickPixelInterval: 150
-            },
-             yAxis: [{ // 第一个 Y 轴，放置在左边（默认在坐标）
-                title: {
-                    text: null
-                },
-                showFirstLabel: true
-            }],
-            tooltip: {
-                    formatter: function () {
-                            return '<b>' + this.series.name + '</b><br/>' +
-                                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                                    Highcharts.numberFormat(this.y, 2);
-                    }
-            },
-            legend: {
-                    enabled: false
-            },
+            ...chartOptions,
+            colors: ['#00f2fe'],
             series: [{
-                    name: '内存利用率',
-                    data: (function () {
-                            // 生成随机值
-                            let data = [],
-                            time = (new Date()).getTime(),
-                            i;
-
-                            for (i = -9; i <= 0; i += 1) {
-                                    data.push({
-                                            x: time + i * 1000,
-                                            y: 0 //Math.random()
-                                    });
-                            }
-                            return data;
-                    }())
+                name: '内存利用率',
+                data: (function () {
+                    var data = [], time = (new Date()).getTime(), i;
+                    for (i = -9; i <= 0; i += 1) {
+                        data.push({x: time + i * 1000, y: 0});
+                    }
+                    return data;
+                }())
             }]
         });
+        
         let diskCharts = Highcharts.chart('diskCharts', {
-            exporting:{
-                enabled:false //隐藏右上角菜单
-            },
-            credits:{
-                enabled:false//隐藏右下角logo
-            },
-            chart: {
-                type: 'spline',
-                marginRight: 10,
-                events: {
-                    load: function () {
-                        let chart = this;
-                        activeLastPointToolip(chart);
-                    }
-                }
-            },
-            title: {
-                    text: null
-            },
-            xAxis: {
-                    type: 'datetime',
-                    tickPixelInterval: 150
-            },
-             yAxis: [{
-                min:0,
-                title: {
-                    text: null
-                },
-                showFirstLabel: true
-            }],
-            tooltip: {
-                    formatter: function () {
-                            return '<b>' + this.series.name + '</b><br/>' +
-                                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                                    Highcharts.numberFormat(this.y, 2);
-
-
-                    }
-            },
-            legend: {
-                    enabled: false
-            },
+            ...chartOptions,
+            colors: ['#38f9d7'],
             series: [{
-                    name: '磁盘利用率',
-                    data: (function () {
-                            // 生成随机值
-                            let data = [],
-                            time = (new Date()).getTime(),
-                            i;
-
-                            for (i = -9; i <= 0; i += 1) {
-                                    data.push({
-                                            x: time + i * 1000,
-                                            y: 0 //Math.random()
-                                    });
-                            }
-
-                            return data;
-                    }())
+                name: '存储利用率',
+                data: (function () {
+                    var data = [], time = (new Date()).getTime(), i;
+                    for (i = -9; i <= 0; i += 1) {
+                        data.push({x: time + i * 1000, y: 0});
+                    }
+                    return data;
+                }())
             }]
         });
 
@@ -389,13 +646,15 @@
         let eleZlmTotalMediaCount = $("#zlm_total_media_count");
 
         //系统信息
-
         let eleOsMachineNode = $("#os_machine_node");
         let eleOsSystemName = $("#os_system_name");
         let ele_os_run_date_str = $("#os_run_date_str");
         let ele_os_cpu_used_rate = $("#os_cpu_used_rate");
         let ele_os_virtual_mem_used_rate = $("#os_virtual_mem_used_rate");
-        let ele_os_disk_used_rate = $("#os_disk_used_rate ");
+        let ele_os_disk_used_rate = $("#os_disk_used_rate");
+        let cpu_progress = $("#cpu_progress");
+        let memory_progress = $("#memory_progress");
+        let disk_progress = $("#disk_progress");
         
         let eleProjectVersion = $("#project_version");
 
@@ -436,6 +695,11 @@
                             ele_os_cpu_used_rate.html(os_cpu_used_rate_str);
                             ele_os_virtual_mem_used_rate.html(os_virtual_mem_used_rate_str);
                             ele_os_disk_used_rate.html(os_disk_used_rate_str);
+                            
+                            // 更新进度条
+                            cpu_progress.css('width', os_cpu_used_rate + '%');
+                            memory_progress.css('width', os_virtual_mem_used_rate + '%');
+                            disk_progress.css('width', os_disk_used_rate + '%');
 
                            //设置图表数据
                             let x = (new Date()).getTime();
@@ -457,6 +721,7 @@
                }
             });
         }
+        
         function f_getZlmProcessData() {
             $.ajax({
                url: '/open/getZlmProcessData',
@@ -474,9 +739,9 @@
                     let total_media_count = parseInt(info["total_media_count"]);
 
                     if(process_state===1){
-                        eleZlmProcessState.html("<span class='sun-state-success'>在线</span>");
+                        eleZlmProcessState.html('<span class="status-badge online">在线</span>');
                     }else{
-                        eleZlmProcessState.html("<span class='sun-state-error'>离线</span>");
+                        eleZlmProcessState.html('<span class="status-badge offline">离线</span>');
                     }
                     eleZlmTotalMediaCount.html(total_media_count);
                }
@@ -486,8 +751,8 @@
         function f_downloadNewVersion(){
             window.open(downloadNewVersionUrl);
         }
+        
         function f_getCheckVersion() {
-
             $.ajax({
                url: '/version/getCheckVersion',
                type: "get",
@@ -500,12 +765,12 @@
                },
                success: function (res) {
                   let info = res.info;
-                  let historyVersionUrl = info.historyVersionUrl;//历史版本下载地址
-                   if(1000 === res.code){//发现新版本
-                       let version = info.version.toString();//新版本版本号
-                       let updateContent = info.updateContent;//array
-                       let pubdate = info.pubdate;//版本发布时间
-                       downloadNewVersionUrl = info.url;//新版本下载地址
+                  let historyVersionUrl = info.historyVersionUrl;
+                   if(1000 === res.code){
+                       let version = info.version.toString();
+                       let updateContent = info.updateContent;
+                       let pubdate = info.pubdate;
+                       downloadNewVersionUrl = info.url;
                         let html = "";
 
                         html+="<tr><th scope=\"row\">"+version+"</th>";
@@ -521,14 +786,11 @@
                    }
                }
             });
-
         }
+        
         $(function() {
             f_getIndex();
             f_getZlmProcessData();
         });
-
-
 </script>
 {% endblock javascripts %}
-

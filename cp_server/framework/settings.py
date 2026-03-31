@@ -15,10 +15,10 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_UA = "cp_server"
-PROJECT_BUILT = "cp_server built on 2026/03/09"
-PROJECT_VERSION = "1.003"
+PROJECT_BUILT = "cp_server built on 2026/03/31"
+PROJECT_VERSION = "1.007"
 PROJECT_FLAG = "cluster_platform"
-PROJECT_SUPPORT_REBEKAH_MIN_VERSION = 5.002
+PROJECT_SUPPORT_REBEKAH_MIN_VERSION = 5.007
 PROJECT_ADMIN_START_TIMESTAMP = int(time.time())
 
 SECRET_KEY = 'django-insecure-o(am*2x=@ynuv5w*&$*yc-(1cjsku-b2@$x*t9!swd+n0-cp_server'
@@ -77,8 +77,16 @@ ASGI_APPLICATION = 'framework.asgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "cluster_platform.sqlite3"),
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "cluster_platform",
+        "USER": "root",
+        "PASSWORD": "pwd123456",
+        "HOST": "192.168.1.6",
+        "PORT": "3306",
+        "OPTIONS": {
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
     }
 }
 

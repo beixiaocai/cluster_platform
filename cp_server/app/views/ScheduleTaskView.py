@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 
 def index(request):
     context = {
-        "settings": f_settingsReadData()
+        "settings": g_settings.data
     }
     return render(request, 'app/scheduleTask/index.html', context)
 

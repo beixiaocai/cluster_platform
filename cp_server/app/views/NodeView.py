@@ -9,7 +9,7 @@ from app.utils.Utils import buildPageLabels, gen_random_code_s
 
 def index(request):
     context = {
-        "settings": f_settingsReadData()
+        "settings": g_settings.data
     }
 
     data = []
@@ -146,16 +146,16 @@ def edit(request):
             return f_responseJson(res)
         else:
             if __ret:
-                redirect_url = "/node/index"
+                redirect_url = "/platform/node/index"
             else:
-                redirect_url = "/node/edit?code=" + code
+                redirect_url = "/platform/node/edit?code=" + code
             g_logger.info("NodeView.edit() ret=%d,msg=%s" % (__ret, __msg))
             return render(request, 'app/message.html',
                           {"msg": __msg, "is_success": __ret, "redirect_url": redirect_url})
 
     else:
         context = {
-            "settings": f_settingsReadData()
+            "settings": g_settings.data
         }
         params = f_parseGetParams(request)
         code = params.get("code")
@@ -167,9 +167,9 @@ def edit(request):
                 return render(request, 'app/node/edit.html', context)
             else:
                 return render(request, 'app/message.html',
-                              {"msg": "该节点不存在", "is_success": False, "redirect_url": "/node/index"})
+                              {"msg": "该节点不存在", "is_success": False, "redirect_url": "/platform/node/index"})
         else:
-            return redirect("/node/index")
+            return redirect("/platform/node/index")
 
 
 def api_openDel(request):

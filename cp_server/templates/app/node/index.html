@@ -7,627 +7,622 @@
   {{ block.super }}
 <link rel="stylesheet" href="/static/lib/jquery/confirm/jquery-confirm.css" />
 <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    .right_col {
-        background-color: #f8f9fa;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
         min-height: 100vh;
     }
+    .right_col { background: transparent; padding: 20px; }
+    .page-container { max-width: 1400px; margin: 0 auto; }
     
-    .x_panel {
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    /* 页面标题栏 */
+    .page-header {
+        background: white;
         border-radius: 8px;
-        overflow: hidden;
-        border: none;
-    }
-    
-    .x_title {
-        background-color: #fff;
-        border-bottom: 2px solid #e9ecef;
         padding: 16px 20px;
-        margin-bottom: 0;
-    }
-    
-    .x_title h2 {
-        font-size: 18px;
-        font-weight: 600;
-        color: #495057;
-        margin: 0;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         display: flex;
+        justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
         gap: 12px;
     }
-    
-    .btn {
-        border-radius: 6px;
-        font-size: 13px;
-        padding: 6px 12px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        border: 1px solid transparent;
-    }
-    
-    .btn-sm {
-        font-size: 12px;
-        padding: 4px 10px;
-    }
-    
-    .btn-default {
-        background-color: #f8f9fa;
-        border-color: #dee2e6;
-        color: #495057;
-    }
-    
-    .btn-default:hover {
-        background-color: #e9ecef;
-        border-color: #adb5bd;
-        color: #212529;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .table {
-        margin-bottom: 0;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-    
-    .table-responsive {
-        border-radius: 0 0 8px 8px;
-        overflow: hidden;
-    }
-    
-    .table-bordered {
-        border: none;
-    }
-    
-    .table-bordered > thead > tr > th,
-    .table-bordered > tbody > tr > td {
-        border: 1px solid #e9ecef;
-        padding: 8px 12px;
-        vertical-align: middle;
-        line-height: 1.3;
-    }
-    
-    .table-bordered > thead > tr {
-        background-color: #f8f9fa;
-        border-bottom: 2px solid #e9ecef;
-    }
-    
-    .table-bordered > thead > tr > th {
+    .page-title { display: flex; align-items: center; gap: 10px; }
+    .page-title h2 {
+        font-size: 16px;
         font-weight: 600;
-        color: #495057;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        background-color: #f8f9fa;
+        color: #303133;
+        margin: 0;
     }
-    
-    .table-bordered > tbody > tr {
-        transition: background-color 0.2s ease;
-        background-color: white;
-    }
-    
-    .table-bordered > tbody > tr:hover {
-        background-color: #f8f9fa;
-    }
-    
-    .sun-state-success {
-        background-color: #d4edda;
-        color: #155724;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 500;
-        margin-right: 4px;
-        display: inline-block;
-    }
-    
-    .sun-state-error {
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 500;
-        margin-right: 4px;
-        display: inline-block;
-    }
-    
-    .sun-state-warning {
-        background-color: #fff3cd;
-        color: #856404;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 500;
-        margin-right: 4px;
-        display: inline-block;
-    }
-    
-    .sun-a-label {
-        color: #6b7280;
-        text-decoration: none;
-        font-weight: 500;
-        cursor: pointer;
-        font-size: 12px;
-        padding: 4px 10px;
+    .title-icon {
+        width: 24px; height: 24px;
+        background: #f5f7fa;
         border-radius: 4px;
-        transition: all 0.2s;
-        background-color: #f5f5f5;
-        border: 1px solid #e5e5e5;
-        display: inline-block;
-        margin-right: 6px;
+        display: flex; align-items: center; justify-content: center;
+        color: #606266; font-size: 12px;
     }
     
-    .sun-a-label:last-child {
-        margin-right: 0;
+    /* 搜索栏 */
+    .search-bar { display: flex; gap: 8px; align-items: center; }
+    .search-input {
+        padding: 6px 12px;
+        border: 1px solid #dcdfe6;
+        border-radius: 4px;
+        font-size: 13px;
+        width: 220px;
+        transition: all 0.2s ease;
+        outline: none;
+        background: white;
+    }
+    .search-input:focus {
+        border-color: #409EFF;
+        box-shadow: 0 0 0 2px rgba(64,158,255,0.1);
     }
     
-    .sun-a-label:hover {
-        color: #374151;
-        background-color: #e5e5e5;
-        border-color: #d4d4d4;
+    /* 按钮 */
+    .btn {
+        padding: 6px 14px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
         text-decoration: none;
     }
-    
-    .sun-a-label.btn-detail {
-        background-color: #eff6ff;
-        border-color: #bfdbfe;
-        color: #2563eb;
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-primary {
+        background: #409EFF;
+        color: white;
+    }
+    .btn-primary:hover {
+        background: #66b1ff;
+    }
+    .btn-secondary {
+        background: #f4f4f5;
+        color: #606266;
+        border: 1px solid #e9e9eb;
+    }
+    .btn-secondary:hover {
+        background: #e9e9eb;
     }
     
-    .sun-a-label.btn-detail:hover {
-        background-color: #dbeafe;
-        border-color: #93c5fd;
+    /* 统计卡片 */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 6px;
+        margin-bottom: 10px;
     }
-    
-    .sun-a-label.btn-delete {
-        background-color: #fef2f2;
-        border-color: #fecaca;
-        color: #dc2626;
-    }
-    
-    .sun-a-label.btn-delete:hover {
-        background-color: #fee2e2;
-        border-color: #fca5a5;
-    }
-    
-    .xc_toolbar {
+    .stat-card {
+        background: white;
+        border-radius: 4px;
+        padding: 4px 10px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        border: 1px solid #ebeef5;
         display: flex;
-        gap: 8px;
-        margin-bottom: 15px;
         align-items: center;
-        background: #FFFFFF;
-        padding: 12px 16px;
+        gap: 8px;
+    }
+    .stat-card:hover {
+        border-color: #409EFF;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .stat-icon {
+        width: 20px; height: 20px;
+        border-radius: 4px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+        background: #f5f7fa;
+        color: #606266;
+    }
+    .stat-content { display: flex; flex-direction: column; }
+    .stat-value { font-size: 16px; font-weight: 600; color: #303133; line-height: 1.2; }
+    .stat-label { font-size: 10px; color: #909399; line-height: 1.2; }
+    
+    /* 节点卡片 - 增加宽度，降低高度 */
+    .nodes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    .node-card {
+        background: white;
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        flex-wrap: wrap;
+        padding: 14px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        transition: all 0.2s ease;
+        border: 1px solid #ebeef5;
     }
+    .node-card:hover {
+        border-color: #409EFF;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .node-card.online { border-left: 2px solid #67C23A; }
+    .node-card.offline { border-left: 2px solid #F56C6C; }
     
-    .xc_search-input {
-        padding: 0 10px;
-        border: 1px solid #E5E6EB;
+    .node-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+    }
+    .node-info-left { display: flex; gap: 10px; align-items: center; flex: 1; }
+    .node-avatar {
+        width: 32px; height: 32px;
         border-radius: 6px;
-        font-size: 13px;
-        width: 200px;
-        transition: all 0.2s;
-        outline: none;
-        height: 32px;
-        line-height: 32px;
-        box-sizing: border-box;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 600; color: white;
+        background: #909399;
+        flex-shrink: 0;
+    }
+    .node-basic-info h3 { 
+        font-size: 14px; 
+        font-weight: 600; 
+        color: #303133; 
+        margin: 0 0 2px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .node-code { 
+        font-size: 11px; 
+        color: #909399; 
+        font-family: 'Courier New', monospace;
     }
     
-    .xc_search-input:focus {
-        border-color: #165DFF;
-        box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+    .status-badge {
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+    .status-badge.online { background: #f0f9ff; color: #67C23A; border: 1px solid #e1f3d8; }
+    .status-badge.offline { background: #fef0f0; color: #F56C6C; border: 1px solid #fde2e2; }
+    .status-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: currentColor;
     }
     
-    .xc_search-input::placeholder {
-        color: #C9CDD4;
+    .node-card-body { margin-bottom: 12px; }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid #f2f6fc;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-size: 11px; color: #909399; }
+    .info-value { 
+        font-size: 12px; 
+        color: #303133; 
+        font-weight: 500;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     
-    .xc_btn-modern {
-        padding: 0 12px;
-        background: #F2F3F5;
-        color: #4E5969;
-        border: 1px solid #E5E6EB;
-        border-radius: 6px;
-        font-size: 13px;
+    .tag {
+        display: inline-block;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 500;
+        margin-right: 4px;
+        margin-bottom: 2px;
+        background: #f5f7fa;
+        color: #606266;
+    }
+    .tags-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    
+    .node-card-footer {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding-top: 10px;
+        border-top: 1px solid #f2f6fc;
+    }
+    .action-btn {
+        padding: 5px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 500;
+        border: none;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 4px;
-        white-space: nowrap;
-        height: 32px;
-        line-height: 1;
-    }
-    
-    .xc_btn-modern:hover {
-        background: #E5E6EB;
-        border-color: #C9CDD4;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .xc_btn-modern.primary {
-        background: #165DFF;
-        border-color: #165DFF;
+        text-decoration: none;
         color: white;
+        white-space: nowrap;
     }
+    .action-btn i { font-size: 10px; }
+    .action-btn-detail { background: #f5f7fa; color: #606266; }
+    .action-btn-detail:hover { background: #e9e9eb; color: #303133; }
+    .action-btn-heartbeat { background: #f5f7fa; color: #606266; }
+    .action-btn-heartbeat:hover { background: #e9e9eb; color: #303133; }
+    .action-btn-export { background: #f5f7fa; color: #606266; }
+    .action-btn-export:hover { background: #e9e9eb; color: #303133; }
+    .action-btn-upgrade { background: #f5f7fa; color: #606266; }
+    .action-btn-upgrade:hover { background: #e9e9eb; color: #303133; }
+    .action-btn-restart { background: #f5f7fa; color: #606266; }
+    .action-btn-restart:hover { background: #e9e9eb; color: #303133; }
+    .action-btn-delete { background: #fef0f0; color: #F56C6C; }
+    .action-btn-delete:hover { background: #fde2e2; color: #c0392b; }
+    .action-btn-restartos { background: #fef0f0; color: #F56C6C; }
+    .action-btn-restartos:hover { background: #fde2e2; color: #c0392b; }
     
-    .xc_btn-modern.primary:hover {
-        background: #4080FF;
-        border-color: #4080FF;
-    }
-
-    .pagination {
-        margin: 20px 0 0 0;
+    /* 分页 */
+    .pagination-container {
+        background: white;
+        border-radius: 8px;
+        padding: 12px 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         display: flex;
         justify-content: center;
         align-items: center;
+        gap: 16px;
     }
-    
-    .pagination > li > a {
-        padding: 8px 12px;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        margin: 0 4px;
-        color: #495057;
-        transition: all 0.3s ease;
+    .pagination-info { font-size: 12px; color: #909399; }
+    .pagination-info span { color: #409EFF; font-weight: 500; }
+    .pagination { display: flex; gap: 6px; list-style: none; }
+    .pagination li a {
+        padding: 5px 10px;
+        background: #f4f4f5;
+        border: 1px solid #e9e9eb;
+        border-radius: 4px;
+        color: #606266;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 12px;
+        transition: all 0.2s ease;
+        display: inline-block;
     }
-    
-    .pagination > li > a:hover {
-        background-color: #f8f9fa;
-        border-color: #adb5bd;
-        color: #212529;
+    .pagination li a:hover {
+        background: #e9e9eb;
     }
-    
-    .pagination > li.active > a {
-        background-color: #495057;
-        border-color: #495057;
+    .pagination li.active a {
+        background: #409EFF;
+        border-color: #409EFF;
         color: white;
     }
     
-    .node-info {
-        line-height: 1.4;
-        padding: 8px 12px;
-        overflow: hidden;
+    /* 空状态 */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
+    .empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.3; color: #909399; }
+    .empty-state-text { font-size: 14px; color: #909399; }
     
-    .node-status {
-        margin-bottom: 4px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        align-items: center;
-    }
-    
-    .node-details {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        font-size: 11px;
-        color: #6c757d;
-        line-height: 1.2;
-    }
-    
-    .node-details span {
-        display: inline-block;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        white-space: nowrap;
-    }
-    
-    .node-version {
-        font-weight: 500;
-        color: #007bff;
-        background-color: #e7f3ff !important;
-        border-color: #b3d7ff !important;
-    }
-    
-    .node-flag {
-        color: #28a745;
-        background-color: #d4edda !important;
-        border-color: #c3e6cb !important;
-    }
-    
-    .node-machine {
-        color: #fd7e14;
-        background-color: #fff3cd !important;
-        border-color: #ffeeba !important;
-    }
-    
-    .node-finger {
-        color: #17a2b8;
-        background-color: #d1ecf1 !important;
-        border-color: #bee5eb !important;
-    }
-    
-    .node-system {
-        color: #6f42c1;
-        background-color: #e2d9f3 !important;
-        border-color: #d5c8e8 !important;
-    }
-    
-    .node-boot-time {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        font-size: 11px;
-        color: #6c757d;
-        line-height: 1.2;
-        margin-top: 4px;
-    }
-    
-    .node-boot-time span {
-        display: inline-block;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background-color: #f0f0f0;
-        border: 1px solid #ddd;
-        white-space: nowrap;
-    }
-
-    .ws-connected {
-        color: #28a745;
-    }
-    
-    .ws-disconnected {
-        color: #dc3545;
-    }
-    
+    /* 模态框 */
     .detail-modal {
         display: none;
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 9999;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99999;
     }
-    
-    .detail-modal.show {
-        display: block;
-    }
-    
+    .detail-modal.show { display: flex; align-items: center; justify-content: center; }
     .detail-modal-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #fff;
+        background: white;
         border-radius: 8px;
-        width: 500px;
+        width: 90%;
+        max-width: 500px;
         max-height: 80vh;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
-    
     .detail-modal-header {
-        padding: 15px 20px;
-        border-bottom: 1px solid #eee;
+        padding: 14px 20px;
+        background: #f5f7fa;
+        border-bottom: 1px solid #ebeef5;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
-    
-    .detail-modal-header h3 {
-        margin: 0;
-        font-size: 16px;
-        color: #333;
-    }
-    
+    .detail-modal-header h3 { margin: 0; font-size: 15px; font-weight: 600; color: #303133; }
     .detail-modal-close {
-        background: none;
+        background: transparent;
         border: none;
-        font-size: 20px;
+        width: 28px; height: 28px;
+        border-radius: 4px;
+        color: #909399;
+        font-size: 18px;
         cursor: pointer;
-        color: #999;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    
-    .detail-modal-body {
-        padding: 20px;
-        max-height: 60vh;
-        overflow-y: auto;
-    }
-    
-    .detail-item {
-        margin-bottom: 12px;
-    }
-    
-    .detail-label {
-        font-size: 12px;
-        color: #999;
-        margin-bottom: 4px;
-    }
-    
-    .detail-value {
-        font-size: 14px;
-        color: #333;
-        word-break: break-all;
-    }
-    
+    .detail-modal-close:hover { background: #f5f7fa; color: #303133; }
+    .detail-modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
+    .detail-item { margin-bottom: 16px; }
+    .detail-label { font-size: 11px; color: #909399; font-weight: 500; margin-bottom: 6px; }
+    .detail-value { font-size: 13px; color: #303133; word-break: break-all; }
     .detail-json {
-        background: #f8f9fa;
-        padding: 10px;
+        background: #f5f7fa;
+        padding: 12px;
         border-radius: 4px;
         font-size: 12px;
-        max-height: 200px;
+        max-height: 150px;
         overflow-y: auto;
         white-space: pre-wrap;
         word-break: break-all;
+        border: 1px solid #ebeef5;
+        font-family: 'Courier New', monospace;
     }
+    
+    /* 加载动画 */
+    .loading-spinner {
+        display: inline-block;
+        width: 16px; height: 16px;
+        border: 2px solid rgba(64,158,255,0.3);
+        border-radius: 50%;
+        border-top-color: #409EFF;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+        .right_col { padding: 10px; }
+        .page-header { flex-direction: column; align-items: stretch; }
+        .page-title { justify-content: center; }
+        .search-bar { justify-content: center; }
+        .nodes-grid { grid-template-columns: 1fr; }
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .node-card-footer { flex-direction: column; }
+        .action-btn { width: 100%; }
+    }
+    
+    #top_loading {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: #ecf5ff;
+        border-radius: 12px;
+        font-size: 12px;
+        color: #409EFF;
+        font-weight: 500;
+    }
+    
+    /* 开关样式 */
+    .xc_switch_container { display: inline-flex; align-items: center; gap: 6px; }
+    .xc_switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+    .xc_switch input { opacity: 0; width: 0; height: 0; }
+    .xc_switch_slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #dcdfe6;
+        transition: .2s;
+        border-radius: 20px;
+    }
+    .xc_switch_slider:before {
+        position: absolute;
+        content: "";
+        height: 14px; width: 14px;
+        left: 3px; bottom: 3px;
+        background-color: white;
+        transition: .2s;
+        border-radius: 50%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .xc_switch input:checked + .xc_switch_slider { background-color: #409EFF; }
+    .xc_switch input:focus + .xc_switch_slider { box-shadow: 0 0 1px #409EFF; }
+    .xc_switch input:checked + .xc_switch_slider:before { transform: translateX(16px); }
+    .xc_switch_label { font-size: 12px; color: #606266; user-select: none; }
 </style>
-
 {% endblock stylesheets %}
 
 {% block content %}
-
 <div class="right_col" role="main">
-    <div class="">
-        <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                    <div class="x_title">
-                        <h2 style="display: inline-flex; align-items: center; gap: 15px;">平台节点管理
-                            <span id="top_loading" style="display:none;">
-                                <img src="/static/images/load.gif" alt="loading" style="width:16px;height:16px;">加载中
-                            </span>
-                            <div style="display: flex; gap: 8px; align-items: center; margin-left: 10px;">
-                                <input type="text" id="search_input" class="xc_search-input" placeholder="搜索编号/名称/指纹" value="{{ keyword|default:'' }}">
-                                <button class="xc_btn-modern" onclick="doSearch()">
-                                    <i class="fa fa-search"></i> 搜索
-                                </button>
-                                {% if keyword %}
-                                <button class="xc_btn-modern" onclick="doClear()">
-                                    <i class="fa fa-times"></i> 清除
-                                </button>
-                                {% endif %}
-                            </div>
-                        </h2>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr class="headings">
-                                        <th style="width:50px;">ID</th>
-                                        <th style="width:120px;">编号</th>
-                                        <th style="width:100px;">名称</th>
-                                        <th style="width:100px;">连接状态</th>
-                                        <th style="width:auto;">节点信息</th>
-                                        <th style="width:220px;">操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {% for d in data %}
-                                    <tr>
-                                        <td>{{ d.id }}</td>
-                                        <td>{{ d.code }}</td>
-                                        <td>{{ d.name|default:"-" }}</td>
-                                        <td>
-                                            {% if d.online %}
-                                                <span class="sun-state-success">在线</span>
-                                            {% else %}
-                                                <span class="sun-state-error">离线</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="node-info">
-                                            <div class="node-status">
-                                                {% if d.is_auth == 1 %}
-                                                    <span class="sun-state-success">
-                                                        {% if d.auth_msg %}
-                                                            {{ d.auth_msg }}
-                                                        {% elif d.is_multi_process == 1 %}
-                                                            高级版({{ d.max_count }}路)
-                                                        {% else %}
-                                                            普通版
-                                                        {% endif %}
-                                                    </span>
-                                                {% else %}
-                                                    <span class="sun-state-error">未授权</span>
-                                                {% endif %}
-                                            </div>
-                                            <div class="node-details">
-                                                <span class="node-version">v{{ d.version }}</span>
-                                                {% if d.flag %}
-                                                    <span class="node-flag">{{ d.flag }}</span>
-                                                {% endif %}
-                                                {% if d.machine_node %}
-                                                    <span class="node-machine">{{ d.machine_node }}</span>
-                                                {% endif %}
-                                                {% if d.finger %}
-                                                    <span>{{ d.finger }}</span>
-                                                {% endif %}
-                                                {% if d.system_name %}
-                                                    <span class="node-system">{{ d.system_name }}</span>
-                                                {% endif %}
-                                                {% if d.client_ip %}
-                                                    <span>{{ d.client_ip }}</span>
-                                                {% endif %}
-                                            </div>
-                                            <div class="node-boot-time">
-                                                {% if d.project_start_timestamp %}
-                                                    <span>软件启动: {{ d.project_start_timestamp|timestamp:"%Y/%m/%d %H:%M" }}</span>
-                                                {% endif %}
-                                                {% if d.os_boot_timestamp %}
-                                                    <span>系统启动: {{ d.os_boot_timestamp|timestamp:"%Y/%m/%d %H:%M" }}</span>
-                                                {% endif %}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
-                                                <a href="javascript:f_openDetail('{{ d.code }}')" class="sun-a-label btn-detail">详情</a>
-                                                <a href="javascript:f_openHeartbeats('{{ d.code }}')" class="sun-a-label" style="background-color: #f3e5f5; border-color: #c5cae9; color: #1b5e20;">心跳记录</a>
-                                                <a href="javascript:f_openExportLogs('{{ d.code }}')" class="sun-a-label" style="background-color: #e3f2fd; border-color: #90caf9; color: #1565c0;">导出日志</a>
-                                                <a href="javascript:f_openUpgrade('{{ d.code }}')" class="sun-a-label" style="background-color: #e8f5e9; border-color: #a5d6a7; color: #2e7d32;">升级</a>
-                                                <a href="javascript:f_restartApp('{{ d.code }}')" class="sun-a-label" style="background-color: #fff3e0; border-color: #ffcc80; color: #e65100;">重启软件</a>
-                                                <a href="javascript:f_openDel('{{ d.code }}')" class="sun-a-label btn-delete">删除</a>
-												<a href="javascript:f_restartOS('{{ d.code }}')" class="sun-a-label" style="background-color: #ffebee; border-color: #ef9a9a; color: #c62828;">重启系统</a>
-                                                
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% empty %}
-                                    <tr>
-                                        <td colspan="8" style="text-align:center;padding:20px;color:#6c757d;">
-                                            暂无节点数据
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+    <div class="page-container">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="page-title">
+                <div class="title-icon"><i class="fa fa-server"></i></div>
+                <h2>平台节点管理</h2>
+                <span id="top_loading" style="display:none;">
+                    <span class="loading-spinner"></span>加载中
+                </span>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="search_input" class="search-input" placeholder="搜索编号/名称/指纹" value="{{ keyword|default:'' }}">
+                <button class="btn btn-secondary" onclick="doSearch()">
+                    <i class="fa fa-search"></i> 搜索
+                </button>
+                {% if keyword %}
+                <button class="btn btn-secondary" onclick="doClear()">
+                    <i class="fa fa-times"></i> 清除
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa fa-server"></i></div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ data|length }}</div>
+                    <div class="stat-label">总节点数</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
+                <div class="stat-content">
+                    <div class="stat-value" id="online_count">0</div>
+                    <div class="stat-label">在线节点</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa fa-times-circle"></i></div>
+                <div class="stat-content">
+                    <div class="stat-value" id="offline_count">0</div>
+                    <div class="stat-label">离线节点</div>
                 </div>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-                <ul class="pagination">
-                    <li>
-                        <span style="margin-right:10px;color:#000;">
-                            共<span>{{ pageData.page_num }}</span>页 / <span>{{ pageData.count }}</span>条
+        
+        <!-- 节点卡片列表 -->
+        <div class="nodes-grid">
+            {% for d in data %}
+            <div class="node-card {% if d.online %}online{% else %}offline{% endif %}">
+                <div class="node-card-header">
+                    <div class="node-info-left">
+                        <div class="node-avatar">{{ d.code|slice:":2"|upper }}</div>
+                        <div class="node-basic-info">
+                            <h3>{{ d.name|default:"未命名节点" }}</h3>
+                            <div class="node-code">{{ d.code }}</div>
+                        </div>
+                    </div>
+                    <div>
+                        {% if d.online %}
+                        <span class="status-badge online">
+                            <span class="status-dot"></span>在线
                         </span>
-                    </li>
-                    {% for d in pageData.pageLabels %}
-                        {% if d.cur == 1 %}
-                            <li class="paginate_button active"><a href="#">{{ d.name }}</a></li>
                         {% else %}
-                            <li class="paginate_button"><a href="/node/index?p={{ d.page }}&ps={{ pageData.page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ d.name }}</a></li>
+                        <span class="status-badge offline">
+                            <span class="status-dot"></span>离线
+                        </span>
                         {% endif %}
-                    {% endfor %}
-                </ul>
+                    </div>
+                </div>
+                
+                <div class="node-card-body">
+                    <div class="info-row">
+                        <span class="info-label"><i class="fa fa-shield"></i> 授权状态</span>
+                        <div class="tags-container">
+                            {% if d.is_auth == 1 %}
+                            <span class="tag tag-auth">
+                                {% if d.auth_msg %}{{ d.auth_msg }}
+                                {% elif d.is_multi_process == 1 %}高级版 ({{ d.max_count }}路)
+                                {% else %}普通版{% endif %}
+                            </span>
+                            {% else %}
+                            <span class="tag tag-noauth">未授权</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label"><i class="fa fa-tag"></i> 版本信息</span>
+                        <div class="tags-container">
+                            <span class="tag tag-version">v{{ d.version }}</span>
+                            {% if d.flag %}<span class="tag tag-system">{{ d.flag }}</span>{% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label"><i class="fa fa-desktop"></i> 系统信息</span>
+                        <span class="info-value">{{ d.system_name|default:"-" }}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label"><i class="fa fa-network-wired"></i> 网络地址</span>
+                        <span class="info-value">{{ d.client_ip|default:"-" }}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="info-label"><i class="fa fa-clock"></i> 运行时间</span>
+                        <span class="info-value">
+                            {% if d.project_start_timestamp %}
+                                {{ d.project_start_timestamp|timestamp:"%Y/%m/%d %H:%M" }}
+                            {% else %}-{% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="node-card-footer">
+                    <a href="javascript:f_openDetail('{{ d.code }}')" class="action-btn action-btn-detail">
+                        <i class="fa fa-eye"></i> 详情
+                    </a>
+                    <a href="javascript:f_openHeartbeats('{{ d.code }}')" class="action-btn action-btn-heartbeat">
+                        <i class="fa fa-heartbeat"></i> 心跳
+                    </a>
+                    <a href="javascript:f_openExportLogs('{{ d.code }}')" class="action-btn action-btn-export">
+                        <i class="fa fa-download"></i> 日志
+                    </a>
+                    <a href="javascript:f_openUpgrade('{{ d.code }}')" class="action-btn action-btn-upgrade">
+                        <i class="fa fa-arrow-up"></i> 升级
+                    </a>
+                    <a href="javascript:f_restartApp('{{ d.code }}')" class="action-btn action-btn-restart">
+                        <i class="fa fa-redo"></i> 重启
+                    </a>
+                    <a href="javascript:f_openDel('{{ d.code }}')" class="action-btn action-btn-delete">
+                        <i class="fa fa-trash"></i> 删除
+                    </a>
+					<a href="javascript:f_restartOS('{{ d.code }}')" class="action-btn action-btn-restartos">
+                        <i class="fa fa-power-off"></i> 重启系统
+                    </a>
+                </div>
             </div>
+            {% empty %}
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <div class="empty-state-icon"><i class="fa fa-inbox"></i></div>
+                <div class="empty-state-text">暂无节点数据</div>
+            </div>
+            {% endfor %}
         </div>
-
+        
+        <!-- 分页 -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                共<span>{{ pageData.page_num }}</span>页 / <span>{{ pageData.count }}</span>条
+            </div>
+            <ul class="pagination">
+                {% for d in pageData.pageLabels %}
+                    {% if d.cur == 1 %}
+                    <li class="active"><a href="#">{{ d.name }}</a></li>
+                    {% else %}
+                    <li><a href="/platform/node/index?p={{ d.page }}&ps={{ pageData.page_size }}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ d.name }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 </div>
 
+<!-- 详情模态框 -->
 <div class="detail-modal" id="detailModal">
     <div class="detail-modal-content">
         <div class="detail-modal-header">
-            <h3>节点详情</h3>
+            <h3><i class="fa fa-info-circle"></i> 节点详情</h3>
             <button class="detail-modal-close" onclick="f_closeDetail()">&times;</button>
         </div>
-        <div class="detail-modal-body" id="detailModalBody">
-        </div>
+        <div class="detail-modal-body" id="detailModalBody"></div>
     </div>
 </div>
 
+<!-- 升级模态框 -->
 <div class="detail-modal" id="upgradeModal">
     <div class="detail-modal-content" style="width: 450px;">
         <div class="detail-modal-header">
-            <h3>升级节点版本</h3>
+            <h3><i class="fa fa-arrow-up"></i> 升级节点版本</h3>
             <button class="detail-modal-close" onclick="f_closeUpgrade()">&times;</button>
         </div>
         <div class="detail-modal-body">
@@ -637,21 +632,22 @@
             </div>
             <div class="detail-item">
                 <div class="detail-label">升级包文件</div>
-                <input type="file" id="upgrade_file" accept=".xcupdate" style="width: 100%; margin-top: 5px;">
-                <div style="font-size: 11px; color: #999; margin-top: 5px;">请选择 .xcupdate 格式的升级包</div>
+                <input type="file" id="upgrade_file" accept=".xcupdate" style="width: 100%; margin-top: 5px; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                <div style="font-size: 11px; color: #909399; margin-top: 6px;">请选择 .xcupdate 格式的升级包</div>
             </div>
-            <div class="detail-item" style="margin-top: 20px; text-align: right;">
-                <button class="btn btn-default" onclick="f_closeUpgrade()">取消</button>
-                <button class="btn btn-primary" onclick="f_submitUpgrade()" style="background-color: #2e7d32; border-color: #2e7d32; color: white; margin-left: 10px;">开始升级</button>
+            <div class="detail-item" style="margin-top: 16px; text-align: right; display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="f_closeUpgrade()">取消</button>
+                <button class="btn btn-primary" onclick="f_submitUpgrade()">开始升级</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- 导出日志模态框 -->
 <div class="detail-modal" id="exportLogsModal">
     <div class="detail-modal-content" style="width: 400px;">
         <div class="detail-modal-header">
-            <h3>导出日志</h3>
+            <h3><i class="fa fa-download"></i> 导出日志</h3>
             <button class="detail-modal-close" onclick="f_closeExportLogs()">&times;</button>
         </div>
         <div class="detail-modal-body">
@@ -668,108 +664,42 @@
                     <span class="xc_switch_label">导出流日志</span>
                 </label>
             </div>
-            <div style="font-size: 11px; color: #999; margin-top: 8px;">导出日志文件，提供给开发者排查问题</div>
-            <div class="detail-item" style="margin-top: 20px; text-align: right;">
-                <button class="btn btn-default" onclick="f_closeExportLogs()">取消</button>
-                <button class="btn btn-primary" onclick="f_submitExportLogs()" style="background-color: #1565c0; border-color: #1565c0; color: white; margin-left: 10px;">导出日志</button>
+            <div style="font-size: 11px; color: #909399; margin-top: 6px;">导出日志文件，提供给开发者排查问题</div>
+            <div class="detail-item" style="margin-top: 16px; text-align: right; display: flex; gap: 8px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="f_closeExportLogs()">取消</button>
+                <button class="btn btn-primary" onclick="f_submitExportLogs()" style="background: #409EFF;">导出日志</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- 心跳记录模态框 -->
 <div class="detail-modal" id="heartbeatsModal">
-    <div class="detail-modal-content" style="width: 550px;">
+    <div class="detail-modal-content" style="width: 650px;">
         <div class="detail-modal-header">
-            <h3>心跳记录 - <span id="heartbeats_node_code" style="color:#165DFF;"></span></h3>
+            <h3><i class="fa fa-heartbeat"></i> 心跳记录 - <span id="heartbeats_node_code" style="color:#fff;"></span></h3>
             <button class="detail-modal-close" onclick="f_closeHeartbeats()">&times;</button>
         </div>
         <div class="detail-modal-body">
             <div style="margin-top: 10px;">
-                <table class="table table-bordered" style="font-size: 13px;">
+                <table class="table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
                     <thead>
-                        <tr>
-                            <th style="width: 50px;">ID</th>
-                            <th style="width: 160px;">心跳时间</th>
-                            <th style="width: 120px;">客户端IP</th>
-                            <th style="width: 160px;">添加时间</th>
+                        <tr style="background: #f7fafc; border-bottom: 2px solid #e2e8f0;">
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #4a5568;">ID</th>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #4a5568;">心跳时间</th>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #4a5568;">客户端 IP</th>
+                            <th style="padding: 12px; text-align: left; font-weight: 600; color: #4a5568;">添加时间</th>
                         </tr>
                     </thead>
                     <tbody id="heartbeats_table_body">
-                        <tr>
-                            <td colspan="4" style="text-align:center;padding:20px;color:#6c757d;">加载中...</td>
-                        </tr>
+                        <tr><td colspan="4" style="padding: 20px; text-align: center; color: #718096;">加载中...</td></tr>
                     </tbody>
                 </table>
             </div>
-            <div id="heartbeats_pagination" style="margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 5px;"></div>
+            <div id="heartbeats_pagination" style="margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 10px;"></div>
         </div>
     </div>
 </div>
-
-<style>
-    .xc_switch_container {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .xc_switch {
-        position: relative;
-        display: inline-block;
-        width: 42px;
-        height: 22px;
-    }
-
-    .xc_switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .xc_switch_slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #dcdfe6;
-        transition: .3s;
-        border-radius: 22px;
-    }
-
-    .xc_switch_slider:before {
-        position: absolute;
-        content: "";
-        height: 16px;
-        width: 16px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: .3s;
-        border-radius: 50%;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .xc_switch input:checked + .xc_switch_slider {
-        background-color: #169F85;
-    }
-
-    .xc_switch input:focus + .xc_switch_slider {
-        box-shadow: 0 0 1px #169F85;
-    }
-
-    .xc_switch input:checked + .xc_switch_slider:before {
-        transform: translateX(20px);
-    }
-
-    .xc_switch_label {
-        font-size: 12px;
-        color: #606266;
-        user-select: none;
-    }
-</style>
-
 {% endblock content %}
 
 {% block javascripts %}
@@ -778,6 +708,7 @@
 <script>
     let ele_top_loading = $("#top_loading");
     let m_node_data = {};
+    
     {% for d in data %}
     m_node_data['{{ d.code }}'] = {
         code: '{{ d.code|escapejs }}',
@@ -793,16 +724,32 @@
         project_start_timestamp: {{ d.project_start_timestamp|default:0 }},
         os_boot_timestamp: {{ d.os_boot_timestamp|default:0 }},
         register_info: {% if d.register_info %}{{ d.register_info|safe }}{% else %}{}{% endif %},
+        online: {% if d.online %}true{% else %}false{% endif %}
     };
     {% endfor %}
+    
+    // 统计在线和离线节点数
+    let onlineCount = 0;
+    let offlineCount = 0;
+    for (let code in m_node_data) {
+        if (m_node_data[code].online) {
+            onlineCount++;
+        } else {
+            offlineCount++;
+        }
+    }
+    
+    // 更新统计
+    document.getElementById('online_count').innerText = onlineCount;
+    document.getElementById('offline_count').innerText = offlineCount;
 
     function doSearch() {
         let keyword = $('#search_input').val().trim();
-        window.location.href = '/node/index?keyword=' + encodeURIComponent(keyword);
+        window.location.href = '/platform/node/index?keyword=' + encodeURIComponent(keyword);
     }
 
     function doClear() {
-        window.location.href = '/node/index';
+        window.location.href = '/platform/node/index';
     }
 
     $('#search_input').on('keydown', function(e) {
@@ -813,25 +760,18 @@
 
     function f_openDetail(code) {
         let node = m_node_data[code];
-        if (!node) {
-            myAlert('节点数据不存在', 'error');
-            return;
-        }
+        if (!node) { myAlert('节点数据不存在', 'error'); return; }
         
         let registerInfo = node.register_info;
         if (typeof registerInfo === 'string') {
-            try {
-                registerInfo = JSON.parse(registerInfo);
-            } catch (e) {
-                registerInfo = {};
-            }
+            try { registerInfo = JSON.parse(registerInfo); } catch (e) { registerInfo = {}; }
         }
         
         let html = '';
         html += '<div class="detail-item"><div class="detail-label">节点编号</div><div class="detail-value">' + node.code + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">节点名称</div><div class="detail-value">' + node.name + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">节点描述</div><div class="detail-value">' + node.describe + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">客户端IP</div><div class="detail-value">' + node.client_ip + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">客户端 IP</div><div class="detail-value">' + node.client_ip + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">内网地址</div><div class="detail-value">' + node.client_ip + ':' + node.admin_port + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">版本号</div><div class="detail-value">' + node.version + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">授权状态</div><div class="detail-value">' + (node.is_auth == 1 ? node.auth_msg : '未授权') + '</div></div>';
@@ -858,62 +798,35 @@
         return Y + '/' + M + '/' + D + ' ' + h + ':' + m + ':' + s;
     }
     
-    function f_closeDetail() {
-        document.getElementById('detailModal').classList.remove('show');
-    }
-
+    function f_closeDetail() { document.getElementById('detailModal').classList.remove('show'); }
     function f_openDel(code) {
-        if (!confirm('确定要删除该节点吗？')) {
-            return;
-        }
+        if (!confirm('确定要删除该节点吗？')) return;
         ele_top_loading.show();
         $.ajax({
-            url: '/node/openDel',
-            type: "post",
-            async: true,
-            data: {"code": code},
-            dataType: "json",
-            timeout: 0,
-            error: function () {
-                ele_top_loading.hide();
-                myAlert("网络异常，请确定网络正常！", "error");
-            },
+            url: '/platform/node/openDel', type: "post", async: true, data: {"code": code},
+            dataType: "json", timeout: 0,
+            error: function () { ele_top_loading.hide(); myAlert("网络异常，请确定网络正常！", "error"); },
             success: function (res) {
                 ele_top_loading.hide();
-                if (res.code === 1000) {
-                    window.location.reload();
-                } else {
-                    myAlert(res.msg, "error");
-                }
+                if (res.code === 1000) { window.location.reload(); } else { myAlert(res.msg, "error"); }
             }
         });
     }
 
     let m_upgrade_node_code = '';
-    
     function f_openUpgrade(code) {
         m_upgrade_node_code = code;
         document.getElementById('upgrade_node_code').innerText = code;
         document.getElementById('upgrade_file').value = '';
         document.getElementById('upgradeModal').classList.add('show');
     }
-    
-    function f_closeUpgrade() {
-        document.getElementById('upgradeModal').classList.remove('show');
-    }
+    function f_closeUpgrade() { document.getElementById('upgradeModal').classList.remove('show'); }
     
     function f_submitUpgrade() {
         let fileInput = document.getElementById('upgrade_file');
-        if (!fileInput.files || fileInput.files.length === 0) {
-            myAlert('请选择升级包文件', 'error');
-            return;
-        }
-        
+        if (!fileInput.files || fileInput.files.length === 0) { myAlert('请选择升级包文件', 'error'); return; }
         let file = fileInput.files[0];
-        if (!file.name.endsWith('.xcupdate')) {
-            myAlert('请选择 .xcupdate 格式的升级包', 'error');
-            return;
-        }
+        if (!file.name.endsWith('.xcupdate')) { myAlert('请选择 .xcupdate 格式的升级包', 'error'); return; }
         
         let formData = new FormData();
         formData.append('node_code', m_upgrade_node_code);
@@ -924,82 +837,41 @@
         myAlert('正在上传升级包，请稍候...', 'info', 0);
         
         $.ajax({
-            url: '/node/upgrade',
-            type: "post",
-            data: formData,
-            processData: false,
-            contentType: false,
+            url: '/platform/node/upgrade', type: "post", data: formData, processData: false, contentType: false,
             timeout: 300000,
-            error: function () {
-                ele_top_loading.hide();
-                myAlert("网络异常，请确定网络正常！", "error");
-            },
+            error: function () { ele_top_loading.hide(); myAlert("网络异常，请确定网络正常！", "error"); },
             success: function (res) {
                 ele_top_loading.hide();
-                if (res.code === 1000) {
-                    myAlert(res.msg || '升级包上传成功，节点正在升级中...', 'success', 3000);
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 3000);
-                } else {
-                    myAlert(res.msg || '升级失败', "error");
-                }
+                if (res.code === 1000) { myAlert(res.msg || '升级包上传成功，节点正在升级中...', 'success', 3000); setTimeout(function(){ window.location.reload(); }, 3000); }
+                else { myAlert(res.msg || '升级失败', "error"); }
             }
         });
     }
 
     function f_restartApp(code) {
-        if (!confirm('确定要重启节点 [' + code + '] 的软件吗？')) {
-            return;
-        }
-        
+        if (!confirm('确定要重启节点 [' + code + '] 的软件吗？')) return;
         ele_top_loading.show();
         $.ajax({
-            url: '/node/restartApp',
-            type: "post",
-            data: {
-                node_code: code
-            },
-            timeout: 30000,
-            error: function () {
-                ele_top_loading.hide();
-                myAlert("网络异常，请确定网络正常！", "error");
-            },
+            url: '/platform/node/restartApp', type: "post", data: { node_code: code }, timeout: 30000,
+            error: function () { ele_top_loading.hide(); myAlert("网络异常，请确定网络正常！", "error"); },
             success: function (res) {
                 ele_top_loading.hide();
-                if (res.code === 1000) {
-                    myAlert(res.msg || '重启软件指令已发送', 'success');
-                } else {
-                    myAlert(res.msg || '重启软件失败', "error");
-                }
+                if (res.code === 1000) { myAlert(res.msg || '重启软件指令已发送', 'success'); }
+                else { myAlert(res.msg || '重启软件失败', "error"); }
             }
         });
     }
     
     function f_restartOS(code) {
-        if (!confirm('确定要重启节点 [' + code + '] 的操作系统吗？此操作将重启整个服务器！')) {
-            return;
-        }
-        
+        if (!confirm('确定要重启节点 [' + code + '] 的操作系统吗？此操作将重启整个服务器！')) return;
         ele_top_loading.show();
         $.ajax({
-            url: '/node/restartOS',
-            type: "post",
-            data: {
-                node_code: code
-            },
-            timeout: 30000,
-            error: function () {
-                ele_top_loading.hide();
-                myAlert("网络异常，请确定网络正常！", "error");
-            },
+            url: '/platform/node/restartOS', type: "post", data: { node_code: code }, timeout: 30000,
+            error: function () { ele_top_loading.hide(); myAlert("网络异常，请确定网络正常！", "error"); },
             success: function (res) {
                 ele_top_loading.hide();
-                if (res.code === 1000) {
-                    myAlert(res.msg || '重启系统指令已发送', 'success');
-                } else {
-                    myAlert(res.msg || '重启系统失败', "error");
-                }
+                if (res.code === 1000) { myAlert(res.msg || '重启系统指令已发送', 'success'); }
+                else { myAlert(res.msg || '重启系统失败', "error"); }
             }
         });
     }
@@ -1012,56 +884,34 @@
         alertElement.className = `xc-alert ${icon}`;
         alertElement.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:16px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);display:flex;align-items:center;gap:10px;';
         
-        if (icon === 'success') {
-            alertElement.style.backgroundColor = '#4CAF50';
-        } else if (icon === 'error') {
-            alertElement.style.backgroundColor = '#F44336';
-        } else {
-            alertElement.style.backgroundColor = '#2196F3';
-        }
+        if (icon === 'success') { alertElement.style.backgroundColor = '#4CAF50'; }
+        else if (icon === 'error') { alertElement.style.backgroundColor = '#F44336'; }
+        else { alertElement.style.backgroundColor = '#2196F3'; }
         
         alertElement.innerHTML = `<span>${text}</span>`;
         document.body.appendChild(alertElement);
         
-        if (hideAfter > 0) {
-            setTimeout(() => {
-                alertElement.remove();
-            }, hideAfter);
-        }
+        if (hideAfter > 0) { setTimeout(() => { alertElement.remove(); }, hideAfter); }
     }
 
     let m_export_logs_node_code = '';
-
     function f_openExportLogs(code) {
         m_export_logs_node_code = code;
         document.getElementById('export_logs_node_code').innerText = code;
         document.getElementById('export_stream_log').checked = false;
         document.getElementById('exportLogsModal').classList.add('show');
     }
-
-    function f_closeExportLogs() {
-        document.getElementById('exportLogsModal').classList.remove('show');
-    }
-
+    function f_closeExportLogs() { document.getElementById('exportLogsModal').classList.remove('show'); }
+    
     function f_submitExportLogs() {
         let isExportStream = document.getElementById('export_stream_log').checked ? 1 : 0;
-
         f_closeExportLogs();
         ele_top_loading.show();
         myAlert('正在导出日志，请稍候...', 'info', 0);
-
+        
         $.ajax({
-            url: '/node/exportLogs',
-            type: "post",
-            data: {
-                node_code: m_export_logs_node_code,
-                is_export_stream: isExportStream
-            },
-            timeout: 180000,
-            error: function () {
-                ele_top_loading.hide();
-                myAlert("网络异常，请确定网络正常！", "error");
-            },
+            url: '/platform/node/exportLogs', type: "post", data: { node_code: m_export_logs_node_code, is_export_stream: isExportStream }, timeout: 180000,
+            error: function () { ele_top_loading.hide(); myAlert("网络异常，请确定网络正常！", "error"); },
             success: function (res) {
                 ele_top_loading.hide();
                 if (res.code === 1000) {
@@ -1069,12 +919,10 @@
                     let info = res.info || {};
                     let exportFilename = info.export_filename;
                     if (exportFilename) {
-                        let downloadUrl = "/node/downloadLog?node_code=" + m_export_logs_node_code + "&filename=" + exportFilename;
+                        let downloadUrl = "/platform/node/downloadLog?node_code=" + m_export_logs_node_code + "&filename=" + exportFilename;
                         window.open(downloadUrl);
                     }
-                } else {
-                    myAlert(res.msg || '导出失败', "error");
-                }
+                } else { myAlert(res.msg || '导出失败', "error"); }
             }
         });
     }
@@ -1102,70 +950,55 @@
         document.getElementById('heartbeatsModal').classList.add('show');
         f_loadHeartbeats();
     }
-
-    function f_closeHeartbeats() {
-        document.getElementById('heartbeatsModal').classList.remove('show');
-    }
-
+    function f_closeHeartbeats() { document.getElementById('heartbeatsModal').classList.remove('show'); }
+    
     function f_loadHeartbeats() {
-        document.getElementById('heartbeats_table_body').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#6c757d;">加载中...</td></tr>';
-        
+        document.getElementById('heartbeats_table_body').innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:#718096;">加载中...</td></tr>';
         $.ajax({
-            url: '/node/getHeartbeats',
-            type: 'get',
-            data: {
-                node_code: m_heartbeats_node_code,
-                p: m_heartbeats_page,
-                ps: m_heartbeats_page_size
-            },
+            url: '/platform/node/getHeartbeats', type: 'get', data: { node_code: m_heartbeats_node_code, p: m_heartbeats_page, ps: m_heartbeats_page_size },
             success: function(res) {
                 if (res.code === 1000) {
                     let html = '';
                     if (res.data && res.data.length > 0) {
                         for (let i = 0; i < res.data.length; i++) {
                             let item = res.data[i];
-                            html += '<tr>';
-                            html += '<td>' + item.id + '</td>';
-                            html += '<td>' + f_formatDateTime(item.heartbeat_time) + '</td>';
-                            html += '<td>' + (item.client_ip || '-') + '</td>';
-                            html += '<td>' + f_formatDateTime(item.create_time) + '</td>';
+                            html += '<tr style="border-bottom:1px solid #f0f0f0;">';
+                            html += '<td style="padding:12px;">' + item.id + '</td>';
+                            html += '<td style="padding:12px;">' + f_formatDateTime(item.heartbeat_time) + '</td>';
+                            html += '<td style="padding:12px;">' + (item.client_ip || '-') + '</td>';
+                            html += '<td style="padding:12px;">' + f_formatDateTime(item.create_time) + '</td>';
                             html += '</tr>';
                         }
                     } else {
-                        html = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#6c757d;">暂无心跳记录</td></tr>';
+                        html = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#909399;">暂无心跳记录</td></tr>';
                     }
                     document.getElementById('heartbeats_table_body').innerHTML = html;
                     
                     let pageData = res.pageData || {};
                     let paginationHtml = '';
-                    paginationHtml += '<span style="margin-right:10px;color:#666;">共' + pageData.count + '条</span>';
-                    
+                    paginationHtml += '<span style="color:#718096;">共' + pageData.count + '条</span>';
                     if (pageData.page_num > 1) {
                         if (m_heartbeats_page > 1) {
-                            paginationHtml += '<button class="btn btn-default btn-sm" onclick="f_heartbeatsGoPage(1)">首页</button>';
-                            paginationHtml += '<button class="btn btn-default btn-sm" onclick="f_heartbeatsGoPage(' + (m_heartbeats_page - 1) + ')">上一页</button>';
+                            paginationHtml += '<button class="btn btn-sm btn-secondary" onclick="f_heartbeatsGoPage(1)">首页</button>';
+                            paginationHtml += '<button class="btn btn-sm btn-secondary" onclick="f_heartbeatsGoPage(' + (m_heartbeats_page - 1) + ')">上一页</button>';
                         }
-                        paginationHtml += '<span style="margin:0 10px;">第' + m_heartbeats_page + '/' + pageData.page_num + '页</span>';
+                        paginationHtml += '<span style="color:#4a5568;">第' + m_heartbeats_page + '/' + pageData.page_num + '页</span>';
                         if (m_heartbeats_page < pageData.page_num) {
-                            paginationHtml += '<button class="btn btn-default btn-sm" onclick="f_heartbeatsGoPage(' + (m_heartbeats_page + 1) + ')">下一页</button>';
-                            paginationHtml += '<button class="btn btn-default btn-sm" onclick="f_heartbeatsGoPage(' + pageData.page_num + ')">末页</button>';
+                            paginationHtml += '<button class="btn btn-sm btn-secondary" onclick="f_heartbeatsGoPage(' + (m_heartbeats_page + 1) + ')">下一页</button>';
+                            paginationHtml += '<button class="btn btn-sm btn-secondary" onclick="f_heartbeatsGoPage(' + pageData.page_num + ')">末页</button>';
                         }
                     }
                     document.getElementById('heartbeats_pagination').innerHTML = paginationHtml;
                 } else {
-                    document.getElementById('heartbeats_table_body').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#dc3545;">' + res.msg + '</td></tr>';
+                    document.getElementById('heartbeats_table_body').innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#F56C6C;">' + res.msg + '</td></tr>';
                 }
             },
             error: function() {
-                document.getElementById('heartbeats_table_body').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#dc3545;">网络异常</td></tr>';
+                document.getElementById('heartbeats_table_body').innerHTML = '<tr><td colspan="4" style="padding:30px;text-align:center;color:#F56C6C;">网络异常</td></tr>';
             }
         });
     }
 
-    function f_heartbeatsGoPage(page) {
-        m_heartbeats_page = page;
-        f_loadHeartbeats();
-    }
+    function f_heartbeatsGoPage(page) { m_heartbeats_page = page; f_loadHeartbeats(); }
 </script>
-
 {% endblock javascripts %}

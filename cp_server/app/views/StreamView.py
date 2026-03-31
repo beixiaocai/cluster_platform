@@ -5,7 +5,7 @@ import threading
 
 def index(request):
     context = {
-        "settings": f_settingsReadData()
+        "settings": g_settings.data
     }
     
     nodes = NodeModel.objects.all().order_by('-id')
@@ -447,7 +447,7 @@ def api_openStopPusher(request):
 
 def player(request):
     context = {
-        "settings": f_settingsReadData()
+        "settings": g_settings.data
     }
     params = f_parseGetParams(request)
     g_logger.debug("StreamView.player() params:%s" % str(params))

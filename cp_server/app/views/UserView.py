@@ -102,7 +102,7 @@ def f_readLoginPrivateKey():
 
 def index(request):
     context = {
-        "settings": f_settingsReadData()
+        "settings": g_settings.data
     }
     data = []
 
@@ -172,7 +172,7 @@ def add(request):
                           {"msg": "无权限", "is_success": False, "redirect_url": "/user/index"})
     else:
         context = {
-            "settings": f_settingsReadData()
+            "settings": g_settings.data
         }
         if request.method == 'POST':
             __ret = False
@@ -309,7 +309,7 @@ def edit(request):
     else:
 
         context = {
-            "settings": f_settingsReadData()
+            "settings": g_settings.data
         }
 
         if request.method == 'POST':
@@ -485,7 +485,7 @@ def captcha(request):
 def login(request):
     from framework.settings import PROJECT_VERSION
     context = {
-        "settings": f_settingsReadData(),
+        "settings": g_settings.data,
         "project_version": PROJECT_VERSION
     }
 

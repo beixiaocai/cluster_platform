@@ -1,4 +1,6 @@
 import json
+import os
+import re
 import uuid
 import threading
 import time
@@ -9,11 +11,25 @@ from asgiref.sync import async_to_sync
 from framework.settings import PROJECT_SUPPORT_REBEKAH_MIN_VERSION
 
 g_command_responses = {}
-g_command_lock = threading.Lock()
+g_command_lock = threading.RLock()  # 使用RLock支持递归锁定
+g_command_events = {}
+MAX_COMMAND_ENTRIES = 1000  # 最大命令条目数，防止内存泄漏
+
+def _cleanup_old_commands():
+    """清理旧的命令条目，防止内存无限增长"""
+    global g_command_responses, g_command_events
+    with g_command_lock:
+        if len(g_command_responses) > MAX_COMMAND_ENTRIES:
+            entries_to_remove = int(MAX_COMMAND_ENTRIES * 0.2)
+            old_keys = list(g_command_responses.keys())[:entries_to_remove]
+            for key in old_keys:
+                del g_command_responses[key]
+                if key in g_command_events:
+                    del g_command_events[key]
+            print(f"ClusterConsumer._cleanup_old_commands() cleaned up {entries_to_remove} old entries")
 
 def get_ws_token():
     try:
-        import os
         config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'config.json')
         with open(config_path, 'r', encoding='utf-8') as f:
             config = json.load(f)
@@ -31,9 +47,9 @@ class ClusterConsumer(WebsocketConsumer):
         print(f"ClusterConsumer.connect() new connection")
     
     def disconnect(self, close_code):
+        node_manager = self.get_node_manager()
+        node_manager.unregister_node(self.channel_name)
         if self.node_code:
-            node_manager = self.get_node_manager()
-            node_manager.unregister_node(self.channel_name)
             print(f"ClusterConsumer.disconnect() node_code={self.node_code}")
     
     def receive(self, text_data):
@@ -73,9 +89,13 @@ class ClusterConsumer(WebsocketConsumer):
             self.close()
             return
         
-        import re
-        if not re.match(r'^[a-zA-Z0-9]+$', node_code):
-            self.send_error("node_code format invalid, only letters and numbers allowed")
+        if not re.match(r'^[a-zA-Z0-9_\-\.]+$', node_code):
+            self.send_error("node_code format invalid, only letters, numbers, underscore, hyphen and dot allowed")
+            self.close()
+            return
+        
+        if len(node_code) > 64:
+            self.send_error("node_code too long, maximum 64 characters")
             self.close()
             return
         
@@ -92,7 +112,7 @@ class ClusterConsumer(WebsocketConsumer):
             version_float = 0
         
         if version_float < PROJECT_SUPPORT_REBEKAH_MIN_VERSION:
-            self.send_error_msg(f"version not supported, minimum version: {PROJECT_SUPPORT_REBEKAH_MIN_VERSION}, current version: {project_version}")
+            self.send_error(f"version not supported, minimum version: {PROJECT_SUPPORT_REBEKAH_MIN_VERSION}, current version: {project_version}")
             self.close()
             return
         
@@ -139,6 +159,17 @@ class ClusterConsumer(WebsocketConsumer):
         if not node_code:
             node_code = self.node_code
         
+        # 验证心跳的node_code与当前连接的node_code匹配
+        if node_code and self.node_code and node_code != self.node_code:
+            print(f"ClusterConsumer.handle_heartbeat() node_code mismatch, expected={self.node_code}, got={node_code}")
+            self.send(json.dumps({
+                'type': 'heartbeat_response',
+                'code': 0,
+                'msg': 'node_code mismatch',
+                'need_register': True
+            }))
+            return
+        
         if node_code:
             node_manager = self.get_node_manager()
             client_ip = self.scope.get('client', ['unknown', 0])[0]
@@ -168,11 +199,16 @@ class ClusterConsumer(WebsocketConsumer):
         msg = data.get('data', {}).get('msg', '')
         result = data.get('data', {}).get('result')
         
-        print(f"ClusterConsumer.handle_command_response() command_id={command_id}, code={code}")
+        print(f"ClusterConsumer.handle_command_response() command_id={command_id}, code={code}, node_code={self.node_code}")
         
         if command_id:
             with g_command_lock:
                 if command_id in g_command_responses:
+                    command_info = g_command_responses[command_id]
+                    if command_info.get('node_code') != self.node_code:
+                        print(f"ClusterConsumer.handle_command_response() node_code mismatch, expected={command_info.get('node_code')}, got={self.node_code}")
+                        return
+                    
                     response_result = {
                         "code": code,
                         "msg": msg
@@ -181,10 +217,10 @@ class ClusterConsumer(WebsocketConsumer):
                         for k, v in result.items():
                             response_result[k] = v
                     
-                    g_command_responses[command_id] = {
-                        "status": "completed",
-                        "result": response_result
-                    }
+                    g_command_responses[command_id]["result"] = response_result
+                    
+                    if command_id in g_command_events:
+                        g_command_events[command_id].set()
     
     def handle_alarm_report(self, data):
         alarm_data = data.get('data', {})
@@ -207,13 +243,6 @@ class ClusterConsumer(WebsocketConsumer):
         }))
     
     def send_error(self, msg):
-        self.send(json.dumps({
-            'type': 'error',
-            'code': 0,
-            'msg': msg
-        }))
-    
-    def send_error_msg(self, msg):
         self.send(json.dumps({
             'type': 'error',
             'code': 0,
@@ -260,9 +289,23 @@ def send_command_to_node_sync(node_code, action, params=None, timeout=120):
         return {"code": 0, "msg": "node not connected"}
     
     command_id = str(uuid.uuid4())
+    event = threading.Event()
     
     with g_command_lock:
-        g_command_responses[command_id] = {"status": "pending", "result": None}
+        # 先清理旧条目，再检查是否超过限制
+        _cleanup_old_commands()
+        
+        # 如果清理后仍然超过限制，拒绝新命令
+        if len(g_command_responses) >= MAX_COMMAND_ENTRIES:
+            print(f"send_command_to_node_sync() command queue full, rejecting command for node={node_code}")
+            return {"code": 0, "msg": "command queue full, try again later"}
+        
+        g_command_responses[command_id] = {
+            "status": "pending",
+            "result": None,
+            "node_code": node_code
+        }
+        g_command_events[command_id] = event
     
     try:
         async_to_sync(channel_layer.send)(channel_name, {
@@ -277,20 +320,26 @@ def send_command_to_node_sync(node_code, action, params=None, timeout=120):
         with g_command_lock:
             if command_id in g_command_responses:
                 del g_command_responses[command_id]
+            if command_id in g_command_events:
+                del g_command_events[command_id]
         return {"code": 0, "msg": f"send command error: {e}"}
     
-    start_time = time.time()
-    while time.time() - start_time < timeout:
+    if event.wait(timeout):
         with g_command_lock:
-            if command_id in g_command_responses and g_command_responses[command_id]["status"] == "completed":
-                result = g_command_responses[command_id]["result"]
+            if command_id in g_command_responses:
+                result = g_command_responses[command_id].get("result")
                 del g_command_responses[command_id]
-                return result
-        time.sleep(0.1)
+            else:
+                result = {"code": 0, "msg": "response already cleaned up"}
+            if command_id in g_command_events:
+                del g_command_events[command_id]
+        return result
     
     print(f"send_command_to_node_sync() timeout command_id={command_id}")
     with g_command_lock:
         if command_id in g_command_responses:
             del g_command_responses[command_id]
+        if command_id in g_command_events:
+            del g_command_events[command_id]
     
     return {"code": 0, "msg": "command timeout"}

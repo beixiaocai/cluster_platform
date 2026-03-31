@@ -4,11 +4,11 @@ g_logger.info("LLMView loaded")
 
 
 def index(request):
-    return render(request, 'app/llm/index.html', {"settings": f_settingsReadData()})
+    return render(request, 'app/llm/index.html', {"settings": g_settings.data})
 
 
 def test(request):
-    return render(request, 'app/llm/test.html', {"settings": f_settingsReadData()})
+    return render(request, 'app/llm/test.html', {"settings": g_settings.data})
 
 
 def api_getList(request):

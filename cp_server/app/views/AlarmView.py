@@ -4,7 +4,7 @@ from app.utils.Utils import buildPageLabels
 
 def index(request):
     context = {
-        "settings": f_settingsReadData()
+        "settings": g_settings.data
     }
     now_date = datetime.now()
     context["startDate"] = (now_date - timedelta(days=6)).strftime("%Y-%m-%d")

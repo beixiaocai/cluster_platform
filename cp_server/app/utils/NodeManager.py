@@ -27,6 +27,8 @@ class NodeManager:
         self._checker_interval = 30
         self._checker_thread = None
         self._checker_running = False
+        self._heartbeat_buffer = {}  # 心跳缓冲，用于批量写入
+        self._heartbeat_buffer_lock = threading.Lock()
     
     def register_node(self, node_code, channel_name, discover_info, client_ip=None, consumer=None):
         with self._lock:
@@ -70,15 +72,17 @@ class NodeManager:
         with self._lock:
             node_code = self._channels.get(channel_name)
             if node_code:
+                # 更新节点状态为断开
                 if node_code in self._nodes:
                     self._nodes[node_code]['connected'] = False
                     self._nodes[node_code]['channel_name'] = None
                     self._update_node_disconnect_db(node_code)
+                    del self._nodes[node_code]
+                
+                # 清理通道和消费者映射
                 del self._channels[channel_name]
                 if channel_name in self._consumers:
                     del self._consumers[channel_name]
-                if node_code in self._nodes:
-                    del self._nodes[node_code]
             return None
     
     def update_heartbeat(self, node_code, client_ip=None):
@@ -86,11 +90,83 @@ class NodeManager:
             if node_code in self._nodes:
                 now = datetime.now()
                 self._nodes[node_code]['last_heartbeat'] = now
-                self._save_heartbeat_to_db(node_code, now, client_ip)
+                # 使用缓冲，减少数据库写入频率
+                with self._heartbeat_buffer_lock:
+                    self._heartbeat_buffer[node_code] = {
+                        'heartbeat_time': now,
+                        'client_ip': client_ip
+                    }
                 return True
             return False
     
+    def flush_heartbeat_buffer(self):
+        """批量刷新心跳数据到数据库"""
+        with self._heartbeat_buffer_lock:
+            buffer_copy = self._heartbeat_buffer.copy()
+            self._heartbeat_buffer.clear()
+        
+        if not buffer_copy:
+            return
+        
+        try:
+            from app.models import NodeHeartModel
+            
+            # 批量创建心跳记录
+            heartbeats_to_create = []
+            nodes_to_cleanup = []
+            
+            for node_code, data in buffer_copy.items():
+                heartbeats_to_create.append(NodeHeartModel(
+                    node_code=node_code,
+                    heartbeat_time=data['heartbeat_time'],
+                    client_ip=data['client_ip']
+                ))
+                nodes_to_cleanup.append(node_code)
+            
+            if heartbeats_to_create:
+                NodeHeartModel.objects.bulk_create(heartbeats_to_create)
+                print(f"NodeManager.flush_heartbeat_buffer() flushed {len(heartbeats_to_create)} heartbeats")
+                
+                # 批量清理旧记录（只清理超过 100 条的节点）
+                self._batch_cleanup_old_heartbeats(nodes_to_cleanup, keep_count=100)
+        except Exception as e:
+            print(f"NodeManager.flush_heartbeat_buffer() error: {e}")
+            # 失败时将数据放回缓冲区（但不覆盖已有的新数据）
+            with self._heartbeat_buffer_lock:
+                for node_code, data in buffer_copy.items():
+                    if node_code not in self._heartbeat_buffer:
+                        self._heartbeat_buffer[node_code] = data
+                    else:
+                        # 比较时间，只保留较新的心跳
+                        existing_time = self._heartbeat_buffer[node_code]['heartbeat_time']
+                        if data['heartbeat_time'] > existing_time:
+                            self._heartbeat_buffer[node_code] = data
+    
+    def _batch_cleanup_old_heartbeats(self, node_codes, keep_count=100):
+        """批量清理多个节点的旧心跳记录"""
+        try:
+            from app.models import NodeHeartModel
+            
+            ids_to_delete = []
+            for node_code in node_codes:
+                # 检查是否需要清理
+                total_count = NodeHeartModel.objects.filter(node_code=node_code).count()
+                if total_count > keep_count:
+                    # 获取要删除的 ID（保留最新的 keep_count 条）
+                    old_heartbeats = NodeHeartModel.objects.filter(
+                        node_code=node_code
+                    ).order_by('-heartbeat_time')[keep_count:].values_list('id', flat=True)
+                    ids_to_delete.extend(old_heartbeats)
+            
+            # 批量删除
+            if ids_to_delete:
+                NodeHeartModel.objects.filter(id__in=ids_to_delete).delete()
+                print(f"NodeManager._batch_cleanup_old_heartbeats() deleted {len(ids_to_delete)} old heartbeats")
+        except Exception as e:
+            print(f"NodeManager._batch_cleanup_old_heartbeats() error: {e}")
+    
     def _save_heartbeat_to_db(self, node_code, heartbeat_time, client_ip=None):
+        """单个心跳写入（兼容旧代码）"""
         try:
             from app.models import NodeHeartModel
             NodeHeartModel.objects.create(
@@ -137,11 +213,6 @@ class NodeManager:
         with self._lock:
             return [node for node in self._nodes.values() if node.get('connected')]
     
-    def is_node_online(self, node_code):
-        with self._lock:
-            node = self._nodes.get(node_code)
-            return node.get('connected', False) if node else False
-    
     def get_channel_name(self, node_code):
         with self._lock:
             node = self._nodes.get(node_code)
@@ -160,18 +231,18 @@ class NodeManager:
         return timeout_nodes
     
     def unregister_node_by_code(self, node_code, close_connection=True):
+        consumer_to_close = None
+        channel_name = None
+        node_found = False
+        
         with self._lock:
             if node_code in self._nodes:
+                node_found = True
                 node = self._nodes[node_code]
                 channel_name = node.get('channel_name')
                 
                 if close_connection and channel_name and channel_name in self._consumers:
-                    try:
-                        consumer = self._consumers[channel_name]
-                        consumer.close()
-                        print(f"NodeManager.unregister_node_by_code() closed websocket for node_code={node_code}")
-                    except Exception as e:
-                        print(f"NodeManager.unregister_node_by_code() close connection error: {e}")
+                    consumer_to_close = self._consumers[channel_name]
                 
                 if channel_name and channel_name in self._channels:
                     del self._channels[channel_name]
@@ -179,9 +250,17 @@ class NodeManager:
                     del self._consumers[channel_name]
                 self._update_node_disconnect_db(node_code)
                 del self._nodes[node_code]
-                print(f"NodeManager.unregister_node_by_code() node_code={node_code}")
-                return True
-            return False
+        
+        if consumer_to_close:
+            try:
+                consumer_to_close.close()
+                print(f"NodeManager.unregister_node_by_code() closed websocket for node_code={node_code}")
+            except Exception as e:
+                print(f"NodeManager.unregister_node_by_code() close connection error: {e}")
+        
+        if node_found:
+            print(f"NodeManager.unregister_node_by_code() node_code={node_code}")
+        return node_found
     
     def start_heartbeat_checker(self):
         if self._checker_running:
@@ -201,6 +280,14 @@ class NodeManager:
     def _heartbeat_checker_loop(self):
         while self._checker_running:
             try:
+                # 批量刷新心跳缓冲区到数据库（失败时保留缓冲区数据，下次重试）
+                try:
+                    self.flush_heartbeat_buffer()
+                except Exception as e:
+                    print(f"NodeManager._heartbeat_checker_loop() flush heartbeat buffer error: {e}")
+                    # 不清除缓冲区，下次重试
+                
+                # 检查超时节点
                 timeout_nodes = self.check_heartbeat_timeout()
                 for node_code in timeout_nodes:
                     print(f"NodeManager._heartbeat_checker_loop() node {node_code} heartbeat timeout")

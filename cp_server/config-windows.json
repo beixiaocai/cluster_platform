@@ -1,0 +1,28 @@
+{
+    "host": "192.168.1.7",
+    "safe": "x20y17W1X2SHI3xDA4MEI5NVwa1",
+    "logDebug": false,
+    "adminPort": 9824,
+    "mediaRtspPort": 9854,
+    "mediaHttpPort": 9826,
+    "mediaSecret": "cp2026zlmzs0aA9ajn7UiOWie",
+    "wsToken": "cp_server_safe_key_2026",
+    "install": "D:\\project\\rebekah\\cluster_platform\\cp_server",
+    "isEnableLoginCaptcha": false,
+    "fontPath": "D:\\project\\rebekah\\cluster_platform\\cp_server\\static\\upload\\fonts\\tsimhei.ttf",
+    "uploadDir": "D:\\project\\rebekah\\cluster_platform\\cp_server\\static\\upload",
+    "storageDir": "D:\\project\\rebekah\\cluster_platform\\cp_server\\static\\storage",
+    "storageTempDir": "D:\\project\\rebekah\\cluster_platform\\cp_server\\static\\storage\\temp",
+    "oem": {
+        "name": "集群管理平台",
+        "welcome": "欢迎",
+        "logo_url": "/static/images/logo.png",
+        "bottom_name": "集群管理平台",
+        "is_show_author": true,
+        "author": "宇图瑞视",
+        "author_link": "https://www.yuturuishi.com/",
+        "auth_online_link": "https://www.yuturuishi.com",
+        "enable_update": true,
+        "check_version_download_url": "https://github.com/beixiaocai/cluster_platform"
+    }
+}

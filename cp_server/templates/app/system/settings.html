@@ -1,33 +1,193 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} 平台启动配置 {% endblock title %}
+{% block title %} 平台配置 {% endblock title %}
 {% block stylesheets %}
   {{ block.super }}
 <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+        background: #f5f7fa;
+        min-height: 100vh;
+    }
+    .right_col { background: transparent; padding: 20px; }
+    
     .config-page {
-        padding: 15px 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0;
+    }
+    
+    .config-header {
+        background: white;
+        padding: 16px 20px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        border: 1px solid #ebeef5;
+    }
+    
+    .config-header-left {
+        display: flex;
+        align-items: center;
     }
     
     .config-page-title {
-        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
         font-weight: 600;
-        color: #333;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
+        color: #303133;
+        margin: 0;
+    }
+    
+    .config-page-title i {
+        width: 24px; height: 24px;
+        background: #f5f7fa;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #606266;
+        font-size: 12px;
+    }
+    
+    .config-page-subtitle {
+        margin: 0;
+        color: #909399;
+        font-size: 12px;
+        padding-left: 12px;
+        border-left: 2px solid #e4e7ed;
+    }
+    
+    #top_loading {
+        display: none;
+        font-size: 12px;
+        color: #909399;
+        margin-left: 10px;
+        display: flex;
+        align-items: center;
+    }
+    
+    #top_loading img {
+        width: 14px;
+        height: 14px;
+        margin-right: 5px;
+    }
+    
+    /* 选项卡样式 */
+    .config-tabs {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        margin-bottom: 16px;
+        overflow: hidden;
+        border: 1px solid #ebeef5;
+    }
+    
+    .tabs-header {
+        display: flex;
+        background: #f5f7fa;
+        border-bottom: 1px solid #e4e7ed;
+        overflow-x: auto;
+    }
+    
+    .tab-btn {
+        padding: 10px 16px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        color: #606266;
+        transition: all 0.2s ease;
+        position: relative;
+        white-space: nowrap;
+    }
+    
+    .tab-btn:hover {
+        background: #e9e9eb;
+        color: #303133;
+    }
+    
+    .tab-btn.active {
+        color: #409EFF;
+        background: white;
+    }
+    
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #409EFF;
+        border-radius: 2px 2px 0 0;
+    }
+    
+    .tab-btn i {
+        margin-right: 6px;
+        font-size: 12px;
+    }
+    
+    .tab-content {
+        display: none;
+        padding: 18px;
+    }
+    
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     .config-section {
-        margin-bottom: 20px;
+        margin-bottom: 18px;
+    }
+    
+    .config-section:last-child {
+        margin-bottom: 0;
     }
     
     .config-section-title {
         font-size: 14px;
         font-weight: 600;
-        color: #555;
-        margin-bottom: 10px;
-        padding-left: 8px;
-        border-left: 3px solid #3b82f6;
+        color: #303133;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .config-section-title i {
+        width: 20px; height: 20px;
+        background: #f5f7fa;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #606266;
+        font-size: 11px;
+        margin-right: 8px;
+    }
+    
+    .config-section-title::before {
+        content: '';
+        width: 3px;
+        height: 14px;
+        background: #409EFF;
+        border-radius: 2px;
+        margin-right: 10px;
     }
     
     .config-grid {
@@ -39,99 +199,115 @@
     .config-item {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 5px;
     }
     
     .config-label {
         font-size: 12px;
-        color: #666;
+        color: #606266;
+        font-weight: 500;
     }
     
     .config-label .req {
-        color: #e74c3c;
+        color: #F56C6C;
+        margin-left: 2px;
     }
     
     .config-input {
-        padding: 8px 10px;
-        border: 1px solid #ddd;
+        padding: 8px 12px;
+        border: 1px solid #dcdfe6;
         border-radius: 4px;
         font-size: 13px;
-        transition: border-color 0.2s;
+        transition: all 0.2s ease;
+        background: white;
+        color: #606266;
     }
     
     .config-input:focus {
         outline: none;
-        border-color: #3b82f6;
+        border-color: #409EFF;
+        box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
     }
     
     .config-checkbox-item {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 10px;
-        background: #f8f9fa;
+        padding: 8px 12px;
+        background: #f5f7fa;
+        border: 1px solid #e4e7ed;
         border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .config-checkbox-item:hover {
+        background: #e9e9eb;
+        border-color: #dcdfe6;
     }
     
     .config-checkbox-item input {
         width: 16px;
         height: 16px;
-        accent-color: #3b82f6;
+        accent-color: #409EFF;
+        cursor: pointer;
     }
     
     .config-checkbox-item span {
         font-size: 13px;
-        color: #333;
+        color: #606266;
+        font-weight: 500;
+    }
+    
+    .config-hint {
+        font-size: 11px;
+        color: #909399;
+        margin-top: 3px;
     }
     
     .config-actions {
         display: flex;
         gap: 10px;
-        margin-top: 20px;
-        padding-top: 15px;
-        border-top: 1px solid #eee;
+        margin-top: 8px;
+        padding: 16px 20px;
+        background: #f5f7fa;
+        border-radius: 8px;
+        border-top: 1px solid #e4e7ed;
     }
     
     .config-btn {
-        padding: 8px 20px;
+        padding: 6px 12px;
         border-radius: 4px;
-        font-size: 13px;
+        font-size: 12px;
+        font-weight: 500;
         cursor: pointer;
         border: none;
-        transition: opacity 0.2s;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
     
-    .config-btn:hover {
-        opacity: 0.9;
+    .config-btn i {
+        font-size: 12px;
     }
     
     .config-btn-primary {
-        background: #3b82f6;
-        color: #fff;
+        background: #409EFF;
+        color: white;
+    }
+    
+    .config-btn-primary:hover {
+        background: #66b1ff;
     }
     
     .config-btn-success {
-        background: #10b981;
-        color: #fff;
+        background: #67C23A;
+        color: white;
     }
     
-    .config-hint {
-        font-size: 11px;
-        color: #999;
-    }
-    
-    #top_loading {
-        display: none;
-        font-size: 12px;
-        color: #3b82f6;
-        margin-left: 10px;
-    }
-    
-    #top_loading img {
-        width: 14px;
-        height: 14px;
-        vertical-align: middle;
-        margin-right: 4px;
+    .config-btn-success:hover {
+        background: #85ce61;
     }
 </style>
 {% endblock stylesheets %}
@@ -139,90 +315,223 @@
 {% block content %}
 <div class="right_col" role="main">
     <div class="config-page">
-        <div class="config-page-title">
-            平台启动配置
+        <div class="config-header">
+            <div class="config-header-left">
+                <h1 class="config-page-title"><i class="fa fa-cogs"></i>平台配置</h1>
+                <p class="config-page-subtitle">管理平台核心配置参数</p>
+            </div>
             <span id="top_loading"><img src="/static/images/load.gif" alt="">保存中</span>
         </div>
         
-        <form id="settingsForm">
-            <div class="config-section">
-                <div class="config-section-title">服务配置</div>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label class="config-label">管理端口 <span class="req">*</span></label>
-                        <input type="number" name="adminPort" value="{{config.adminPort}}" class="config-input">
-                    </div>
-                    <div class="config-item">
-                        <label class="config-label">日志调试</label>
-                        <label class="config-checkbox-item">
-                            <input type="checkbox" name="logDebug" {% if config.logDebug %}checked{% endif %}>
-                            <span>开启详细日志</span>
-                        </label>
-                    </div>
-                </div>
+        <!-- 选项卡容器 -->
+        <div class="config-tabs">
+            <!-- 选项卡头部 -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('system')">
+                    <i class="fa fa-server"></i>系统配置
+                </button>
+                <button class="tab-btn" onclick="switchTab('media')">
+                    <i class="fa fa-video-camera"></i>媒体服务
+                </button>
+                <button class="tab-btn" onclick="switchTab('security')">
+                    <i class="fa fa-shield"></i>安全配置
+                </button>
+                <button class="tab-btn" onclick="switchTab('storage')">
+                    <i class="fa fa-database"></i>存储配置
+                </button>
+                <button class="tab-btn" onclick="switchTab('oem')">
+                    <i class="fa fa-paint-brush"></i>OEM 配置
+                </button>
             </div>
             
-            <div class="config-section">
-                <div class="config-section-title">媒体服务</div>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label class="config-label">RTSP端口 <span class="req">*</span></label>
-                        <input type="number" name="mediaRtspPort" value="{{config.mediaRtspPort}}" class="config-input">
-                    </div>
-                    <div class="config-item">
-                        <label class="config-label">HTTP端口 <span class="req">*</span></label>
-                        <input type="number" name="mediaHttpPort" value="{{config.mediaHttpPort}}" class="config-input">
-                    </div>
-                    <div class="config-item">
-                        <label class="config-label">媒体密钥 <span class="req">*</span></label>
-                        <input type="text" name="mediaSecret" value="{{config.mediaSecret}}" class="config-input">
-                        <span class="config-hint">ZLMediaKit推流鉴权密钥</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="config-section">
-                <div class="config-section-title">安全配置</div>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label class="config-label">API安全密钥 <span class="req">*</span></label>
-                        <input type="text" name="safe" value="{{config.safe}}" class="config-input">
-                        <span class="config-hint">开放接口验证的请求头安全值</span>
-                    </div>
-                    <div class="config-item">
-                        <label class="config-label">WebSocket Token <span class="req">*</span></label>
-                        <input type="text" name="wsToken" value="{{config.wsToken}}" class="config-input">
-                        <span class="config-hint">节点连接认证令牌</span>
-                    </div>
-                    <div class="config-item">
-                        <label class="config-label">登录验证码</label>
-                        <label class="config-checkbox-item">
-                            <input type="checkbox" name="isEnableLoginCaptcha" {% if config.isEnableLoginCaptcha %}checked{% endif %}>
-                            <span>启用登录验证码</span>
-                        </label>
+            <!-- 选项卡内容 -->
+            <form id="settingsForm">
+                <!-- 系统配置选项卡 -->
+                <div id="tab-system" class="tab-content active">
+                    <div class="config-section">
+                        <div class="config-section-title"><i class="fa fa-cog"></i>基础服务配置</div>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label class="config-label">管理端口 <span class="req">*</span></label>
+                                <input type="number" name="adminPort" value="{{config.adminPort}}" class="config-input">
+                                <span class="config-hint">Web 管理界面访问端口</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">日志调试</label>
+                                <label class="config-checkbox-item">
+                                    <input type="checkbox" name="logDebug" {% if config.logDebug %}checked{% endif %}>
+                                    <span>开启详细日志输出</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="config-section">
-                <div class="config-section-title">存储配置</div>
-                <div class="config-grid">
-                    <div class="config-item">
-                        <label class="config-label">上传目录 <span class="req">*</span></label>
-                        <input type="text" name="uploadDir" value="{{config.uploadDir}}" class="config-input">
-                    </div>
-                    <div class="config-item">
-                        <label class="config-label">临时存储目录 <span class="req">*</span></label>
-                        <input type="text" name="storageTempDir" value="{{config.storageTempDir}}" class="config-input">
+                
+                <!-- 媒体服务选项卡 -->
+                <div id="tab-media" class="tab-content">
+                    <div class="config-section">
+                        <div class="config-section-title"><i class="fa fa-film"></i>ZLMediaKit 配置</div>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label class="config-label">RTSP 端口 <span class="req">*</span></label>
+                                <input type="number" name="mediaRtspPort" value="{{config.mediaRtspPort}}" class="config-input">
+                                <span class="config-hint">RTSP 推流端口</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">HTTP 端口 <span class="req">*</span></label>
+                                <input type="number" name="mediaHttpPort" value="{{config.mediaHttpPort}}" class="config-input">
+                                <span class="config-hint">HTTP-FLV 拉流端口</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">媒体密钥 <span class="req">*</span></label>
+                                <input type="text" name="mediaSecret" value="{{config.mediaSecret}}" class="config-input">
+                                <span class="config-hint">ZLMediaKit 推流鉴权密钥</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="config-actions">
-                <button type="button" onclick="f_saveSettings()" class="config-btn config-btn-primary">保存配置</button>
-                <button type="button" onclick="f_exportLogs()" class="config-btn config-btn-success">导出日志</button>
-            </div>
-        </form>
+                
+                <!-- 安全配置选项卡 -->
+                <div id="tab-security" class="tab-content">
+                    <div class="config-section">
+                        <div class="config-section-title"><i class="fa fa-lock"></i>接口与认证配置</div>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label class="config-label">API 安全密钥 <span class="req">*</span></label>
+                                <input type="text" name="safe" value="{{config.safe}}" class="config-input">
+                                <span class="config-hint">开放接口验证的请求头安全值</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">WebSocket Token <span class="req">*</span></label>
+                                <input type="text" name="wsToken" value="{{config.wsToken}}" class="config-input">
+                                <span class="config-hint">节点连接 WebSocket 认证令牌</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">登录验证码</label>
+                                <label class="config-checkbox-item">
+                                    <input type="checkbox" name="isEnableLoginCaptcha" {% if config.isEnableLoginCaptcha %}checked{% endif %}>
+                                    <span>启用登录验证码</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 存储配置选项卡 -->
+                <div id="tab-storage" class="tab-content">
+                    <div class="config-section">
+                        <div class="config-section-title"><i class="fa fa-folder-open"></i>目录路径配置</div>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label class="config-label">安装根目录 <span class="req">*</span></label>
+                                <input type="text" name="install" value="{{config.install}}" class="config-input">
+                                <span class="config-hint">程序安装根目录路径</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">上传目录 <span class="req">*</span></label>
+                                <input type="text" name="uploadDir" value="{{config.uploadDir}}" class="config-input">
+                                <span class="config-hint">用户上传文件存储目录</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">字体文件路径 <span class="req">*</span></label>
+                                <input type="text" name="fontPath" value="{{config.fontPath}}" class="config-input">
+                                <span class="config-hint">用于图片生成的字体文件</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">临时存储目录 <span class="req">*</span></label>
+                                <input type="text" name="storageTempDir" value="{{config.storageTempDir}}" class="config-input">
+                                <span class="config-hint">临时文件存储目录</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- OEM 配置选项卡 -->
+                <div id="tab-oem" class="tab-content">
+                    <div class="config-section">
+                        <div class="config-section-title"><i class="fa fa-info-circle"></i>平台基本信息</div>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label class="config-label">平台名称 <span class="req">*</span></label>
+                                <input type="text" name="oem_name" value="{{settings.name}}" class="config-input">
+                                <span class="config-hint">显示在浏览器标题和登录页的平台名称</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">欢迎语</label>
+                                <input type="text" name="oem_welcome" value="{{settings.welcome}}" class="config-input">
+                                <span class="config-hint">登录页面欢迎提示语</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">底部名称</label>
+                                <input type="text" name="oem_bottom_name" value="{{settings.bottom_name}}" class="config-input">
+                                <span class="config-hint">页面底部显示的平台名称</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-section-title"><i class="fa fa-image"></i>LOGO 与链接</div>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label class="config-label">Logo URL</label>
+                                <input type="text" name="oem_logo_url" value="{{settings.logo_url}}" class="config-input">
+                                <span class="config-hint">左上角 Logo 图片地址</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">作者名称</label>
+                                <input type="text" name="oem_author" value="{{settings.author}}" class="config-input">
+                                <span class="config-hint">版权所有方名称</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">作者链接</label>
+                                <input type="text" name="oem_author_link" value="{{settings.author_link}}" class="config-input">
+                                <span class="config-hint">点击作者跳转的网址</span>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">授权在线链接</label>
+                                <input type="text" name="oem_auth_online_link" value="{{settings.auth_online_link}}" class="config-input">
+                                <span class="config-hint">在线授权验证地址</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <div class="config-section-title"><i class="fa fa-toggle-on"></i>功能开关</div>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label class="config-label">显示作者</label>
+                                <label class="config-checkbox-item">
+                                    <input type="checkbox" name="oem_is_show_author" {% if settings.is_show_author %}checked{% endif %}>
+                                    <span>在页面底部显示作者信息</span>
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">启用更新检查</label>
+                                <label class="config-checkbox-item">
+                                    <input type="checkbox" name="oem_enable_update" {% if settings.enable_update %}checked{% endif %}>
+                                    <span>定期检查并提示新版本</span>
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <label class="config-label">版本下载地址</label>
+                                <input type="text" name="oem_check_version_download_url" value="{{settings.check_version_download_url}}" class="config-input">
+                                <span class="config-hint">检查更新时获取下载链接的地址</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="config-actions">
+                    <button type="button" onclick="f_saveSettings()" class="config-btn config-btn-primary">
+                        <i class="fa fa-save"></i>保存全部配置
+                    </button>
+                    <button type="button" onclick="f_exportLogs()" class="config-btn config-btn-success">
+                        <i class="fa fa-download"></i>导出日志
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock content %}
@@ -231,6 +540,19 @@
 {{ block.super }}
 <script>
     let ele_top_loading = $("#top_loading");
+    
+    // 选项卡切换函数
+    function switchTab(tabName) {
+        // 隐藏所有选项卡内容
+        $('.tab-content').removeClass('active');
+        // 移除所有按钮激活状态
+        $('.tab-btn').removeClass('active');
+        
+        // 显示目标选项卡
+        $('#tab-' + tabName).addClass('active');
+        // 激活对应按钮
+        $('button[onclick="switchTab(\'' + tabName + '\')"]').addClass('active');
+    }
 
     function f_exportLogs(){
         ele_top_loading.show();
@@ -258,12 +580,29 @@
     function f_saveSettings(){
         ele_top_loading.show();
         let data = {};
+        
+        // 收集所有文本框和数字框的值
         $("#settingsForm").find('input[type="text"], input[type="number"]').each(function() {
-            data[$(this).attr('name')] = $(this).val();
+            let name = $(this).attr('name');
+            let value = $(this).val();
+            // OEM 配置需要特殊处理前缀
+            if (name && name.startsWith('oem_')) {
+                data[name] = value;
+            } else if (name) {
+                data[name] = value;
+            }
         });
+        
+        // 收集所有复选框的值
         $("#settingsForm").find('input[type="checkbox"]').each(function() {
-            data[$(this).attr('name')] = $(this).is(':checked');
+            let name = $(this).attr('name');
+            if (name) {
+                data[name] = $(this).is(':checked');
+            }
         });
+        
+        console.log('保存的配置数据:', data);
+        
         $.ajax({
             url: "/system/postSaveSettings",
             type: "post",
@@ -278,6 +617,12 @@
                 ele_top_loading.hide();
                 if(res.code === 1000){
                     myAlert(res.msg, "success");
+                    // 如果是 OEM 配置保存成功，提示刷新页面
+                    if (data['oem_name'] !== undefined) {
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    }
                 } else {
                     myAlert(res.msg, "error");
                 }

@@ -34,7 +34,58 @@ def download(request):
         return f_responseJson({"code": 0, "msg": str(e)})
 
 def access(request):
-    return openAccess(request)
+    params = f_parseGetParams(request)
+    filename = params.get("filename")
+    
+    # 清理路径中的双斜杠
+    if filename:
+        filename = filename.replace("//", "/")
+    
+    try:
+        if filename:
+            if (filename.endswith(".mp4") or
+                    filename.endswith(".avi") or
+                    filename.endswith(".wav") or
+                    filename.endswith(".jpeg") or
+                    filename.endswith(".jpg") or
+                    filename.endswith(".png")):
+
+                filepath = os.path.join(g_config.storageDir, filename)
+
+                if os.path.exists(filepath):
+                    f = open(filepath, mode="rb")
+                    data = f.read()
+                    f.close()
+
+                    if filename.endswith(".mp4"):
+                        fs = os.path.getsize(filepath)
+                        response = HttpResponse(data, content_type="video/mp4")
+                        response['Accept-Ranges'] = "bytes"
+                        response['Access-Control-Allow-Origin'] = "*"
+                        response['Access-Control-Allow-Headers'] = "*"
+                        response['Access-Control-Allow-Methods'] = "POST, GET, OPTIONS, DELETE"
+                        response['Content-Length'] = fs
+                    elif filename.endswith(".jpg") or filename.endswith(".png"):
+                        response = HttpResponse(data, content_type="image/jpeg")
+                        response['Access-Control-Allow-Origin'] = "*"
+                        response['Access-Control-Allow-Headers'] = "*"
+                        response['Access-Control-Allow-Methods'] = "POST, GET, OPTIONS, DELETE"
+                    else:
+                        response = HttpResponse(data, content_type="application/octet-stream")
+                        response['Access-Control-Allow-Origin'] = "*"
+                        response['Access-Control-Allow-Headers'] = "*"
+                        response['Access-Control-Allow-Methods'] = "POST, GET, OPTIONS, DELETE"
+
+                    return response
+                else:
+                    return f_responseJson({"msg": "File not found: " + filepath})
+            else:
+                return f_responseJson({"msg": "Unsupported format"})
+        else:
+            return f_responseJson({"msg": "Filename required"})
+
+    except Exception as e:
+        return f_responseJson({"msg": str(e)})
 
 def info(request):
     return f_responseJson({"code": 0, "msg": "not implemented"})

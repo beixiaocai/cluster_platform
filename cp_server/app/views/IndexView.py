@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 def index(request):
     context = {
-        "settings": f_settingsReadData()
+        "settings": g_settings.data
     }
     return render(request, 'app/index.html', context)
 

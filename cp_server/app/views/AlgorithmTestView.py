@@ -2,7 +2,7 @@ from app.views.ViewsBase import *
 
 
 def index(request):
-    return render(request, 'app/algorithmTest/index.html', {"settings": f_settingsReadData()})
+    return render(request, 'app/algorithmTest/index.html', {"settings": g_settings.data})
 
 
 def api_getFlows(request):

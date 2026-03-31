@@ -23,58 +23,58 @@
         }
         .login-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 360px;
         }
         .login-card {
             background: #fff;
-            border-radius: 12px;
-            padding: 40px;
+            border-radius: 10px;
+            padding: 30px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
         .login-logo {
-            width: 56px;
-            height: 56px;
-            background: #22c55e;
-            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            background: #3b82f6;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
+            margin: 0 auto 16px;
         }
         .login-logo svg {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             fill: white;
         }
         .login-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
             color: #1a1a1a;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .login-subtitle {
             font-size: 13px;
             color: #888;
         }
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
         .form-label {
             display: block;
             font-size: 12px;
             font-weight: 500;
             color: #555;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         .form-input {
             width: 100%;
-            padding: 12px 14px;
+            padding: 10px 12px;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 14px;
             transition: all 0.2s ease;
             background: #fafafa;
@@ -82,7 +82,7 @@
         }
         .form-input:focus {
             outline: none;
-            border-color: #22c55e;
+            border-color: #3b82f6;
             background: #fff;
         }
         .form-input::placeholder {
@@ -90,15 +90,15 @@
         }
         .captcha-row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
         }
         .captcha-row .form-input {
             flex: 1;
         }
         .captcha-img {
-            width: 100px;
-            height: 44px;
+            width: 90px;
+            height: 40px;
             border-radius: 6px;
             cursor: pointer;
             object-fit: cover;
@@ -106,31 +106,56 @@
         }
         .btn-login {
             width: 100%;
-            padding: 12px;
-            background: #22c55e;
+            padding: 10px;
+            background: #3b82f6;
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 8px;
+            margin-top: 4px;
         }
         .btn-login:hover {
-            background: #16a34a;
+            background: #2563eb;
         }
         .login-footer {
             text-align: center;
-            margin-top: 24px;
-            padding-top: 20px;
+            margin-top: 20px;
+            padding-top: 16px;
             border-top: 1px solid #eee;
+        }
+        .footer-copyright {
             font-size: 11px;
             color: #aaa;
+            margin-bottom: 12px;
+        }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            color: #666;
+        }
+        .social-btn:hover {
+            color: #3b82f6;
+            background: #f5f5f5;
         }
         @media (max-width: 480px) {
             .login-card {
-                padding: 30px 20px;
+                padding: 24px 20px;
             }
             .login-title {
                 font-size: 18px;
@@ -148,7 +173,7 @@
                     </svg>
                 </div>
                 <h1 class="login-title">集群管理平台</h1>
-                <p class="login-subtitle">Cluster Platform</p>
+                <p class="login-subtitle">cluster_platform</p>
             </div>
             
             <form id="loginForm">
@@ -174,7 +199,23 @@
             </form>
             
             <div class="login-footer">
-                © 2024-2026 Cluster Platform · v{{project_version}}
+                <div class="footer-copyright">
+                    © 2024-2026 cluster_platform · v{{project_version}}
+                </div>
+                <div class="social-links">
+                    <a href="https://github.com/beixiaocai/cluster_platform" target="_blank" class="social-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                    <a href="https://gitee.com/Vanishi/cluster_platform" target="_blank" class="social-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.984 0A12.001 12.001 0 0 0 0 11.984 11.984 23.969 23.969 11.984 11.984 0 11.984 0ZM8.508 4.75c1.93 0 3.625 1.875 3.625 3.75s-1.695 3.75-3.625 3.75-3.633-1.875-3.633-3.75 1.703-3.75 3.633-3.75zm9.984 0c1.93 0 3.625 1.875 3.625 3.75s-1.695 3.75-3.625 3.75-3.633-1.875-3.633-3.75 1.703-3.75 3.633-3.75zm-9.984 8.75c1.93 0 3.625 1.875 3.625 3.75s-1.695 3.75-3.625 3.75-3.633-1.875-3.633-3.75 1.703-3.75 3.633-3.75z"/>
+                        </svg>
+                        Gitee
+                    </a>
+                </div>
             </div>
         </div>
     </div>

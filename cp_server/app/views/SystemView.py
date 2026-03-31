@@ -12,21 +12,17 @@ from framework.settings import PROJECT_VERSION,PROJECT_ADMIN_START_TIMESTAMP
 
 def settings(request):
     # 系统设置
-    # 读取settings.json获取系统基本信息
-    system_settings = f_settingsReadData()
-    
-    # 读取config.json获取配置信息
-    import json
-    config_data = {}
+    # 读取 config.json 获取系统基本信息和配置信息
     try:
         with open(g_filepath_config_json, 'r', encoding='utf-8') as f:
             config_data = json.load(f)
     except Exception as e:
         g_logger.error(f"SystemView.settings() error reading config.json: {str(e)}")
+        config_data = {}
     
     context = {
-        "settings": system_settings,  # 用于模板中的系统基本信息（如logo_url）
-        "config": config_data,  # 用于配置编辑表单
+        "settings": config_data.get('oem', {}),  # OEM 配置用于模板中的系统基本信息（如 logo_url）
+        "config": config_data,  # 完整配置用于配置编辑表单
         "project_version": PROJECT_VERSION,
         "project_flag": PROJECT_FLAG
     }
@@ -56,20 +52,16 @@ def api_postExportLogs(request):
         osSystem = OSSystem()
 
 
-        # 压缩log->log.tar
+        # 压缩 log->log.tar
         log_dir = "log"
         if os.path.exists(log_dir):
             log_tar_filepath = os.path.join(export_dir, "log.tar")
             tar_utils.compress_folder(folder_dir=log_dir, output_filepath=log_tar_filepath)
-
-        # （v4.632新增）写入config.json, settings.json, config.ini
+        
+        # 写入 config.json（包含 OEM 配置）
         if os.path.exists(g_filepath_config_json):
             dst = os.path.join(export_dir, "config.json")
             shutil.copyfile(g_filepath_config_json, dst)
-
-        if os.path.exists(g_filepath_settings_json):
-            dst = os.path.join(export_dir, "settings.json")
-            shutil.copyfile(g_filepath_settings_json, dst)
 
         # v4.701新增 end
 
@@ -135,17 +127,31 @@ def api_postSaveSettings(request):
             
             # 更新配置
             for key, value in request.POST.items():
-                # 处理布尔值
-                if value.lower() == 'true':
-                    config_data[key] = True
-                elif value.lower() == 'false':
-                    config_data[key] = False
-                # 处理数字
-                elif value.isdigit():
-                    config_data[key] = int(value)
-                # 处理字符串
+                # 处理 OEM 配置（带 oem_前缀的参数）
+                if key.startswith('oem_'):
+                    oem_key = key[4:]  # 去掉'oem_'前缀
+                    if 'oem' not in config_data:
+                        config_data['oem'] = {}
+                    # 处理布尔值
+                    if value.lower() == 'true':
+                        config_data['oem'][oem_key] = True
+                    elif value.lower() == 'false':
+                        config_data['oem'][oem_key] = False
+                    else:
+                        config_data['oem'][oem_key] = value
+                # 处理普通配置
                 else:
-                    config_data[key] = value
+                    # 处理布尔值
+                    if value.lower() == 'true':
+                        config_data[key] = True
+                    elif value.lower() == 'false':
+                        config_data[key] = False
+                    # 处理数字
+                    elif value.isdigit():
+                        config_data[key] = int(value)
+                    # 处理字符串
+                    else:
+                        config_data[key] = value
             
             # 保存配置
             with open(g_filepath_config_json, 'w', encoding='utf-8') as f:
@@ -170,8 +176,16 @@ def api_postSaveSettings(request):
 
 def onlineStreams(request):
     # 在线视频流页面
+    try:
+        with open(g_filepath_config_json, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        settings_data = config_data.get('oem', {})
+    except Exception as e:
+        g_logger.error(f"SystemView.onlineStreams() error reading config.json: {str(e)}")
+        settings_data = {}
+    
     context = {
-        "settings": f_settingsReadData()
+        "settings": settings_data
     }
     
     nodes = NodeModel.objects.all().order_by('-id')

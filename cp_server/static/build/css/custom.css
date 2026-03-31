@@ -144,7 +144,7 @@ html , body{
     padding: 0 0 4px 0
 }
 .left_col {
-    background: #091f35
+    background: #1e293b
 }
 .nav-sm .container.body .col-md-3.left_col {
     min-height: 100%;
@@ -197,7 +197,7 @@ html , body{
 }
 .nav-sm .nav.child_menu li.active,
 .nav-sm .nav.side-menu li.active-sm {
-    border-right: 5px solid #1ABB9C
+    border-right: 5px solid #3b82f6
 }
 .nav-sm ul.nav.child_menu ul,
 .nav-sm .nav.side-menu li.active-sm ul ul {
@@ -206,7 +206,7 @@ html , body{
     background: none
 }
 .nav-sm>.nav.side-menu>li.active-sm>a {
-    color: #1ABB9C !important
+    color: #3b82f6 !important
 }
 .nav-sm .nav.side-menu li a i.toggle-up {
     display: none !important
@@ -223,7 +223,7 @@ html , body{
     top: 0;
     width: 150px;
     z-index: 4000;
-    background: #091f35;
+    background: #1e293b;
     display: none
 }
 .nav-sm ul.nav.child_menu li {
@@ -322,8 +322,8 @@ html , body{
 }
 .nav_menu {
     float: left;
-    background: #EDEDED;
-    border-bottom: 1px solid #D9DEE4;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
     margin-bottom: 10px;
     width: 100%;
     position: relative
@@ -356,7 +356,7 @@ body .container.body .right_col {
 .nav_title {
     width: 200px;
     float: left;
-    background: #091f35;
+    background: #1e293b;
     border-radius: 0;
     height: 57px
 }
@@ -741,7 +741,7 @@ a:active,
     padding-left: 36px
 }
 .nav-md ul.nav.child_menu li:before {
-    background: #425668;
+    background: #3b82f6;
     bottom: auto;
     content: "";
     height: 8px;
@@ -754,7 +754,7 @@ a:active,
     border-radius: 50%
 }
 .nav-md ul.nav.child_menu li:after {
-    border-left: 1px solid #425668;
+    border-left: 1px solid #3b82f6;
     bottom: 0;
     content: "";
     left: 27px;
@@ -792,7 +792,7 @@ a:active,
 }
 .nav.side-menu>li.current-page,
 .nav.side-menu>li.active {
-    border-right: 5px solid #1ABB9C
+    border-right: 5px solid #3b82f6
 }
 .nav li.current-page {
     background: rgba(255, 255, 255, 0.05)
@@ -805,7 +805,7 @@ a:active,
 }
 .nav.side-menu>li.active>a {
     text-shadow: rgba(0, 0, 0, 0.25) 0 -1px 0;
-    background: linear-gradient(#091f35, #091f35), #091f35;
+    background: rgba(59, 130, 246, 0.15);
     box-shadow: rgba(0, 0, 0, 0.25) 0 1px 0, inset rgba(255, 255, 255, 0.16) 0 1px 0
 }
 .navbar-brand,

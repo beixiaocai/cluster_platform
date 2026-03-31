@@ -19,6 +19,7 @@ from .views import LLMView
 from .views import AlgorithmTestView
 from .views import FaceView
 from .views import ScheduleTaskView
+from .views import PlatformAlarmView
 
 app_name = 'app'
 
@@ -35,16 +36,17 @@ urlpatterns = [
     path('user/postDel', UserView.api_postDel),
     path('user/api_openUserDetail', UserView.api_openUserDetail),
 
-    path('node/index', NodeView.index),
-    path('node/openDel', NodeView.api_openDel),
-    path('node/getOnlineNodes', NodeView.api_getOnlineNodes),
-    path('node/getList', NodeView.api_getList),
-    path('node/upgrade', NodeView.api_upgradeVersion),
-    path('node/restartApp', NodeView.api_restartApp),
-    path('node/restartOS', NodeView.api_restartOS),
-    path('node/exportLogs', NodeView.api_exportLogs),
-    path('node/downloadLog', NodeView.api_downloadLog),
-    path('node/getHeartbeats', NodeView.api_getHeartbeats),
+    path('platform/node/index', NodeView.index),
+    path('platform/node/edit', NodeView.edit),
+    path('platform/node/openDel', NodeView.api_openDel),
+    path('platform/node/getOnlineNodes', NodeView.api_getOnlineNodes),
+    path('platform/node/getList', NodeView.api_getList),
+    path('platform/node/upgrade', NodeView.api_upgradeVersion),
+    path('platform/node/restartApp', NodeView.api_restartApp),
+    path('platform/node/restartOS', NodeView.api_restartOS),
+    path('platform/node/exportLogs', NodeView.api_exportLogs),
+    path('platform/node/downloadLog', NodeView.api_downloadLog),
+    path('platform/node/getHeartbeats', NodeView.api_getHeartbeats),
 
     path('alarm/index', AlarmView.index),
     path('alarm/openHandle', AlarmView.api_openHandle),
@@ -53,6 +55,15 @@ urlpatterns = [
     path('alarm/openInfo', AlarmView.api_openInfo),
     path('alarm/openContext', AlarmView.api_openContext),
     path('alarm/openEdit', AlarmView.api_openEdit),
+
+    path('platform/alarm/index', PlatformAlarmView.index),
+    path('platform/alarm/edit', PlatformAlarmView.edit),
+    path('platform/alarm/openHandle', PlatformAlarmView.api_openHandle),
+    path('platform/alarm/openExport', PlatformAlarmView.api_openExport),
+    path('platform/alarm/openIndex', PlatformAlarmView.api_openIndex),
+    path('platform/alarm/openInfo', PlatformAlarmView.api_openInfo),
+    path('platform/alarm/openEdit', PlatformAlarmView.edit),
+    path('platform/alarm/openAdd', PlatformAlarmView.api_openAdd),
 
 
     path('stream/index', StreamView.index),
