@@ -13,7 +13,7 @@
         background: #f5f7fa;
         min-height: 100vh;
     }
-    .right_col { background: transparent; padding: 20px; }
+    .right_col { background: transparent; padding: 20px; overflow-x: hidden; }
     .page-container { max-width: 1400px; margin: 0 auto; }
     
     /* 页面标题栏 */
@@ -126,17 +126,17 @@
     .stat-value { font-size: 16px; font-weight: 600; color: #303133; line-height: 1.2; }
     .stat-label { font-size: 10px; color: #909399; line-height: 1.2; }
     
-    /* 节点卡片 - 增加宽度，降低高度 */
+    /* 节点卡片 - 缩小宽高 */
     .nodes-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
+        gap: 12px;
         margin-bottom: 16px;
     }
     .node-card {
         background: white;
-        border-radius: 8px;
-        padding: 14px;
+        border-radius: 6px;
+        padding: 12px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         transition: all 0.2s ease;
         border: 1px solid #ebeef5;
@@ -152,20 +152,20 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 12px;
-        gap: 12px;
+        margin-bottom: 10px;
+        gap: 10px;
     }
-    .node-info-left { display: flex; gap: 10px; align-items: center; flex: 1; }
+    .node-info-left { display: flex; gap: 8px; align-items: center; flex: 1; }
     .node-avatar {
-        width: 32px; height: 32px;
-        border-radius: 6px;
+        width: 28px; height: 28px;
+        border-radius: 5px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 13px; font-weight: 600; color: white;
+        font-size: 12px; font-weight: 600; color: white;
         background: #909399;
         flex-shrink: 0;
     }
     .node-basic-info h3 { 
-        font-size: 14px; 
+        font-size: 13px; 
         font-weight: 600; 
         color: #303133; 
         margin: 0 0 2px 0;
@@ -174,44 +174,44 @@
         text-overflow: ellipsis;
     }
     .node-code { 
-        font-size: 11px; 
+        font-size: 10px; 
         color: #909399; 
         font-family: 'Courier New', monospace;
     }
     
     .status-badge {
-        padding: 2px 8px;
-        border-radius: 10px;
-        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-size: 10px;
         font-weight: 500;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
         flex-shrink: 0;
     }
     .status-badge.online { background: #f0f9ff; color: #67C23A; border: 1px solid #e1f3d8; }
     .status-badge.offline { background: #fef0f0; color: #F56C6C; border: 1px solid #fde2e2; }
     .status-dot {
-        width: 6px; height: 6px;
+        width: 5px; height: 5px;
         border-radius: 50%;
         background: currentColor;
     }
     
-    .node-card-body { margin-bottom: 12px; }
+    .node-card-body { margin-bottom: 10px; }
     .info-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 6px 0;
+        padding: 5px 0;
         border-bottom: 1px solid #f2f6fc;
     }
     .info-row:last-child { border-bottom: none; }
-    .info-label { font-size: 11px; color: #909399; }
+    .info-label { font-size: 10px; color: #909399; }
     .info-value { 
-        font-size: 12px; 
+        font-size: 11px; 
         color: #303133; 
         font-weight: 500;
-        max-width: 200px;
+        max-width: 180px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -219,28 +219,28 @@
     
     .tag {
         display: inline-block;
-        padding: 2px 5px;
+        padding: 2px 4px;
         border-radius: 3px;
-        font-size: 10px;
+        font-size: 9px;
         font-weight: 500;
-        margin-right: 4px;
+        margin-right: 3px;
         margin-bottom: 2px;
         background: #f5f7fa;
         color: #606266;
     }
-    .tags-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .tags-container { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
     
     .node-card-footer {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-        padding-top: 10px;
+        gap: 5px;
+        padding-top: 8px;
         border-top: 1px solid #f2f6fc;
     }
     .action-btn {
-        padding: 5px 8px;
-        border-radius: 4px;
-        font-size: 11px;
+        padding: 4px 6px;
+        border-radius: 3px;
+        font-size: 10px;
         font-weight: 500;
         border: none;
         cursor: pointer;
@@ -248,12 +248,12 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 4px;
+        gap: 3px;
         text-decoration: none;
         color: white;
         white-space: nowrap;
     }
-    .action-btn i { font-size: 10px; }
+    .action-btn i { font-size: 9px; }
     .action-btn-detail { background: #f5f7fa; color: #606266; }
     .action-btn-detail:hover { background: #e9e9eb; color: #303133; }
     .action-btn-heartbeat { background: #f5f7fa; color: #606266; }
@@ -279,6 +279,7 @@
         justify-content: center;
         align-items: center;
         gap: 16px;
+        flex-wrap: wrap;
     }
     .pagination-info { font-size: 12px; color: #909399; }
     .pagination-info span { color: #409EFF; font-weight: 500; }
@@ -323,8 +324,10 @@
         width: 100%; height: 100%;
         background: rgba(0, 0, 0, 0.5);
         z-index: 99999;
+        align-items: center;
+        justify-content: center;
     }
-    .detail-modal.show { display: flex; align-items: center; justify-content: center; }
+    .detail-modal.show { display: flex; }
     .detail-modal-content {
         background: white;
         border-radius: 8px;
@@ -333,6 +336,7 @@
         max-height: 80vh;
         overflow: hidden;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        margin: 80px auto;
     }
     .detail-modal-header {
         padding: 14px 20px;
@@ -360,7 +364,8 @@
     .detail-modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
     .detail-item { margin-bottom: 16px; }
     .detail-label { font-size: 11px; color: #909399; font-weight: 500; margin-bottom: 6px; }
-    .detail-value { font-size: 13px; color: #303133; word-break: break-all; }
+    .detail-value { font-size: 13px; color: #303133 !important; word-break: break-all; }
+    .detail-value.node-name { font-size: 14px; font-weight: 600; color: #303133 !important; }
     .detail-json {
         background: #f5f7fa;
         padding: 12px;
@@ -395,6 +400,15 @@
         .stats-grid { grid-template-columns: repeat(2, 1fr); }
         .node-card-footer { flex-direction: column; }
         .action-btn { width: 100%; }
+    }
+    
+    /* 防止页面溢出 */
+    html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+    .right_col {
+        overflow-x: auto;
     }
     
     #top_loading {
@@ -677,7 +691,7 @@
 <div class="detail-modal" id="heartbeatsModal">
     <div class="detail-modal-content" style="width: 650px;">
         <div class="detail-modal-header">
-            <h3><i class="fa fa-heartbeat"></i> 心跳记录 - <span id="heartbeats_node_code" style="color:#fff;"></span></h3>
+            <h3><i class="fa fa-heartbeat"></i> 心跳记录 - <span id="heartbeats_node_code" style="color: #409EFF; font-weight: 600;"></span></h3>
             <button class="detail-modal-close" onclick="f_closeHeartbeats()">&times;</button>
         </div>
         <div class="detail-modal-body">
@@ -769,9 +783,9 @@
         
         let html = '';
         html += '<div class="detail-item"><div class="detail-label">节点编号</div><div class="detail-value">' + node.code + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">节点名称</div><div class="detail-value">' + node.name + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">节点描述</div><div class="detail-value">' + node.describe + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">客户端 IP</div><div class="detail-value">' + node.client_ip + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">节点名称</div><div class="detail-value node-name">' + (node.name || '-') + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">节点描述</div><div class="detail-value">' + (node.describe || '-') + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">客户端 IP</div><div class="detail-value">' + (node.client_ip || '-') + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">内网地址</div><div class="detail-value">' + node.client_ip + ':' + node.admin_port + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">版本号</div><div class="detail-value">' + node.version + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">授权状态</div><div class="detail-value">' + (node.is_auth == 1 ? node.auth_msg : '未授权') + '</div></div>';
