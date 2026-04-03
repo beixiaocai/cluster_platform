@@ -10,12 +10,13 @@ def api_getNodeList(request):
     data = []
     
     if request.method == 'GET':
-        nodes = NodeModel.objects.all()
-        for node in nodes:
+        # 只获取在线的节点（内存中存在的节点）
+        online_nodes = get_node_manager().get_connected_nodes()
+        for node in online_nodes:
             data.append({
-                'code': node.code,
-                'nickname': node.nickname or node.name or node.code,
-                'host': node.host
+                'code': node.get('code'),
+                'nickname': node.get('name') or node.get('code'),
+                'host': node.get('host')
             })
         ret = True
         msg = "success"

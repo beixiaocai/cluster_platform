@@ -7,13 +7,28 @@
   {{ block.super }}
 <link rel="stylesheet" href="/static/lib/jquery/confirm/jquery-confirm.css" />
 <style>
+    /* 弹框居中显示 - 强制覆盖所有可能的外部样式 */
+    .xc-alert {
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        animation: none !important;
+    }
+    
+    /* 模态框容器强制居中 */
+    .modal {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
         background: #f5f7fa;
         min-height: 100vh;
     }
-    .right_col { background: transparent; padding: 20px; overflow-x: hidden; }
+    .right_col { background: transparent; padding: 20px; }
     .page-container { max-width: 1400px; margin: 0 auto; }
     
     /* 页面标题栏 */
@@ -92,44 +107,10 @@
         background: #e9e9eb;
     }
     
-    /* 统计卡片 */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-        gap: 6px;
-        margin-bottom: 10px;
-    }
-    .stat-card {
-        background: white;
-        border-radius: 4px;
-        padding: 4px 10px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-        border: 1px solid #ebeef5;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .stat-card:hover {
-        border-color: #409EFF;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    }
-    .stat-icon {
-        width: 20px; height: 20px;
-        border-radius: 4px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 12px;
-        flex-shrink: 0;
-        background: #f5f7fa;
-        color: #606266;
-    }
-    .stat-content { display: flex; flex-direction: column; }
-    .stat-value { font-size: 16px; font-weight: 600; color: #303133; line-height: 1.2; }
-    .stat-label { font-size: 10px; color: #909399; line-height: 1.2; }
-    
-    /* 节点卡片 - 缩小宽高 */
+    /* 节点卡片 - 紧凑小巧设计 */
     .nodes-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 12px;
         margin-bottom: 16px;
     }
@@ -145,8 +126,6 @@
         border-color: #409EFF;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .node-card.online { border-left: 2px solid #67C23A; }
-    .node-card.offline { border-left: 2px solid #F56C6C; }
     
     .node-card-header {
         display: flex;
@@ -157,42 +136,42 @@
     }
     .node-info-left { display: flex; gap: 8px; align-items: center; flex: 1; }
     .node-avatar {
-        width: 28px; height: 28px;
-        border-radius: 5px;
+        width: 36px; height: 36px;
+        border-radius: 6px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: 600; color: white;
+        font-size: 15px; font-weight: 600; color: white;
         background: #909399;
         flex-shrink: 0;
     }
     .node-basic-info h3 { 
-        font-size: 13px; 
+        font-size: 16px; 
         font-weight: 600; 
         color: #303133; 
-        margin: 0 0 2px 0;
+        margin: 0 0 4px 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     .node-code { 
-        font-size: 10px; 
+        font-size: 13px; 
         color: #909399; 
         font-family: 'Courier New', monospace;
     }
     
     .status-badge {
-        padding: 2px 6px;
-        border-radius: 8px;
-        font-size: 10px;
-        font-weight: 500;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 3px;
+        gap: 5px;
         flex-shrink: 0;
     }
     .status-badge.online { background: #f0f9ff; color: #67C23A; border: 1px solid #e1f3d8; }
     .status-badge.offline { background: #fef0f0; color: #F56C6C; border: 1px solid #fde2e2; }
     .status-dot {
-        width: 5px; height: 5px;
+        width: 7px; height: 7px;
         border-radius: 50%;
         background: currentColor;
     }
@@ -206,11 +185,11 @@
         border-bottom: 1px solid #f2f6fc;
     }
     .info-row:last-child { border-bottom: none; }
-    .info-label { font-size: 10px; color: #909399; }
+    .info-label { font-size: 13px; color: #909399; }
     .info-value { 
-        font-size: 11px; 
+        font-size: 14px; 
         color: #303133; 
-        font-weight: 500;
+        font-weight: 600;
         max-width: 180px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -219,41 +198,41 @@
     
     .tag {
         display: inline-block;
-        padding: 2px 4px;
-        border-radius: 3px;
-        font-size: 9px;
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 11px;
         font-weight: 500;
-        margin-right: 3px;
+        margin-right: 4px;
         margin-bottom: 2px;
         background: #f5f7fa;
         color: #606266;
     }
-    .tags-container { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+    .tags-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
     
     .node-card-footer {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 5px;
+        gap: 6px;
         padding-top: 8px;
         border-top: 1px solid #f2f6fc;
     }
     .action-btn {
-        padding: 4px 6px;
-        border-radius: 3px;
-        font-size: 10px;
-        font-weight: 500;
+        padding: 7px 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
         border: none;
         cursor: pointer;
         transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 3px;
+        gap: 4px;
         text-decoration: none;
         color: white;
         white-space: nowrap;
     }
-    .action-btn i { font-size: 9px; }
+    .action-btn i { font-size: 12px; }
     .action-btn-detail { background: #f5f7fa; color: #606266; }
     .action-btn-detail:hover { background: #e9e9eb; color: #303133; }
     .action-btn-heartbeat { background: #f5f7fa; color: #606266; }
@@ -279,7 +258,6 @@
         justify-content: center;
         align-items: center;
         gap: 16px;
-        flex-wrap: wrap;
     }
     .pagination-info { font-size: 12px; color: #909399; }
     .pagination-info span { color: #409EFF; font-weight: 500; }
@@ -316,8 +294,11 @@
     .empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.3; color: #909399; }
     .empty-state-text { font-size: 14px; color: #909399; }
     
-    /* 模态框 */
-    .detail-modal {
+    /* 模态框 - 全部居中显示 */
+    .detail-modal,
+    .upgrade-modal,
+    .export-logs-modal,
+    .heartbeats-modal {
         display: none;
         position: fixed;
         top: 0; left: 0;
@@ -327,7 +308,14 @@
         align-items: center;
         justify-content: center;
     }
-    .detail-modal.show { display: flex; }
+    .detail-modal.show,
+    .upgrade-modal.show,
+    .export-logs-modal.show,
+    .heartbeats-modal.show { 
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
     .detail-modal-content {
         background: white;
         border-radius: 8px;
@@ -336,7 +324,6 @@
         max-height: 80vh;
         overflow: hidden;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-        margin: 80px auto;
     }
     .detail-modal-header {
         padding: 14px 20px;
@@ -364,8 +351,7 @@
     .detail-modal-body { padding: 20px; max-height: 60vh; overflow-y: auto; }
     .detail-item { margin-bottom: 16px; }
     .detail-label { font-size: 11px; color: #909399; font-weight: 500; margin-bottom: 6px; }
-    .detail-value { font-size: 13px; color: #303133 !important; word-break: break-all; }
-    .detail-value.node-name { font-size: 14px; font-weight: 600; color: #303133 !important; }
+    .detail-value { font-size: 13px; color: #303133; word-break: break-all; }
     .detail-json {
         background: #f5f7fa;
         padding: 12px;
@@ -400,15 +386,6 @@
         .stats-grid { grid-template-columns: repeat(2, 1fr); }
         .node-card-footer { flex-direction: column; }
         .action-btn { width: 100%; }
-    }
-    
-    /* 防止页面溢出 */
-    html, body {
-        overflow-x: hidden;
-        max-width: 100vw;
-    }
-    .right_col {
-        overflow-x: auto;
     }
     
     #top_loading {
@@ -474,31 +451,6 @@
                     <i class="fa fa-times"></i> 清除
                 </button>
                 {% endif %}
-            </div>
-        </div>
-        
-        <!-- 统计卡片 -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fa fa-server"></i></div>
-                <div class="stat-content">
-                    <div class="stat-value">{{ data|length }}</div>
-                    <div class="stat-label">总节点数</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
-                <div class="stat-content">
-                    <div class="stat-value" id="online_count">0</div>
-                    <div class="stat-label">在线节点</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fa fa-times-circle"></i></div>
-                <div class="stat-content">
-                    <div class="stat-value" id="offline_count">0</div>
-                    <div class="stat-label">离线节点</div>
-                </div>
             </div>
         </div>
         
@@ -691,7 +643,7 @@
 <div class="detail-modal" id="heartbeatsModal">
     <div class="detail-modal-content" style="width: 650px;">
         <div class="detail-modal-header">
-            <h3><i class="fa fa-heartbeat"></i> 心跳记录 - <span id="heartbeats_node_code" style="color: #409EFF; font-weight: 600;"></span></h3>
+            <h3><i class="fa fa-heartbeat"></i> 心跳记录 - <span id="heartbeats_node_code" style="color:#fff;"></span></h3>
             <button class="detail-modal-close" onclick="f_closeHeartbeats()">&times;</button>
         </div>
         <div class="detail-modal-body">
@@ -741,21 +693,7 @@
         online: {% if d.online %}true{% else %}false{% endif %}
     };
     {% endfor %}
-    
-    // 统计在线和离线节点数
-    let onlineCount = 0;
-    let offlineCount = 0;
-    for (let code in m_node_data) {
-        if (m_node_data[code].online) {
-            onlineCount++;
-        } else {
-            offlineCount++;
-        }
-    }
-    
-    // 更新统计
-    document.getElementById('online_count').innerText = onlineCount;
-    document.getElementById('offline_count').innerText = offlineCount;
+
 
     function doSearch() {
         let keyword = $('#search_input').val().trim();
@@ -783,9 +721,9 @@
         
         let html = '';
         html += '<div class="detail-item"><div class="detail-label">节点编号</div><div class="detail-value">' + node.code + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">节点名称</div><div class="detail-value node-name">' + (node.name || '-') + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">节点描述</div><div class="detail-value">' + (node.describe || '-') + '</div></div>';
-        html += '<div class="detail-item"><div class="detail-label">客户端 IP</div><div class="detail-value">' + (node.client_ip || '-') + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">节点名称</div><div class="detail-value">' + node.name + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">节点描述</div><div class="detail-value">' + node.describe + '</div></div>';
+        html += '<div class="detail-item"><div class="detail-label">客户端 IP</div><div class="detail-value">' + node.client_ip + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">内网地址</div><div class="detail-value">' + node.client_ip + ':' + node.admin_port + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">版本号</div><div class="detail-value">' + node.version + '</div></div>';
         html += '<div class="detail-item"><div class="detail-label">授权状态</div><div class="detail-value">' + (node.is_auth == 1 ? node.auth_msg : '未授权') + '</div></div>';
@@ -852,7 +790,7 @@
         
         $.ajax({
             url: '/platform/node/upgrade', type: "post", data: formData, processData: false, contentType: false,
-            timeout: 300000,
+            timeout: 600000,
             error: function () { ele_top_loading.hide(); myAlert("网络异常，请确定网络正常！", "error"); },
             success: function (res) {
                 ele_top_loading.hide();
@@ -896,11 +834,7 @@
         
         const alertElement = document.createElement('div');
         alertElement.className = `xc-alert ${icon}`;
-        alertElement.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:16px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);display:flex;align-items:center;gap:10px;';
-        
-        if (icon === 'success') { alertElement.style.backgroundColor = '#4CAF50'; }
-        else if (icon === 'error') { alertElement.style.backgroundColor = '#F44336'; }
-        else { alertElement.style.backgroundColor = '#2196F3'; }
+        alertElement.style.cssText = 'position:fixed !important;top:50% !important;left:50% !important;transform:translate(-50%, -50%) !important;padding:16px 24px;border-radius:8px;font-size:14px;font-weight:500;color:white;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.2);display:flex;align-items:center;gap:10px;min-width:300px;text-align:center;background-color:' + (icon === 'success' ? '#4CAF50' : icon === 'error' ? '#F44336' : '#2196F3') + ';';
         
         alertElement.innerHTML = `<span>${text}</span>`;
         document.body.appendChild(alertElement);

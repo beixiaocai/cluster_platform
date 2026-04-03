@@ -74,12 +74,16 @@ def index(request):
             'last_update_time': node.last_update_time,
         }
         
+        # 优先使用内存中的在线状态判断
         online_node = get_node_manager().get_node(node.code)
         if online_node:
             node_dict['online'] = True
             node_dict['online_last_heartbeat'] = online_node.get('last_heartbeat')
+            print(f"DEBUG: Node {node.code} is ONLINE in memory")
         else:
+            # 如果内存中没有，说明节点未连接，显示离线
             node_dict['online'] = False
+            print(f"DEBUG: Node {node.code} is OFFLINE - not in memory, ws_connected={node.ws_connected}")
         
         data.append(node_dict)
 

@@ -1,4 +1,5 @@
 {% extends "app/base_site.html" %}
+{% load custom_filters %}
 
 {% block title %} 平台用户管理 {% endblock title %}
 
@@ -7,113 +8,120 @@
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
         background: #f5f7fa;
         min-height: 100vh;
     }
     .right_col { background: transparent; padding: 20px; }
+    .page-container { max-width: 1400px; margin: 0 auto; }
     
-    .user-page-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0;
-    }
-    
-    .user-header {
+    /* 页面标题栏 */
+    .page-header {
         background: white;
-        padding: 16px 20px;
         border-radius: 8px;
+        padding: 16px 20px;
         margin-bottom: 16px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        align-items: center;
         flex-wrap: wrap;
-        border: 1px solid #ebeef5;
+        gap: 12px;
     }
-    
-    .user-header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .user-page-title {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+    .page-title { display: flex; align-items: center; gap: 10px; }
+    .page-title h2 {
         font-size: 16px;
         font-weight: 600;
         color: #303133;
         margin: 0;
     }
-    
-    .user-page-title i {
+    .title-icon {
         width: 24px; height: 24px;
         background: #f5f7fa;
         border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #606266;
-        font-size: 12px;
+        display: flex; align-items: center; justify-content: center;
+        color: #606266; font-size: 12px;
     }
     
-    .user-actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .user-btn {
-        padding: 6px 12px;
+    /* 按钮 */
+    .btn {
+        padding: 6px 14px;
         border-radius: 4px;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 500;
-        cursor: pointer;
+        transition: all 0.2s ease;
         border: none;
-        transition: all 0.2s;
+        cursor: pointer;
         display: inline-flex;
         align-items: center;
         gap: 4px;
+        text-decoration: none;
     }
-    
-    .user-btn-primary {
-        background: #f5f7fa;
-        color: #606266;
-    }
-    
-    .user-btn-primary:hover {
-        background: #e9e9eb;
-        color: #303133;
-    }
-    
-    .user-btn-add {
+    .btn-primary {
         background: #409EFF;
         color: white;
     }
-    
-    .user-btn-add:hover {
+    .btn-primary:hover {
         background: #66b1ff;
     }
-        
-    .user-content {
+    .btn-secondary {
+        background: #f4f4f5;
+        color: #606266;
+        border: 1px solid #e9e9eb;
+    }
+    .btn-secondary:hover {
+        background: #e9e9eb;
+    }
+    
+    /* 统计卡片 */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 4px;
+        padding: 8px 12px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        border: 1px solid #ebeef5;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .stat-card:hover {
+        border-color: #409EFF;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .stat-icon {
+        width: 24px; height: 24px;
+        border-radius: 4px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+        background: #f5f7fa;
+        color: #606266;
+    }
+    .stat-content { display: flex; flex-direction: column; }
+    .stat-value { font-size: 18px; font-weight: 600; color: #303133; line-height: 1.2; }
+    .stat-label { font-size: 11px; color: #909399; line-height: 1.2; }
+    
+    /* 用户表格 */
+    .users-table {
         background: white;
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         border: 1px solid #ebeef5;
+        margin-bottom: 16px;
     }
-    
-    .user-table {
+    .users-table table {
         width: 100%;
         border-collapse: collapse;
     }
-    
-    .user-table th {
-        padding: 10px 14px;
+    .users-table th {
+        padding: 12px 14px;
         text-align: left;
         font-weight: 600;
         color: #909399;
@@ -121,351 +129,158 @@
         background: #f5f7fa;
         border-bottom: 1px solid #ebeef5;
     }
-    
-    .user-table td {
-        padding: 10px 14px;
+    .users-table td {
+        padding: 12px 14px;
         font-size: 13px;
         color: #606266;
         border-bottom: 1px solid #ebeef5;
     }
-    
-    .user-table tbody tr:hover {
+    .users-table tbody tr:hover {
         background-color: #f5f7fa;
     }
-        
-    .user-status-badge {
+    
+    /* 状态徽章 - 黑白灰配色 */
+    .status-badge {
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 500;
-        background: #f5f7fa;
-        color: #606266;
-        border: 1px solid #e4e7ed;
+        gap: 5px;
+        flex-shrink: 0;
+    }
+    .status-badge.active { background: #f4f4f5; color: #606266; border: 1px solid #e9e9eb; }
+    .status-badge.inactive { background: #f4f4f5; color: #909399; border: 1px solid #e9e9eb; }
+    .status-dot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: currentColor;
     }
     
-    .user-status-badge.active {
-        background: #f0f9ff;
-        color: #409EFF;
-        border-color: #d9ecff;
-    }
-    
-    .user-status-badge.inactive {
-        background: #fef0f0;
-        color: #F56C6C;
-        border-color: #fde2e2;
-    }
-        
-    .user-action-btn {
-        padding: 4px 10px;
+    /* 操作按钮 - 黑白灰配色 */
+    .action-btn {
+        padding: 6px 10px;
         border-radius: 4px;
         font-size: 12px;
-        cursor: pointer;
+        font-weight: 600;
         border: none;
-        background: #f5f7fa;
-        color: #606266;
-        transition: all 0.2s;
-        margin-right: 6px;
-    }
-    
-    .user-action-btn:hover {
-        background: #e9e9eb;
-        color: #303133;
-    }
-    
-    .user-action-btn.delete {
-        background: #fef0f0;
-        color: #F56C6C;
-    }
-    
-    .user-action-btn.delete:hover {
-        background: #fde2e2;
-        color: #c0392b;
-    }
-        
-    .user-pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        padding-top: 12px;
-        padding-bottom: 8px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        border: 1px solid #ebeef5;
-    }
-    
-    .user-page-info {
-        font-size: 12px;
-        color: #909399;
-        margin-right: 15px;
-    }
-    
-    .user-page-btn {
-        min-width: 32px;
-        height: 32px;
-        border-radius: 4px;
-        border: 1px solid #e4e7ed;
-        background-color: white;
-        color: #606266;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
         text-decoration: none;
-        font-size: 12px;
-    }
-    
-    .user-page-btn:hover:not(.active) {
-        border-color: #409EFF;
-        color: #409EFF;
-    }
-    
-    .user-page-btn.active {
-        background-color: #409EFF;
-        color: white;
-        border-color: #409EFF;
-    }
-            
-    .modal-header {
-        background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
-        color: white;
-        padding: 16px 20px;
-        border-bottom: none;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-radius: 8px 8px 0 0;
-    }
-    
-    .modal-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: white;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    
-    .modal-title-icon {
-        width: 28px; height: 28px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(10px);
-    }
-    
-    .modal-title-icon i {
-        font-size: 14px;
-    }
-    
-    .modal-close-btn {
-        background: rgba(255, 255, 255, 0.15);
-        border: none;
-        cursor: pointer;
-        color: white;
-        transition: all 0.3s;
-        padding: 0;
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .modal-close-btn i {
-        font-size: 16px;
-        line-height: 1;
-    }
-    
-    .modal-close-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: rotate(90deg);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    
-    .modal-body {
-        padding: 20px;
-        background: white;
-    }
-    
-    .modal-footer {
-        padding: 14px 20px;
-        border-top: 1px solid #e4e7ed;
-        background: #f5f7fa;
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-    }
-    
-    .form-group {
-        margin-bottom: 16px;
-    }
-    
-    .form-group label.control-label {
-        font-size: 12px;
         color: #606266;
-        font-weight: 500;
-        text-align: right;
-        padding-right: 10px;
-        line-height: 32px;
+        background: #f5f5f5;
+        white-space: nowrap;
     }
+    .action-btn i { font-size: 11px; }
+    .action-btn:hover { background: #e9e9eb; }
+    .action-btn-edit { background: #f5f5f5; color: #606266; }
+    .action-btn-delete { background: #f5f5f5; color: #F56C6C; }
     
-    .form-control {
-        padding: 8px 12px;
-        border: 1px solid #dcdfe6;
-        border-radius: 4px;
-        font-size: 13px;
-        transition: all 0.2s;
+    /* 分页 - 参考节点管理页面 */
+    .pagination-container {
         background: white;
-        width: 100%;
-    }
-    
-    .form-control:focus {
-        outline: none;
-        border-color: #409EFF;
-        box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
-    }
-    
-    .radio {
-        display: inline-block;
-        margin-right: 16px;
-    }
-    
-    .radio input[type="radio"] {
-        margin-right: 4px;
-    }
-    
-    .radio label {
-        font-size: 13px;
-        color: #606266;
-        cursor: pointer;
-    }
-    
-    .modal-dialog {
-        max-width: 500px;
-        margin: 80px auto;
-    }
-    
-    .modal-content {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-        overflow: hidden;
-    }
-    
-    /* 模态框标题栏 */
-    .modal-header {
-        background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
-        color: white;
-        padding: 18px 20px;
-        border-bottom: none;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: relative;
-    }
-    
-    .modal-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: white;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    }
-    
-    .modal-title-icon {
-        width: 32px; height: 32px;
-        background: rgba(255, 255, 255, 0.2);
         border-radius: 8px;
+        padding: 12px 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         display: flex;
-        align-items: center;
         justify-content: center;
-        backdrop-filter: blur(10px);
+        align-items: center;
+        gap: 16px;
     }
-    
-    .modal-title-icon i {
-        font-size: 16px;
+    .pagination-info { font-size: 12px; color: #909399; }
+    .pagination-info span { color: #409EFF; font-weight: 500; }
+    .pagination { display: flex; gap: 6px; list-style: none; }
+    .pagination li a {
+        padding: 5px 10px;
+        background: #f4f4f5;
+        border: 1px solid #e9e9eb;
+        border-radius: 4px;
+        color: #606266;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 12px;
+        transition: all 0.2s ease;
+        display: inline-block;
+    }
+    .pagination li a:hover {
+        background: #e9e9eb;
+    }
+    .pagination li.active a {
+        background: #409EFF;
+        border-color: #409EFF;
         color: white;
     }
     
-    .modal-title-text {
-        letter-spacing: 0.5px;
-    }
-    
-    /* 关闭按钮 */
-    .modal-close-btn {
-        background: rgba(255, 255, 255, 0.15);
-        border: none;
-        cursor: pointer;
-        color: white;
-        transition: all 0.3s;
-        padding: 0;
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        display: flex;
+    /* 模态框 - 居中显示 */
+    .user-modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99999;
         align-items: center;
         justify-content: center;
     }
-    
-    .modal-close-btn i {
-        font-size: 16px;
-        line-height: 1;
+    .user-modal.show { 
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
-    
-    .modal-close-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: rotate(90deg);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    
-    /* 模态框主体 */
-    .modal-body {
-        padding: 24px 20px;
+    .modal-content-wrapper {
         background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 80vh;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
+    .modal-header-custom {
+        padding: 14px 20px;
+        background: #f4f4f5;
+        border-bottom: 1px solid #e9e9eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .modal-header-custom h3 { margin: 0; font-size: 15px; font-weight: 600; color: #606266; }
+    .modal-close {
+        background: transparent;
+        border: none;
+        width: 28px; height: 28px;
+        border-radius: 4px;
+        color: #909399;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-close:hover { background: #e9e9eb; color: #303133; }
+    .modal-body-custom { padding: 20px; max-height: 60vh; overflow-y: auto; }
     
     /* 表单样式 */
-    .user-form {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-    
     .form-item {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+        margin-bottom: 16px;
     }
-    
+    .form-item:last-child { margin-bottom: 0; }
     .form-label {
         font-size: 13px;
         color: #606266;
         font-weight: 500;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
         gap: 6px;
     }
-    
-    .form-label-icon {
-        color: #409EFF;
-        font-size: 14px;
-        width: 16px;
-        text-align: center;
-    }
-    
+    .form-label i { color: #909399; font-size: 14px; width: 16px; text-align: center; }
     .form-input {
         padding: 10px 12px;
         border: 1px solid #dcdfe6;
@@ -476,23 +291,18 @@
         width: 100%;
         box-sizing: border-box;
     }
-    
     .form-input:focus {
         outline: none;
-        border-color: #409EFF;
-        box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+        border-color: #f4f4f5;
+        box-shadow: 0 0 0 2px rgba(244, 244, 245, 0.3);
     }
-    
-    .form-input::placeholder {
-        color: #c0c4cc;
-    }
+    .form-input::placeholder { color: #c0c4cc; }
     
     /* 单选按钮组 */
     .radio-group {
         display: flex;
         gap: 16px;
     }
-    
     .radio-label {
         display: flex;
         align-items: center;
@@ -502,28 +312,22 @@
         color: #606266;
         user-select: none;
     }
-    
     .radio-label input[type="radio"] {
         width: 16px;
         height: 16px;
         cursor: pointer;
-        accent-color: #409EFF;
+        accent-color: #606266;
     }
     
-    .radio-text {
-        color: #606266;
-    }
-    
-    /* 模态框底部 */
-    .modal-footer {
-        padding: 16px 20px;
-        border-top: 1px solid #e4e7ed;
-        background: #f5f7fa;
+    /* 模态框底部 - 黑白灰配色 */
+    .modal-footer-custom {
+        padding: 14px 20px;
+        border-top: 1px solid #e9e9eb;
+        background: #f4f4f5;
         display: flex;
         justify-content: flex-end;
-        gap: 10px;
+        gap: 8px;
     }
-    
     .modal-btn {
         padding: 8px 20px;
         border-radius: 6px;
@@ -536,285 +340,223 @@
         border: none;
         font-weight: 500;
     }
-    
-    .modal-btn i {
-        font-size: 12px;
-    }
-    
+    .modal-btn i { font-size: 12px; }
     .modal-btn-cancel {
         background: white;
         color: #606266;
         border: 1px solid #dcdfe6;
     }
-    
-    .modal-btn-cancel:hover {
-        background: #f5f7fa;
-        border-color: #c0c4cc;
-        color: #303133;
-    }
-    
+    .modal-btn-cancel:hover { background: #f4f4f5; border-color: #c0c4cc; color: #303133; }
     .modal-btn-submit {
-        background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
-        color: white;
+        background: #f4f4f5;
+        color: #303133;
+        border: 1px solid #e9e9eb;
+    }
+    .modal-btn-submit:hover { background: #e9e9eb; }
+    
+    /* 弹框居中显示 */
+    .xc-alert {
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        animation: none !important;
     }
     
-    .modal-btn-submit:hover {
-        background: linear-gradient(135deg, #66b1ff 0%, #409EFF 100%);
-        box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+    /* 加载动画 - 黑白灰配色 */
+    .loading-spinner {
+        display: inline-block;
+        width: 16px; height: 16px;
+        border: 2px solid rgba(96,98,102,0.3);
+        border-radius: 50%;
+        border-top-color: #606266;
+        animation: spin 0.8s linear infinite;
     }
-    
-    .top-loading {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        color: #909399;
-        margin-left: 10px;
-    }
-    
-    .top-loading img {
-        width: 14px;
-        height: 14px;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 {% endblock stylesheets %}
 
 {% block content %}
-
-  <div class="right_col" role="main">
-    <div class="user-page-container">
-      <div class="user-header">
-        <div class="user-header-left">
-          <h2 class="user-page-title"><i class="fa fa-users"></i>平台用户管理</h2>
+<div class="right_col" role="main">
+    <div class="page-container">
+        <!-- 页面标题栏 -->
+        <div class="page-header">
+            <h2>平台用户管理</h2>
+            <button onclick="f_openAdd()" class="btn btn-secondary">
+                <i class="fa fa-plus"></i>添加用户
+            </button>
         </div>
-        <div class="user-actions">
-          <button onclick="f_openAdd()" class="user-btn user-btn-add">
-            <i class="fa fa-plus"></i>添加用户
-          </button>
-          <span id="top_loading" class="top-loading" style="display: none;">
-            <img src="/static/images/load.gif" alt="loading">
-            <span>加载中</span>
-          </span>
-          <span id="top_msg" style="font-size: 12px; color: #909399;">{{top_msg}}</span>
+        
+        <!-- 用户表格 -->
+        <div class="users-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>超级管理员</th>
+                        <th>状态</th>
+                        <th>加入时间</th>
+                        <th>上次登录</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for d in data %}
+                    <tr>
+                        <td>{{ d.id }}</td>
+                        <td>{{ d.username }}</td>
+                        <td>{{ d.email }}</td>
+                        <td>
+                            {% if d.is_superuser == 1 %}
+                                <span style="color: #606266; font-weight: 600;">是</span>
+                            {% else %}
+                                <span style="color: #909399;">否</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if d.is_active == 1 %}
+                                <span class="status-badge active"><span class="status-dot"></span>正常</span>
+                            {% else %}
+                                <span class="status-badge inactive"><span class="status-dot"></span>禁用</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ d.date_joined|date:"Y-m-d H:i" }}</td>
+                        <td>{{ d.last_login|date:"Y-m-d H:i"|default:"-" }}</td>
+                        <td>
+                            <div style="display: flex; gap: 6px;">
+                                <button onclick="f_edit('{{ d.id }}')" class="action-btn action-btn-edit">
+                                    <i class="fa fa-edit"></i>编辑
+                                </button>
+                                <button onclick="f_del('{{ d.id }}')" class="action-btn action-btn-delete">
+                                    删除
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
-      </div>
-      
-      <div class="user-content">
-        <div class="table-responsive">
-          <table class="user-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>用户名</th>
-                <th>邮箱</th>
-                <th>超级管理员</th>
-                <th>状态</th>
-                <th>加入时间</th>
-                <th>上次登录时间</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-
-            <tbody>
-            {%  for d  in data %}
-              <tr>
-                <td>{{ d.id }}</td>
-                <td>{{ d.username }}</td>
-                <td>{{ d.email }}</td>
-               <td>
-                   {% if d.is_superuser == 1 %}
-                     <span style="color: #67C23A; font-weight: 500;">是</span>
+        
+        <!-- 分页 -->
+        <div class="pagination-container" id="pageData">
+            <div class="pagination-info">
+                共<span>{{ pageData.page_num }}</span>页 / <span>{{ pageData.count }}</span>条
+            </div>
+            <ul class="pagination">
+                {% for d in pageData.pageLabels %}
+                    {% if d.cur == 1 %}
+                        <li class="active"><a href="#">{{ d.name }}</a></li>
                     {% else %}
-                    <span style="color: #909399;">否</span>
+                        <li><a href="/user/index?p={{ d.page }}&ps={{ pageData.page_size }}">{{ d.name }}</a></li>
                     {% endif %}
-               </td>
-               <td>
-                    {% if d.is_active == 1 %}
-                    <span class="user-status-badge active">正常</span>
-                    {% else %}
-                    <span class="user-status-badge inactive">禁用</span>
-                    {% endif %}
-               </td>
-                  <td>{{ d.date_joined }}</td>
-                  <td>{{ d.last_login }}</td>
-                <td>
-                      <div class="btn-group">
-                      <button onclick="f_edit('{{ d.id }}')" class="user-action-btn" type="button"><i class="fa fa-edit"></i> 编辑</button>
-                      <button onclick="f_del('{{ d.id }}')" class="user-action-btn delete" type="button" title="删除"><i class="fa fa-remove"></i></button>
-                    </div>
-                </td>
-              </tr>
-            {% endfor %}
-
-            </tbody>
-          </table>
+                {% endfor %}
+            </ul>
         </div>
-      </div>
-
-      <div class="user-pagination" id="pageData">
-          <span class="user-page-info">共<span>{{ pageData.page_num}}</span>页 / <span>{{pageData.count}}</span >条</span>
-          
-          {%  for d  in pageData.pageLabels%}
-            {% if d.cur == 1 %}
-              <a href="#" class="user-page-btn active">{{ d.name }}</a>
-            {% else %}
-              <a href="/user/index?p={{d.page}}&ps={{pageData.page_size}}" class="user-page-btn">{{ d.name }}</a>
-            {% endif %}
-          {% endfor %}
-      </div>
-
-       <!-- 添加用户弹窗 start -->
-       <div id="AddUserDialog" class="modal fade user-modal" tabindex="-1" role="dialog" aria-hidden="true">
-         <div class="modal-dialog">
-           <div class="modal-content">
-             <div class="modal-header">
-               <h4 class="modal-title">
-                 <span class="modal-title-icon"><i class="fa fa-user-plus"></i></span>
-                 <span class="modal-title-text">添加用户</span>
-               </h4>
-               <button type="button" class="modal-close-btn" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
-             </div>
-             <div class="modal-body">
-               <form id="addUserForm" class="user-form" method="post" enctype="multipart/form-data">
-                 <input type="hidden" name="handle" value="add">
-                        
-                 <div class="form-item">
-                   <label class="form-label">
-                     <i class="form-label-icon fa fa-user"></i>
-                     用户名
-                   </label>
-                   <input type="text" name="username" required="required" class="form-input" placeholder="请输入用户名">
-                 </div>
-                        
-                 <div class="form-item">
-                   <label class="form-label">
-                     <i class="form-label-icon fa fa-envelope"></i>
-                     邮箱
-                   </label>
-                   <input type="email" name="email" required="required" class="form-input" placeholder="请输入邮箱">
-                 </div>
-                        
-                 <div class="form-item">
-                   <label class="form-label">
-                     <i class="form-label-icon fa fa-lock"></i>
-                     密码
-                   </label>
-                   <input type="password" name="password" required="required" class="form-input" placeholder="请输入密码">
-                 </div>
-                        
-                 <div class="form-item">
-                   <label class="form-label">
-                     <i class="form-label-icon fa fa-toggle-on"></i>
-                     状态
-                   </label>
-                   <div class="radio-group">
-                     <label class="radio-label">
-                       <input type="radio" checked="checked" value="1" name="is_active">
-                       <span class="radio-text">正常</span>
-                     </label>
-                     <label class="radio-label">
-                       <input type="radio" value="0" name="is_active">
-                       <span class="radio-text">禁用</span>
-                     </label>
-                   </div>
-                 </div>
-               </form>
-             </div>
-             <div class="modal-footer">
-               <button type="button" class="modal-btn modal-btn-cancel" data-dismiss="modal">
-                 <i class="fa fa-times"></i>取消
-               </button>
-               <button type="button" onclick="f_openAddSubmit()" class="modal-btn modal-btn-submit">
-                 <i class="fa fa-check"></i>提交
-               </button>
-             </div>
-           </div>
-         </div>
-       </div>
-       <!-- 添加用户弹窗 end -->
-
-       <!-- 编辑用户弹窗 start -->
-       <div id="EditUserDialog" class="modal fade user-modal" tabindex="-1" role="dialog" aria-hidden="true">
-         <div class="modal-dialog">
-           <div class="modal-content">
-             <div class="modal-header">
-               <h4 class="modal-title">
-                 <span class="modal-title-icon"><i class="fa fa-user-edit"></i></span>
-                 <span class="modal-title-text">编辑用户</span>
-               </h4>
-               <button type="button" class="modal-close-btn" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
-             </div>
-             <div class="modal-body">
-               <form id="editUserForm" class="user-form" method="post" enctype="multipart/form-data">
-                 <input type="hidden" name="handle" value="edit">
-                 <input type="hidden" name="id" value="">
-                        
-                 <div class="form-item">
-                   <label class="form-label">
-                     <i class="form-label-icon fa fa-user"></i>
-                     用户名
-                   </label>
-                   <input type="text" name="username" required="required" class="form-input" placeholder="请输入用户名">
-                 </div>
-                        
-                 <div class="form-item">
-                   <label class="form-label">
-                     <i class="form-label-icon fa fa-envelope"></i>
-                     邮箱
-                   </label>
-                   <input type="email" name="email" required="required" class="form-input" placeholder="请输入邮箱">
-                 </div>
-                        
-                 <div class="form-item">
-                   <label class="form-label">
-                     <i class="form-label-icon fa fa-key"></i>
-                     新密码
-                   </label>
-                   <input type="password" name="new_password" class="form-input" placeholder="不修改密码请留空">
-                 </div>
-                        
-                 <div class="form-item">
-                   <label class="form-label">
-                     <i class="form-label-icon fa fa-key"></i>
-                     确认新密码
-                   </label>
-                   <input type="password" name="re_password" class="form-input" placeholder="不修改密码请留空">
-                 </div>
-                        
-                 <div class="form-item">
-                   <label class="form-label">
-                     <i class="form-label-icon fa fa-toggle-on"></i>
-                     状态
-                   </label>
-                   <div class="radio-group">
-                     <label class="radio-label">
-                       <input type="radio" value="1" name="is_active">
-                       <span class="radio-text">正常</span>
-                     </label>
-                     <label class="radio-label">
-                       <input type="radio" value="0" name="is_active">
-                       <span class="radio-text">禁用</span>
-                     </label>
-                   </div>
-                 </div>
-               </form>
-             </div>
-             <div class="modal-footer">
-               <button type="button" class="modal-btn modal-btn-cancel" data-dismiss="modal">
-                 <i class="fa fa-times"></i>取消
-               </button>
-               <button type="button" onclick="f_openEditSubmit()" class="modal-btn modal-btn-submit">
-                 <i class="fa fa-check"></i>提交
-               </button>
-             </div>
-           </div>
-         </div>
-       </div>
-       <!-- 编辑用户弹窗 end -->
-
+        
+        <!-- 添加用户模态框 -->
+        <div class="user-modal" id="addUserModal">
+            <div class="modal-content-wrapper">
+                <div class="modal-header-custom">
+                    <h3><i class="fa fa-user-plus"></i> 添加用户</h3>
+                    <button class="modal-close" onclick="f_closeAdd()">&times;</button>
+                </div>
+                <div class="modal-body-custom">
+                    <form id="addUserForm" class="user-form">
+                        <input type="hidden" name="handle" value="add">
+                        <div class="form-item">
+                            <label class="form-label"><i class="fa fa-user"></i>用户名</label>
+                            <input type="text" name="username" required="required" class="form-input" placeholder="请输入用户名">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><i class="fa fa-envelope"></i>邮箱</label>
+                            <input type="email" name="email" required="required" class="form-input" placeholder="请输入邮箱">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><i class="fa fa-lock"></i>密码</label>
+                            <input type="password" name="password" required="required" class="form-input" placeholder="请输入密码">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><i class="fa fa-toggle-on"></i>状态</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" checked="checked" value="1" name="is_active">
+                                    <span class="radio-text">正常</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" value="0" name="is_active">
+                                    <span class="radio-text">禁用</span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer-custom">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="f_closeAdd()">
+                        <i class="fa fa-times"></i>取消
+                    </button>
+                    <button type="button" onclick="f_openAddSubmit()" class="modal-btn modal-btn-submit">
+                        <i class="fa fa-check"></i>提交
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 编辑用户模态框 -->
+        <div class="user-modal" id="editUserModal">
+            <div class="modal-content-wrapper">
+                <div class="modal-header-custom">
+                    <h3><i class="fa fa-user-edit"></i> 编辑用户</h3>
+                    <button class="modal-close" onclick="f_closeEdit()">&times;</button>
+                </div>
+                <div class="modal-body-custom">
+                    <form id="editUserForm" class="user-form">
+                        <input type="hidden" name="handle" value="edit">
+                        <input type="hidden" name="id" value="">
+                        <div class="form-item">
+                            <label class="form-label"><i class="fa fa-user"></i>用户名</label>
+                            <input type="text" name="username" required="required" class="form-input" placeholder="请输入用户名">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><i class="fa fa-envelope"></i>邮箱</label>
+                            <input type="email" name="email" required="required" class="form-input" placeholder="请输入邮箱">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><i class="fa fa-key"></i>新密码</label>
+                            <input type="password" name="new_password" class="form-input" placeholder="不修改密码请留空">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><i class="fa fa-key"></i>确认新密码</label>
+                            <input type="password" name="re_password" class="form-input" placeholder="不修改密码请留空">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><i class="fa fa-toggle-on"></i>状态</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" value="1" name="is_active">
+                                    <span class="radio-text">正常</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" value="0" name="is_active">
+                                    <span class="radio-text">禁用</span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer-custom">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="f_closeEdit()">
+                        <i class="fa fa-times"></i>取消
+                    </button>
+                    <button type="button" onclick="f_openEditSubmit()" class="modal-btn modal-btn-submit">
+                        <i class="fa fa-check"></i>提交
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-
+</div>
 {% endblock content %}
 
 {% block javascripts %}
@@ -822,13 +564,18 @@
 
 <script>
     let ele_top_loading = $("#top_loading");
-    let ele_top_msg= $("#top_msg");
-
+    
     // 打开添加用户弹窗
     function f_openAdd() {
-        $("#AddUserDialog").modal("show");
+        $("#addUserModal").addClass("show");
     }
-
+    
+    // 关闭添加用户弹窗
+    function f_closeAdd() {
+        $("#addUserModal").removeClass("show");
+        $("#addUserForm")[0].reset();
+    }
+    
     // 打开编辑用户弹窗并填充数据
     function f_edit(user_id) {
         ele_top_loading.show();
@@ -855,14 +602,20 @@
                     let isActiveValue = user.is_active ? "1" : "0";
                     $("#editUserForm input[name='is_active'][value='" + isActiveValue + "']").prop("checked", true);
                     // 打开弹窗
-                    $("#EditUserDialog").modal("show");
+                    $("#editUserModal").addClass("show");
                 } else {
                     myAlert(res.msg, "error");
                 }
             }
         });
     }
-
+    
+    // 关闭编辑用户弹窗
+    function f_closeEdit() {
+        $("#editUserModal").removeClass("show");
+        $("#editUserForm")[0].reset();
+    }
+    
     // 提交添加用户表单
     function f_openAddSubmit() {
         let formData = new FormData($("#addUserForm")[0]);
@@ -886,7 +639,7 @@
                 if (res.code === 1000) {
                     myAlert(res.msg, "success");
                     $("#addUserForm")[0].reset();
-                    $("#AddUserDialog").modal("hide");
+                    f_closeAdd();
                     window.location.reload();
                 } else {
                     myAlert(res.msg, "error");
@@ -894,7 +647,7 @@
             }
         });
     }
-
+    
     // 提交编辑用户表单
     function f_openEditSubmit() {
         let formData = new FormData($("#editUserForm")[0]);
@@ -917,7 +670,7 @@
                 ele_top_loading.hide();
                 if (res.code === 1000) {
                     myAlert(res.msg, "success");
-                    $("#EditUserDialog").modal("hide");
+                    f_closeEdit();
                     window.location.reload();
                 } else {
                     myAlert(res.msg, "error");
@@ -925,7 +678,7 @@
             }
         });
     }
-
+    
     function f_del(user_id){
         ele_top_loading.show();
         $.ajax({
@@ -953,4 +706,3 @@
 </script>
 
 {% endblock javascripts %}
-

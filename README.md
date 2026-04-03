@@ -19,7 +19,7 @@
 
 ## 项目简介
 
-cluster_platform 是专为 视频行为分析系统(rebekah) v5.002+ 设计的集群管理平台，支持统一管理多个 rebekah 节点。
+cluster_platform 是专为 视频行为分析系统(rebekah) v5.008+ 设计的集群管理平台，支持统一管理多个 rebekah 节点。
 
 ### 核心特性
 
@@ -88,7 +88,7 @@ cluster_platform/
 
 - Python 3.8+
 - MySQL 5.7+ 或 SQLite
-- Rebekah v5.002+
+- Rebekah v5.008+
 
 ### 安装步骤
 
