@@ -2,14 +2,14 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.007-green.svg)
+![Version](https://img.shields.io/badge/version-1.009-green.svg)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
 ![Django](https://img.shields.io/badge/django-5.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
 **轻量级视频分析集群管理平台**
 
-[功能特性](#功能特性) • [快速开始](#快速开始) • [配置说明](#配置说明) • [更新日志](#更新日志)
+[功能特性](#功能特性) • [快速开始](#快速开始) • [配置说明](#配置说明) • [常见问题](HELP.md) • [更新日志](#更新日志)
 
 </div>
 
@@ -19,7 +19,7 @@
 
 ## 项目简介
 
-cluster_platform 是专为 视频行为分析系统(rebekah) v5.008+ 设计的集群管理平台，支持统一管理多个 rebekah 节点。
+cluster_platform 是专为 视频行为分析系统(rebekah) v5.002+ 设计的集群管理平台，支持统一管理多个 rebekah 节点。
 
 ### 核心特性
 
@@ -88,7 +88,7 @@ cluster_platform/
 
 - Python 3.8+
 - MySQL 5.7+ 或 SQLite
-- Rebekah v5.008+
+- Rebekah v5.002+
 
 ### 安装步骤
 
@@ -148,19 +148,6 @@ python manage.py runserver 0.0.0.0:9824
 * 请根据自己的平台选择config-windows.json 或 config-linux.json
 * 将选择的config-xxx.json 改名为 config.json
 
-
-### MySQL 常见问题
-
-**No module named 'MySQLdb'**
-```bash
-pip install pymysql
-```
-在 settings.py 开头添加：
-```python
-import pymysql
-pymysql.install_as_MySQLdb()
-```
-
 ---
 
 ## 技术栈
@@ -173,6 +160,17 @@ pymysql.install_as_MySQLdb()
 ---
 
 ## 更新日志
+
+### v1.009 (2026-04-28)
+
+**录像播放器升级**
+- 升级为二级时间轴：一级显示24小时概览，二级显示小时内20个3分钟切片
+- 支持部分录像渐变色显示，新增"部分录像"图例
+- 选中小时/播放切片高亮标识
+- 连续播放间隔从60秒对齐为180秒（与后端切片一致）
+
+**报警详情修复**
+- 修复报警详情弹框只显示一张图片的问题（节点编号含`.`时路径分割错误）
 
 ### v1.007 (2026-03-31)
 

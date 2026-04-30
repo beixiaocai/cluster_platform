@@ -42,10 +42,10 @@ def f_getAlarmInfoByCode(alarm_code):
             image_path = alarm.image_path
 
             if other_image_count > 0:
-                image_path_ss = image_path.split(".")
-                if len(image_path_ss) == 2:
-                    image_path_l = image_path_ss[0]
-                    image_path_r = image_path_ss[1]
+                dot_pos = image_path.rfind(".")
+                if dot_pos > 0:
+                    image_path_l = image_path[:dot_pos]
+                    image_path_r = image_path[dot_pos + 1:]
                     for i in range(other_image_count):
                         __imageUrl = g_config.storageDir_www + "%s_%d.%s" % (image_path_l, (i + 1), image_path_r)
                         if alarm.node_code:
